@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 // get variables from .env file
 import 'dotenv/config';
@@ -6,45 +6,39 @@ import 'dotenv/config';
 const apiKey = process.env.API_KEY;
 const baseUrl = process.env.BASE_URL;
 
-const createKb = async (createArgs) => {
-
-    const { knowledgeBaseName,  callback } = createArgs;
+const test = async () => {
 
     try {
         const config = {
             method: 'post',
-            url: baseUrl + `knowledge_bases` ,
+            url: baseUrl + `knowledgebase` ,
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
             },
             data : {
-                name: knowledgeBaseName,
-                chunk_params: null,
-                score_params: null,
-                louvain_params: null
+                "title": "rm_hi"
             }
+
         };
 
         const response = await axios(config);
 
-        callback(response);
-
     } catch (error) {
-        console.error('Error creating knowledge base:', error.response.data.errors[0]);
+        console.error('Error running test: ', error.response.data.errors[0]);
     }
 };
 
-const createArgs = {
+const deleteArgs = {
     knowledgeBaseName: 'rmdev',
     callback: (r) => {
         if (r.status === 200) {
-            console.log(`Created knowledgebase successfully.`);
+            console.log(`Successfully ran test.`);
         } else {
             console.log("Failure");
         }
     }
 };
 
-createKb(createArgs);
+test();
 
 
