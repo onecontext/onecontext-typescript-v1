@@ -16,7 +16,8 @@ const handleUpload = async (UploadArgs) => {
         formData.append('files', fs.createReadStream(file));
     });
 
-    formData.append('knowledge_base_name', knowledgeBaseName);
+    formData.append('knowledgebase_title', knowledgeBaseName);
+
 
     if (metadataJson) {
         formData.append('metadata_json', JSON.stringify(metadataJson));
