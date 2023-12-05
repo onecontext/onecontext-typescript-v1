@@ -8,17 +8,17 @@ const baseUrl = process.env.BASE_URL;
 
 const createKb = async (createArgs) => {
 
-    const { knowledgeBaseName,  callback } = createArgs;
+    const { knowledgeBaseTitle,  callback } = createArgs;
 
     try {
         const config = {
             method: 'post',
-            url: baseUrl + `knowledge_bases` ,
+            url: baseUrl + `knowledgebase`,
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
             },
             data : {
-                name: knowledgeBaseName,
+                title: knowledgeBaseTitle,
                 chunk_params: null,
                 score_params: null,
                 louvain_params: null
@@ -35,7 +35,7 @@ const createKb = async (createArgs) => {
 };
 
 const createArgs = {
-    knowledgeBaseName: 'rmdev',
+    knowledgeBaseTitle: 'rmdev',
     callback: (r) => {
         if (r.status === 200) {
             console.log(`Created knowledgebase successfully.`);

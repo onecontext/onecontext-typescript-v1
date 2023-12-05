@@ -10,7 +10,7 @@ const test = async () => {
 
     try {
         const config = {
-            method: 'post',
+            method: 'get',
             url: baseUrl + `knowledgebase` ,
             headers: {
                 'Authorization': `Bearer ${apiKey}`,

@@ -1,7 +1,7 @@
-const axios = require('axios');
+import axios from 'axios';
 
 // get variables from .env file
-require('dotenv').config();
+import 'dotenv/config';
 
 const apiKey = process.env.API_KEY;
 const baseUrl = process.env.BASE_URL;
@@ -13,7 +13,7 @@ const deleteKb = async (deleteArgs) => {
     try {
         const config = {
             method: 'delete',
-            url: baseUrl + `knowledge_bases/${knowledgeBaseName}` ,
+            url: baseUrl + `knowledgebase/${knowledgeBaseName}` ,
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
             },
@@ -24,7 +24,7 @@ const deleteKb = async (deleteArgs) => {
         callback(response);
 
     } catch (error) {
-        console.error('Error deleting knowledge base:', error);
+        console.error('Error deleting knowledge base:', error.response.data.errors[0]);
     }
 };
 
