@@ -35,7 +35,7 @@ const createKb = async (createArgs) => {
 };
 
 const createArgs = {
-    knowledgeBaseTitle: 'rmdev',
+    knowledgeBaseTitle: 'rmdev2',
     callback: (r) => {
         if (r.status === 200) {
             console.log(`Created knowledgebase successfully.`);
