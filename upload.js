@@ -44,8 +44,8 @@ const handleUpload = async (UploadArgs) => {
 };
 
 const uploadArgs = {
-    files: ["/Users/rossmurphy/embedpdf/High-Performance-Browser-Networking-Ilya-Grigorik.pdf", "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"],
-    knowledgeBaseName: 'rmdev2',
+    files: ["/Users/rossmurphy/poorcharlie.pdf"],
+    knowledgeBaseName: 'rmdev5',
     metadataJson: {"person_name": "kacper", "description": "example", "datajson": "example"},
     callback: (r) => {
         if (r.status === 200) {

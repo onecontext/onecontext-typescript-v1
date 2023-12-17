@@ -9,7 +9,7 @@ const baseUrl = process.env.BASE_URL;
 
 const query = async (queryArgs) => {
 
-    const { metaDataFilters, knowledgeBaseNames , topK, reRank, reRankPoolSize, queryText, callback } = queryArgs;
+    const { metaDataFilters, knowledgeBaseTitles , topK, reRank, reRankPoolSize, queryText, callback } = queryArgs;
 
 // check if "file_name" is in "metaDataFilters" keys:
     if (!Object.keys(metaDataFilters).includes("file_name")) {
@@ -26,7 +26,7 @@ const query = async (queryArgs) => {
             },
             data: {
                 metadata_filters: metaDataFilters,
-                knowledge_base_names: knowledgeBaseNames,
+                knowledge_base_titles: knowledgeBaseTitles,
                 query: queryText,
                 top_k: topK,
                 rerank: reRank,
@@ -45,7 +45,7 @@ const query = async (queryArgs) => {
 
 const queryArgs = {
     metaDataFilters: {"file_name": ["faith_and_fate.pdf"], "description": "example"},
-    knowledgeBaseNames: ['rmdev'],
+    knowledgeBaseTitles: ['rmdev5'],
     topK: 5,
     reRank: true,
     reRankPoolSize: 10,
@@ -60,6 +60,6 @@ const queryArgs = {
     }
 };
 
-run(10,query,queryArgs).then(() => console.log("Test complete"))
+run(1,query,queryArgs).then(() => console.log("Test complete"))
 
 
