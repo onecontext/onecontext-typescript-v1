@@ -40,7 +40,7 @@ const quest_gen = async (questGenArgs) => {
         callback(response);
 
     } catch (error) {
-        console.error('Error creating quiz:', error);
+        console.error('Error creating quiz:', error.response.data.errors[0]);
     }
 };
 

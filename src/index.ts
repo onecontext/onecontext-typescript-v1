@@ -1,14 +1,15 @@
 import {Readable} from 'stream';
 import axios from 'axios';
-import FormData from 'form-data';
-import 'dotenv/config'
+import FormData = require('form-data');
+import * as dotenv from 'dotenv'
 import sleep from './../utils';
 
+dotenv.config({path: './../.env'});
 const API_KEY = process.env.API_KEY;
 const BASE_URL = process.env.BASE_URL;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
+export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
     try {
         const response = await axios({
             method: 'post',
@@ -30,7 +31,7 @@ const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: str
     }
 };
 
-const deleteKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
+export const deleteKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
     try {
         const response = await axios({
             method: 'delete',
@@ -46,7 +47,7 @@ const deleteKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: str
     }
 };
 
-const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
+export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
     id: string; name: string; knowledge_base_id: string; has_embedding: boolean
 }[]> => {
     const response = await axios({
@@ -157,7 +158,8 @@ export const uploadFile = async ({
                                      knowledgeBaseName,
                                      metadataJson,
                                  }: UploadFileOptions): Promise<boolean> => {
-    const formData = new FormData();
+    let formData: FormData;
+    formData = new FormData();
     files.forEach(file => {
         formData.append('files', Readable.from(Buffer.from(file.content)), {
             filename: file.name,
@@ -201,3 +203,52 @@ export const awaitEmbeddings = async ({knowledgeBaseName, filename}: {
         await sleep({ms:1000});
     }
 };
+
+type CompletionArgs = {
+    prompt: string;
+    context_token_budget: number;
+    model: string;
+    temperature: number;
+    max_tokens: number;
+    stop: string;
+    knowledge_base_name: string;
+    metadata_filters: object;
+    base_url: string;
+    openai_api_key: string;
+    api_key: string;
+};
+
+export const complete = async ({
+                                   prompt,
+                                   context_token_budget,
+                                   model,
+                                   temperature,
+                                   max_tokens,
+                                   stop,
+                                   knowledge_base_name,
+                                   metadata_filters,
+                                   base_url,
+                                   openai_api_key,
+                                   api_key,
+                                  }: CompletionArgs): Promise<any[]> => {
+    const result = await axios({
+        method: 'post',
+        url: base_url + 'context_completion',
+        headers: {
+            Authorization: `Bearer ${api_key}`,
+        },
+        data: {
+            prompt: prompt,
+            context_token_budget: context_token_budget,
+            openai_api_key: openai_api_key,
+            model: model,
+            temperature: temperature,
+            max_tokens: max_tokens,
+            metadata_filters: metadata_filters,
+            knowledge_base_name: knowledge_base_name,
+            stop: stop,
+        },
+    });
+    return result.data;
+};
+
