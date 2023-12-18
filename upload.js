@@ -44,9 +44,9 @@ const handleUpload = async (UploadArgs) => {
 };
 
 const uploadArgs = {
-    files: ["/Users/rossmurphy/poorcharlie.pdf"],
-    knowledgeBaseName: 'rmdev5',
-    metadataJson: {"person_name": "kacper", "description": "example", "datajson": "example"},
+    files: ["/Users/rossmurphy/embedpdf/faith_and_fate.pdf"],
+    knowledgeBaseName: 'examplekb',
+    metadataJson: {"person_name": "ross", "description": "example", "datajson": "example"},
     callback: (r) => {
         if (r.status === 200) {
             console.log("Success");
