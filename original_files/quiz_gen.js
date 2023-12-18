@@ -1,7 +1,6 @@
-const axios = require('axios');
-
-// get variables from .env file
-require('dotenv').config();
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config({ path: './../.env' });
 
 const apiKey = process.env.API_KEY;
 const baseUrl = process.env.BASE_URL;
@@ -91,8 +90,8 @@ Repeat this format {num_questions_topic} times`
 
 const quizGenArgs = {
     userPromptPerTopic: prompt,
-    metaDataFilters: {"file_name": ["chile.pdf", "20150126.pdf"], "description": "example"},
-    knowledgeBaseName: 'retainit',
+    metaDataFilters: {"file_name": ["poorcharlie.pdf"] , "description": "example"},
+    knowledgeBaseName: 'rmtest',
     totalNumberOfQuestions: 10,
     extractPercentage: 0.5,
     callback: (r) => {

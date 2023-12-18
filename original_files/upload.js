@@ -1,12 +1,11 @@
-const fs = require('fs');
-const FormData = require('form-data');
-const axios = require('axios');
-
-// get variables from .env file
-require('dotenv').config();
-
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config({ path: './../.env' });
+import FormData from 'form-data';
+import fs from 'fs';
 const apiKey = process.env.API_KEY;
 const baseUrl = process.env.BASE_URL;
+
 
 const handleUpload = async (UploadArgs) => {
     const { files, knowledgeBaseName, metadataJson, callback } = UploadArgs;
@@ -43,8 +42,8 @@ const handleUpload = async (UploadArgs) => {
 };
 
 const uploadArgs = {
-    files: ["/Users/rossmurphy/embedpdf/chile.pdf", "/Users/rossmurphy/embedpdf/20150126.pdf"],
-    knowledgeBaseName: 'retainit',
+    files: ["/Users/rossmurphy/poorcharlie.pdf"],
+    knowledgeBaseName: 'rmtest',
     metadataJson: {"person_name": "kacper", "description": "example", "datajson": "example"},
     callback: (r) => {
         if (r.status === 200) {

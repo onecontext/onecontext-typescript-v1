@@ -1,12 +1,9 @@
-const axios = require('axios');
-
-// get variables from .env file
-require('dotenv').config();
-
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config({ path: './../.env' });
 const apiKey = process.env.API_KEY;
-const baseUrl = process.env.BASE_URL;
 
-const list_files = async (listFilesArgs) => {
+const baseUrl = process.env.BASE_URL;const list_files = async (listFilesArgs) => {
 
     const { knowledgeBaseName,  callback } = listFilesArgs;
 
@@ -32,7 +29,7 @@ const list_files = async (listFilesArgs) => {
 };
 
 const listFilesArgs = {
-    knowledgeBaseName: 'retainit',
+    knowledgeBaseName: 'rmtest',
     callback: (r) => {
         if (r.status === 200) {
             console.log(r.data);

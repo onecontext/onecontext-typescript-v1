@@ -1,11 +1,9 @@
-const axios = require('axios');
-const {create} = require("axios");
-
-// get variables from .env file
-require('dotenv').config();
-
+import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config({ path: './../.env' });
 const apiKey = process.env.API_KEY;
 const baseUrl = process.env.BASE_URL;
+
 
 const createKb = async (createArgs) => {
 
@@ -36,7 +34,7 @@ const createKb = async (createArgs) => {
 };
 
 const createArgs = {
-    knowledgeBaseName: 'retainit',
+    knowledgeBaseName: 'rmtest',
     callback: (r) => {
         if (r.status === 200) {
             console.log(`Created knowledgebase successfully.`);
