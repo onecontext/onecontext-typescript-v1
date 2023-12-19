@@ -10,14 +10,14 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 async function run() {
     try {
         const completionArgs = {
-            prompt: 'This is a test',
-            context_token_budget: 100,
+            prompt: 'This is a test, give me an introduction based on the content in the provided information: {{docs}}',
+            context_token_budget: 1000,
             model: 'gpt-4-1106-preview',
             knowledge_base_name: 'rmtest',
-            metadata_filters: {},
+            metadata_filters: {"source": "wikipedia"},
             stop: '###',
             temperature: 0.7,
-            max_tokens: 200,
+            max_tokens: 3000,
             base_url: BASE_URL,
             openai_api_key: OPENAI_API_KEY,
             api_key: API_KEY,
