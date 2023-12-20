@@ -44,7 +44,7 @@ const handleUpload = async (UploadArgs) => {
 };
 
 const uploadArgs = {
-    files: ["/Users/rossmurphy/embedpdf/faith_and_fate.pdf"],
+    files: ["/Users/rossmurphy/embedpdf/Implicit_representations.pdf"],
     knowledgeBaseName: 'examplekb',
     metadataJson: {"person_name": "ross", "description": "example", "datajson": "example"},
     callback: (r) => {

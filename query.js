@@ -11,12 +11,6 @@ const query = async (queryArgs) => {
 
     const { metaDataFilters, knowledgeBaseTitles , topK, reRank, reRankPoolSize, queryText, callback } = queryArgs;
 
-// check if "file_name" is in "metaDataFilters" keys:
-    if (!Object.keys(metaDataFilters).includes("file_name")) {
-        console.log("No file name specified. Please pass a 'file_name' key in the metadata filters.");
-        return;
-    }
-
     try {
         const config = {
             method: 'post',
@@ -26,7 +20,7 @@ const query = async (queryArgs) => {
             },
             data: {
                 metadata_filters: metaDataFilters,
-                knowledge_base_titles: knowledgeBaseTitles,
+                knowledgebase_titles: knowledgeBaseTitles,
                 query: queryText,
                 top_k: topK,
                 rerank: reRank,
@@ -44,12 +38,13 @@ const query = async (queryArgs) => {
 };
 
 const queryArgs = {
-    metaDataFilters: {"file_name": ["faith_and_fate.pdf"], "description": "example"},
-    knowledgeBaseTitles: ['rmdev5'],
+    metaDataFilters: {"file_title": {"eq" : "faith_and_fate.pdf"}},
+    // metaDataFilters: {},
+    knowledgeBaseTitles: ['examplekb'],
     topK: 5,
     reRank: true,
     reRankPoolSize: 10,
-    queryText: "tell me about tcp/ip vs http",
+    queryText: "Transformer large language models (LLMs) have sparked admiration for their exceptional performance on tasks that demand intricate multi-step reasoning. Yet, these models simultaneously show failures on surprisingly trivial problems. This begs the question: Are these errors incidental, or do they signal more substantial limitations? In an attempt to demystify Transformers, we investigate the limits of these models across three representative compositional tasks—multi-digit multi- plication, logic grid puzzles, and a classic dynamic programming problem. These tasks require breaking problems down into sub-steps and synthesizing these steps into a precise answer. We formulate compositional tasks as computation graphs to systematically quantify the level of complex",
     callback: (r) => {
         if (r.status === 200) {
             console.log(r.data)
@@ -60,6 +55,4 @@ const queryArgs = {
     }
 };
 
-run(1,query,queryArgs).then(() => console.log("Test complete"))
-
-
+run(100,query,queryArgs).then(() => console.log("Test complete"))
