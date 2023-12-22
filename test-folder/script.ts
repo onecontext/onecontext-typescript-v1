@@ -1,18 +1,15 @@
 import { OneContext } from 'onecontext'
 
-// OneContext.createKnowledgeBase({knowledgeBaseName: "test-4"})
-// OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
-// OneContext.deleteKnowledgeBase({knowledgeBaseName:"test-2ibb"}).then((res)=>{console.log(res)})
-// OneContext.listFiles({knowledgeBaseName:"test-3ibb"}).then((res)=>{console.log(res)})
+OneContext.createKnowledgeBase({knowledgeBaseName: "ross-test"})
 
-// OneContext.uploadFile({
-//     files: [{name: "test.txt", content: "testing testing 1 2 3"}],
-//     knowledgeBaseName: "test-3ibb",
-// }).then((res) => {
-//     console.log(res)
-// })
+OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
+
+OneContext.deleteKnowledgeBase({knowledgeBaseName:"ross-test"}).then((res)=>{console.log(res)})
+
+OneContext.listFiles({knowledgeBaseName:"ross-test"}).then((res)=>{console.log(res)})
 
 OneContext.uploadFile({
+    // you can upload a file EITHER by passing file path, or, by passing some content as text
     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}],
     // files: [{name: "test.txt", content: "test test test"}],
     stream: false,

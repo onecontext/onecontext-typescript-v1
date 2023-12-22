@@ -2,7 +2,7 @@ import {Readable} from 'stream';
 import axios from 'axios';
 import FormData = require('form-data');
 import * as dotenv from 'dotenv'
-import sleep from './../utils';
+import sleep from './utils';
 import * as fs from 'fs';
 import {z} from 'zod';
 import {ocTypes} from "./ocTypes/ocTypes";
