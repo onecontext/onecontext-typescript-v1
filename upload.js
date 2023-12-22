@@ -45,7 +45,7 @@ const handleUpload = async (UploadArgs) => {
 
 const uploadArgs = {
     files: ["/Users/rossmurphy/embedpdf/Implicit_representations.pdf"],
-    knowledgeBaseName: 'examplekb',
+    knowledgeBaseName: 'examplekb2',
     metadataJson: {"person_name": "ross", "description": "example", "datajson": "example"},
     callback: (r) => {
         if (r.status === 200) {

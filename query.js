@@ -38,9 +38,9 @@ const query = async (queryArgs) => {
 };
 
 const queryArgs = {
-    metaDataFilters: {"file_title": {"eq" : "faith_and_fate.pdf"}},
+    metaDataFilters: {"file_title": {"eq" : "Implicit_representations.pdf"}},
     // metaDataFilters: {},
-    knowledgeBaseTitles: ['examplekb'],
+    knowledgeBaseTitles: ['examplekb2'],
     topK: 5,
     reRank: true,
     reRankPoolSize: 10,

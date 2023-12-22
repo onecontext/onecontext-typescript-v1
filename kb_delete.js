@@ -29,7 +29,7 @@ const deleteKb = async (deleteArgs) => {
 };
 
 const deleteArgs = {
-    knowledgeBaseName: 'rmdev5',
+    knowledgeBaseName: 'examplekb2',
     callback: (r) => {
         if (r.status === 200) {
             console.log(`Deleted knowledgebase successfully.`);
