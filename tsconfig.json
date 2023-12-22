@@ -8,6 +8,10 @@
     "sourceMap": true,
     "outDir": "dist"
   },
+  "include": ["src/**/*"],
+  "paths": {
+    "@types/": ["./src/ocTypes/*"]
+  },
   "sourceMap": true,
   "lib": ["es2015"]
 }

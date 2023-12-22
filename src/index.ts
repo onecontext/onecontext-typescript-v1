@@ -3,14 +3,18 @@ import axios from 'axios';
 import FormData = require('form-data');
 import * as dotenv from 'dotenv'
 import sleep from './../utils';
+import * as fs from 'fs';
+import {z} from 'zod';
+import {ocTypes} from "./ocTypes/ocTypes";
 
-dotenv.config({path: __dirname+'/../.env'});
+dotenv.config({path: __dirname + '/../.env'});
 const API_KEY = process.env.API_KEY;
 const BASE_URL = process.env.BASE_URL;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
     try {
+
         const response = await axios({
             method: 'post',
             url: BASE_URL + 'knowledgebase',
@@ -18,11 +22,13 @@ export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseNa
                 Authorization: `Bearer ${API_KEY}`,
             },
             data: {
-                kbcreate: {title: knowledgeBaseName},
+                name: knowledgeBaseName,
             },
         });
+        console.log("Created knowledge base: " + knowledgeBaseName)
         return response.data;
     } catch (error) {
+        console.log("Failed to create knowledge base: " + knowledgeBaseName)
         console.log(error.response.data.errors[0]);
         return null;
     }
@@ -32,32 +38,50 @@ export const deleteKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseNa
     try {
         const response = await axios({
             method: 'delete',
-            url: BASE_URL + `knowledge_bases/${knowledgeBaseName}`,
+            url: BASE_URL + `knowledgebase/${knowledgeBaseName}`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        });
+        console.log("Deleted knowledge base: " + knowledgeBaseName)
+        return response.data;
+    } catch (error) {
+        console.log("Failed to delete knowledge base: " + knowledgeBaseName)
+        console.error(error.response.data.errors[0]);
+        return null;
+    }
+};
+
+export const listKnowledgeBases = async (): Promise<{
+    id: string; name: string;
+}[]> => {
+    const response = await axios({
+        method: 'get',
+        url: BASE_URL + `knowledgebase`,
+        headers: {
+            Authorization: `Bearer ${API_KEY}`,
+        },
+    });
+    return response.data;
+};
+
+
+export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
+    id: string; name: string; knowledgebase_id: string; has_embedding: boolean
+}[]> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `knowledgebase/${knowledgeBaseName}/files`,
             headers: {
                 Authorization: `Bearer ${API_KEY}`,
             },
         });
         return response.data;
     } catch (error) {
-        console.error(error);
+        console.error(error.response.data.errors[0]);
         return null;
     }
-};
-
-export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
-    id: string; name: string; knowledge_base_id: string; has_embedding: boolean
-}[]> => {
-    const response = await axios({
-        method: 'get',
-        url: BASE_URL + `knowledge_bases/${knowledgeBaseName}/files`,
-        headers: {
-            Authorization: `Bearer ${API_KEY}`,
-        },
-        data: {
-            knowledge_base_name: knowledgeBaseName,
-        },
-    });
-    return response.data;
 };
 
 type GenerateQuizOptions = {
@@ -145,26 +169,45 @@ export const createQuest = async ({
 };
 
 type UploadFileOptions = {
-    files: { name: string; content: string }[];
+    files: ocTypes.FileType[];
+    stream: boolean;
     knowledgeBaseName: string;
     metadataJson?: object;
 };
 
 export const uploadFile = async ({
                                      files,
+                                     stream,
                                      knowledgeBaseName,
                                      metadataJson,
                                  }: UploadFileOptions): Promise<boolean> => {
-    let formData: FormData;
-    formData = new FormData();
+    const formData = new FormData();
     files.forEach(file => {
-        formData.append('files', Readable.from(Buffer.from(file.content)), {
-            filename: file.name,
-            contentType: 'text/plain',
-            knownLength: file.content.length,
-        });
+        if (stream) {
+            try {
+                // try and parse it as a content type file, i.e. if the user has passed a readable stream
+                // of text, and has also passed a name for the file
+                const f = ocTypes.ContentFileSchema.parse(file, {errorMap: ocTypes.customErrorMap});
+                formData.append('files', f.readable, {
+                    filename: f.name,
+                    contentType: 'text/plain',
+                })
+            }
+            catch (e) {
+                throw Error(`Error parsing file ${e}`)
+            }}
+
+            else {
+                try {
+                    // try and parse it as a path type file, i.e. the user has given a local file path,
+                    // and we are to use the fs library to read the file stream from that file
+                    const f = ocTypes.PathFileSchema.parse(file, {errorMap: ocTypes.customErrorMap})
+                    formData.append('files', f.readable);
+                } catch (e) {throw Error(`Error parsing file ${e}`)
+                }
+            }
     });
-    formData.append('knowledge_base_name', knowledgeBaseName);
+    formData.append('knowledgebase_name', knowledgeBaseName);
     if (metadataJson) {
         formData.append('metadata_json', JSON.stringify(metadataJson));
     }
@@ -180,7 +223,7 @@ export const uploadFile = async ({
         });
         return response.status === 200;
     } catch (error) {
-        console.error(error);
+        console.error(error.response.data.errors[0]);
         return false;
     }
 };
@@ -197,7 +240,7 @@ export const awaitEmbeddings = async ({knowledgeBaseName, filename}: {
         if (files.some(it => it.name === filename && it.has_embedding)) {
             return;
         }
-        await sleep({ms:1000});
+        await sleep({ms: 1000});
     }
 };
 
@@ -227,7 +270,7 @@ export const complete = async ({
                                    base_url,
                                    openai_api_key,
                                    api_key,
-                                  }: CompletionArgs): Promise<any[]> => {
+                               }: CompletionArgs): Promise<any[]> => {
     const result = await axios({
         method: 'post',
         url: base_url + 'context_completion',
