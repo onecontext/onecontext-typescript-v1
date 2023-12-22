@@ -4,7 +4,7 @@ import FormData = require('form-data');
 import * as dotenv from 'dotenv'
 import sleep from './../utils';
 
-dotenv.config({path: './../.env'});
+dotenv.config({path: __dirname+'/../.env'});
 const API_KEY = process.env.API_KEY;
 const BASE_URL = process.env.BASE_URL;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -13,20 +13,17 @@ export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseNa
     try {
         const response = await axios({
             method: 'post',
-            url: BASE_URL + 'knowledge_bases',
+            url: BASE_URL + 'knowledgebase',
             headers: {
                 Authorization: `Bearer ${API_KEY}`,
             },
             data: {
-                name: knowledgeBaseName,
-                chunk_params: null,
-                score_params: null,
-                louvain_params: null,
+                kbcreate: {title: knowledgeBaseName},
             },
         });
         return response.data;
     } catch (error) {
-        console.error(error);
+        console.log(error.response.data.errors[0]);
         return null;
     }
 };
@@ -252,3 +249,4 @@ export const complete = async ({
     return result.data;
 };
 
+export * as OneContext from './index';
