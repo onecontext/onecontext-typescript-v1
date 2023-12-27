@@ -66,6 +66,31 @@ export const listKnowledgeBases = async (): Promise<{
 };
 
 
+export const query = async ({queryArgs }: { queryArgs: ocTypes.QuerySingleArgType }): Promise<any[]> => {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: BASE_URL + `query`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+                query: queryArgs.query,
+                knowledgebase_name: queryArgs.knowledgeBaseName,
+                metadata_filters: queryArgs.metaDataJson,
+                rerank: queryArgs.rerank,
+                distance_metric: queryArgs.distanceMetric,
+                top_k: queryArgs.topK,
+                out: queryArgs.out,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.response.data.errors[0]);
+        return null;
+    }
+};
+
 export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
     id: string; name: string; knowledgebase_id: string; has_embedding: boolean
 }[]> => {
