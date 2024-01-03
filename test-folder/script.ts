@@ -9,7 +9,7 @@ import { OneContext } from 'onecontext'
 // OneContext.listFiles({knowledgeBaseName:"test-3ibb"}).then((res)=>{console.log(res)})
 
 OneContext.query({queryArgs:{
-    query:"test",
+    query:null,
     knowledgeBaseName:"ross-test-rm-dev",
     distanceMetric:"cosine",
     topK:1,
