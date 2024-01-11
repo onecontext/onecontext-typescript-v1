@@ -4,7 +4,7 @@ import { OneContext } from 'onecontext'
 
 // OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
 
-OneContext.deleteKnowledgeBase({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
+// OneContext.deleteKnowledgeBase({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
 
 // OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
 
@@ -17,13 +17,13 @@ OneContext.deleteKnowledgeBase({knowledgeBaseName:"ross-test-rm-dev"}).then((res
 //     metaDataJson:{"file_name":{"in" : ["High-Performance-Browser-Networking-Ilya-Grigorik.pdf"]}},
 //     }}).then((res)=>{console.log(res)})
 
-// OneContext.uploadFile({
-//     // you can upload a file EITHER by passing file path, or, by passing some content as text
-//     files: [{path: "/Users/rossmurphy/embedpdf/High-Performance-Browser-Networking-Ilya-Grigorik.pdf"}],
-//     // files: [{name: "test.txt", content: "test test test"}],
-//     metadataJson: {"description": "hello"},
-//     stream: false,
-//     knowledgeBaseName: "ross-test-rm-dev",
-// }).then((res) => {
-//     console.log(res)
-// })
+OneContext.uploadFile({
+    // you can upload a file EITHER by passing file path, or, by passing some content as text
+    files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}],
+    // files: [{name: "test.txt", content: "test test test"}],
+    metadataJson: {"description": "hello"},
+    stream: false,
+    knowledgeBaseName: "ross-test-rm-dev",
+}).then((res) => {
+    console.log(res)
+})
