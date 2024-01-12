@@ -109,7 +109,7 @@ export const polarQuery = async ({queryArgs, polarOp}: { queryArgs: ocTypes.Quer
 }
 
 export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
-    id: string; name: string; knowledgebase_id: string; has_embedding: boolean
+    id: string; name: string; knowledgebase_id: string; status: string
 }[]> => {
     try {
         const response = await axios({
@@ -134,7 +134,7 @@ type GenerateQuizOptions = {
     extractPercentage: number;
 };
 
-export const createQuiz = async ({
+export const generateQuiz = async ({
                                      userPromptPerTopic,
                                      metaDataFilters,
                                      knowledgeBaseName,
@@ -173,7 +173,7 @@ type GenerateQuestOptions = {
     model: string;
 };
 
-export const createQuest = async ({
+export const generateQuest = async ({
                                       vision,
                                       mission,
                                       quest,
@@ -293,7 +293,7 @@ export const awaitEmbeddings = async ({knowledgeBaseName, filename}: {
         if (!files.some(it => it.name === filename)) {
             throw new Error('file not found');
         }
-        if (files.some(it => it.name === filename && it.has_embedding)) {
+        if (files.some(it => it.name === filename && it.status == "EMBEDDED")) {
             return;
         }
         await sleep({ms: 1000});
