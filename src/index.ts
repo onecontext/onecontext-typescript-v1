@@ -253,6 +253,19 @@ export const uploadFile = async ({
     }
 };
 
+export const checkKbStatus = async ({knowledgeBaseName}: {
+    knowledgeBaseName: string;
+}) => {
+    const response = await axios({
+        method: 'get',
+        url: BASE_URL + `knowledgebase/${knowledgeBaseName}/status`,
+        headers: {
+            Authorization: `Bearer ${API_KEY}`,
+        },
+    });
+    return response.data;
+};
+
 export const awaitEmbeddings = async ({knowledgeBaseName, filename}: {
     filename: string;
     knowledgeBaseName: string;
