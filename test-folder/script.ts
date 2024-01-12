@@ -6,7 +6,7 @@ import { OneContext } from 'onecontext'
 
 // OneContext.deleteKnowledgeBase({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
 
-OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
+// OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
 
 // OneContext.query({queryArgs:{
 //     query:null,
@@ -17,7 +17,15 @@ OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{consol
 //     metaDataJson:{"file_name":{"in" : ["High-Performance-Browser-Networking-Ilya-Grigorik.pdf"]}},
 //     }}).then((res)=>{console.log(res)})
 
-//
+const df = OneContext.polarQuery({queryArgs:{
+    query:null,
+    knowledgeBaseName:"ross-test-rm-dev",
+    distanceMetric:"cosine",
+    topK:4,
+    out:"chunk",
+    metaDataJson:{"file_name":{"in" : ["faith_and_fate.pdf"]}},
+    }, polarOp: (df) => {return df.sort("page")}}).then((df)=>{console.log(df)})
+
 // OneContext.uploadFile({
 //     // you can upload a file EITHER by passing file path, or, by passing some content as text
 //     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}],

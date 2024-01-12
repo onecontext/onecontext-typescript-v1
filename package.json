@@ -36,6 +36,7 @@
   "homepage": "https://github.com/onecontext/js_sdk#readme",
   "devDependencies": {
     "@types/node": "^20.10.5",
+    "nodejs-polars": "^0.8.4",
     "ts-node": "^10.9.2"
   }
 }

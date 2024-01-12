@@ -6,6 +6,8 @@ import sleep from './utils';
 import * as fs from 'fs';
 import {z} from 'zod';
 import {ocTypes} from "./ocTypes/ocTypes";
+import pl from 'nodejs-polars';
+
 
 dotenv.config({path: __dirname + '/../.env'});
 const API_KEY = process.env.API_KEY;
@@ -90,6 +92,21 @@ export const query = async ({queryArgs }: { queryArgs: ocTypes.QuerySingleArgTyp
         return null;
     }
 };
+
+export const polarQuery = async ({queryArgs, polarOp}: { queryArgs: ocTypes.QuerySingleArgType, polarOp?: Function }): Promise<pl.DataFrame> => {
+    const df: Promise<pl.DataFrame> = query({queryArgs: queryArgs}).then((res) => {
+        const df: pl.DataFrame = pl.DataFrame(res["chunks"]);
+        return df
+    })
+    if (polarOp) {
+        return df.then((df) => {
+            return polarOp(df)
+        })
+    }
+    else {
+        return df
+    }
+}
 
 export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
     id: string; name: string; knowledgebase_id: string; has_embedding: boolean
@@ -252,6 +269,7 @@ export const uploadFile = async ({
         return false;
     }
 };
+
 
 export const checkKbStatus = async ({knowledgeBaseName}: {
     knowledgeBaseName: string;
