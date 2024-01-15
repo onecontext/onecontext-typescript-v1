@@ -27,6 +27,7 @@ export const QuerySingleArgTypeSchema = z.object({
     }).default(null),
     out: z.enum(["id", "chunk", "content", "file", "embedding"]).default("chunk"),
     metaDataJson: z.object({}).partial().default({}),
+    polarOp: z.function().optional()
 });
 
 export const ContentFileSchema = z.object({

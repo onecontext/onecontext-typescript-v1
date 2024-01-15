@@ -68,7 +68,7 @@ export const listKnowledgeBases = async (): Promise<{
 };
 
 
-export const query = async ({queryArgs }: { queryArgs: ocTypes.QuerySingleArgType }): Promise<any[]> => {
+export const query = async ({ queryArgs, polarOp }: { queryArgs: ocTypes.QuerySingleArgType, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
     try {
         const response = await axios({
             method: 'post',
@@ -86,27 +86,18 @@ export const query = async ({queryArgs }: { queryArgs: ocTypes.QuerySingleArgTyp
                 out: queryArgs.out,
             },
         });
-        return response.data;
+
+        if (polarOp) {
+            const df: pl.DataFrame = pl.DataFrame(response.data['chunks']);
+            return polarOp(df);
+        } else {
+            return response.data;
+        }
     } catch (error) {
-        console.error(error.response.data.errors[0]);
+        console.error(error.response?.data?.errors[0] ?? error.message);
         return null;
     }
 };
-
-export const polarQuery = async ({queryArgs, polarOp}: { queryArgs: ocTypes.QuerySingleArgType, polarOp?: Function }): Promise<pl.DataFrame> => {
-    const df: Promise<pl.DataFrame> = query({queryArgs: queryArgs}).then((res) => {
-        const df: pl.DataFrame = pl.DataFrame(res["chunks"]);
-        return df
-    })
-    if (polarOp) {
-        return df.then((df) => {
-            return polarOp(df)
-        })
-    }
-    else {
-        return df
-    }
-}
 
 export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string }): Promise<{
     id: string; name: string; knowledgebase_id: string; status: string

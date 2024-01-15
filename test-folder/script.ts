@@ -8,14 +8,14 @@ import { OneContext } from 'onecontext'
 
 // OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
 
-// OneContext.query({queryArgs:{
-//     query:null,
-//     knowledgeBaseName:"ross-test-rm-dev",
-//     distanceMetric:"cosine",
-//     topK:4,
-//     out:"chunk",
-//     metaDataJson:{"file_name":{"in" : ["High-Performance-Browser-Networking-Ilya-Grigorik.pdf"]}},
-//     }}).then((res)=>{console.log(res)})
+OneContext.query({queryArgs:{
+    query:null,
+    knowledgeBaseName:"ross-test-rm-dev",
+    distanceMetric:"cosine",
+    topK:4,
+    out:"chunk",
+    metaDataJson:{"file_name":{"in" : ["Implicit_representations.pdf"]}},
+    }, polarOp: (df) => {return df.sort("page")}}).then((df)=>{console.log(df)})
 
 // const df = OneContext.polarQuery({queryArgs:{
 //     query:null,
