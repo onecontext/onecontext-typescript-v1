@@ -31,7 +31,7 @@ export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseNa
         return response.data;
     } catch (error) {
         console.log("Failed to create knowledge base: " + knowledgeBaseName)
-        console.log(error.response.data.errors[0]);
+        console.log(error);
         return null;
     }
 };
