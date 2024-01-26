@@ -69,6 +69,15 @@ export const PathFileSchema = z.object({
     return data;
 });
 
+export const KnowledgeBaseCreateSchema = z.object({
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
+    pipelineYaml: z.string().optional(),
+})
+export const GetChunkArgsSchema = z.object({
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
+    metaDataJson: z.object({}).default({}),
+})
+
 export const customErrorMap: z.ZodErrorMap = (error, ctx) => {
     /*
     This is where you override the various error codes
@@ -99,6 +108,8 @@ export type PathFileType = z.infer<typeof PathFileSchema>
 export const FileSchema: z.ZodType = z.union([ContentFileSchema, PathFileSchema]);
 
 export type FileType = z.infer<typeof FileSchema>
+export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
 export type QuerySingleArgType = z.infer<typeof QuerySingleArgTypeSchema>
+export type GetChunkArgs = z.infer<typeof GetChunkArgsSchema>
 
 export * as ocTypes from "./ocTypes";

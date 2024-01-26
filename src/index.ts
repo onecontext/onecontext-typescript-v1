@@ -1,12 +1,10 @@
-import {Readable} from 'stream';
 import axios from 'axios';
-import FormData = require('form-data');
 import * as dotenv from 'dotenv'
-import sleep from './utils';
-import * as fs from 'fs';
-import {z} from 'zod';
+import {flatKey, sleep} from './utils';
 import {ocTypes} from "./ocTypes/ocTypes";
 import pl from 'nodejs-polars';
+import FormData = require('form-data');
+import * as YAML from 'yaml';
 
 
 dotenv.config({path: __dirname + '/../.env'});
@@ -14,9 +12,9 @@ const API_KEY = process.env.API_KEY;
 const BASE_URL = process.env.BASE_URL;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
+// read yaml from file simple.yaml
+export const createKnowledgeBase = async (kbCreate : ocTypes.KnowledgeBaseCreateType ) => {
     try {
-
         const response = await axios({
             method: 'post',
             url: BASE_URL + 'knowledgebase',
@@ -24,14 +22,16 @@ export const createKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseNa
                 Authorization: `Bearer ${API_KEY}`,
             },
             data: {
-                name: knowledgeBaseName,
+                name: kbCreate.knowledgeBaseName,
+                pipeline_yaml: kbCreate.pipelineYaml,
             },
         });
-        console.log("Created knowledge base: " + knowledgeBaseName)
+        console.log("Created knowledge base: " + kbCreate.knowledgeBaseName)
         return response.data;
     } catch (error) {
-        console.log("Failed to create knowledge base: " + knowledgeBaseName)
-        console.log(error);
+        console.log("Failed to create knowledge base: " + kbCreate.knowledgeBaseName)
+        console.log(error)
+        console.log(error.response.data.errors[0]);
         return null;
     }
 };
@@ -91,7 +91,7 @@ export const query = async ({ queryArgs, polarOp }: { queryArgs: ocTypes.QuerySi
             const df: pl.DataFrame = pl.DataFrame(response.data['chunks']);
             return polarOp(df);
         } else {
-            return response.data;
+            return flatKey({obj: response.data, key: 'metadata_json'});
         }
     } catch (error) {
         console.error(error.response?.data?.errors[0] ?? error.message);
@@ -337,6 +337,49 @@ export const complete = async ({
         },
     });
     return result.data;
+};
+
+export const getChunks = async ({ chunkArgs, polarOp }: { chunkArgs: ocTypes.GetChunkArgs, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `knowledgebase/${chunkArgs.knowledgeBaseName}/chunks`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+                metadata_filters: chunkArgs.metaDataJson,
+            },
+        })
+
+        if (polarOp) {
+            const df: pl.DataFrame = pl.DataFrame(response.data.map((obj: object) => flatKey({obj: obj, key: 'metadata_json'})));
+            return polarOp(df);
+        } else {
+            return response.data
+        }
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
+};
+
+
+export const getPipe = async ({ pipelineName }: { pipelineName: string }): Promise<any> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `pipeline/${pipelineName}`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        })
+
+        return YAML.parse(response.data)
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
 };
 
 export * as OneContext from './index';
