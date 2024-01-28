@@ -1,5 +1,4 @@
 import * as z from "zod";
-import * as wasi from "wasi";
 
 // ###
 // stages
@@ -7,17 +6,17 @@ import * as wasi from "wasi";
 
 // enums
 const indexStages = {
-    preProcessor: "PreProcessor",
-    chunker: "Chunker",
-    embedder: "Embedder",
-    scorer: "Scorer",
-    clusterer: "Clusterer"
+    Preprocessor: "Preprocessor",
+    Chunker: "Chunker",
+    Embedder: "Embedder",
+    Scorer: "Scorer",
+    Clusterer: "Clusterer"
 } as const;
 
 
 const queryStages = {
-    reranker: "Reranker",
-    retriever: "Retriever"
+    Reranker: "Reranker",
+    Retriever: "Retriever"
 } as const;
 
 // enums
@@ -45,7 +44,7 @@ const chunkerSteps = {
 } as const
 
 const embedderSteps = {
-    OCEmbedder: "OCEmbedder"
+    SentenceTransformerEmbedder: "SentenceTransformerEmbedder"
 } as const
 
 const scorerSteps = {
@@ -112,9 +111,9 @@ export const QueryStageSchema = <StageName extends queryStageEnum, StepEnum exte
         })),
     });
 };
-export const PreprocessorStageSchema = IndexStageSchema("PreProcessor", "OCPreprocessor");
+export const PreprocessorStageSchema = IndexStageSchema("Preprocessor", "OCPreprocessor");
 export const ChunkerStageSchema = IndexStageSchema("Chunker", "OCChunker");
-export const EmbedderStageSchema = IndexStageSchema("Embedder", "OCEmbedder");
+export const EmbedderStageSchema = IndexStageSchema("Embedder", "SentenceTransformerEmbedder");
 export const ScorerStageSchema = IndexStageSchema("Scorer", "LexRank");
 export const ClustererStageSchema = IndexStageSchema("Clusterer", "LouvainCommunityDetection");
 export const RetrieverStageSchema = QueryStageSchema("Retriever", "OCRetriever");

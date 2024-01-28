@@ -3,9 +3,9 @@ index:
   name: basic_index
 
   stages:
-    - stage: PreProcessor
+    - stage: Preprocessor
       steps:
-        - step: OCPreProcessor
+        - step: OCPreprocessor
           name: simple_pre_processor
           step_args:
             add_punctuation: false

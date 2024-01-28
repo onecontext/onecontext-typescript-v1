@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as dotenv from 'dotenv'
 import {flatKey, sleep} from './utils';
 import {ocTypes} from "./ocTypes/ocTypes";
+import * as yamlValidation from "./ocTypes/yamlValidation";
 import pl from 'nodejs-polars';
 import FormData = require('form-data');
 import * as YAML from 'yaml';
@@ -381,5 +382,14 @@ export const getPipe = async ({ pipelineName }: { pipelineName: string }): Promi
         return null;
     }
 };
+
+export const parseYaml = async ({ yaml }: { yaml: string }): Promise<any> => {
+    try {
+        return yamlValidation.PipelineSchema.parse(YAML.parse(yaml));
+    }
+    catch (error) {
+        console.error(error)
+    }
+}
 
 export * as OneContext from './index';

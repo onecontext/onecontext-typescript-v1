@@ -8,11 +8,11 @@ import YAML from 'yaml';
 
 // OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
 
-// const path = __dirname+"/../simple.yaml"
+const path = __dirname+"/../simple.yaml"
 
 // read yaml at the path
-// const file = fs.readFileSync(path, 'utf8')
-// const parsed = YAML.parse(file)
+const file: string = fs.readFileSync(path, 'utf8')
+
 // OneContext.createKnowledgeBase({knowledgeBaseName: "new-pipelines-gcp-10", pipelineYaml: file})
 
 // OneContext.getChunks({
@@ -25,12 +25,9 @@ import YAML from 'yaml';
 // })
 
 const runit = async () => {
-     return await OneContext.getPipe({pipelineName: "new-pipelines-gcp-10"}).then(
-        (res) => {
-            console.log(res)
-            return res
-        }
-     )
+    return await OneContext.parseYaml({yaml: file}).then((res) => {
+        console.log(res)
+    })
 }
 ( async () => await runit() )()
 
