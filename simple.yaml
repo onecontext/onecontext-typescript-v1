@@ -5,7 +5,7 @@ index:
   stages:
     - stage: PreProcessor
       steps:
-        - step: SimplePreProcessor
+        - step: OCPreProcessor
           name: simple_pre_processor
           step_args:
             add_punctuation: false
@@ -14,7 +14,7 @@ index:
 
     - stage: Chunker
       steps:
-        - step: SimpleChunker
+        - step: OCChunker
           name: simple_chunker
           step_args:
             chunk_size_words: 320
@@ -63,7 +63,7 @@ query:
     - stage: Retriever
 
       steps:
-        - step: SimpleRetriever
+        - step: OCRetriever
           name: retriever
           step_args:
             query: how much wood could a woodchuck chuck if a woodchuck could chuck wood
@@ -75,7 +75,7 @@ query:
     - stage: Reranker
 
       steps:
-        - step: SimpleReranker
+        - step: OCReranker
           name: simple_reranker
           step_args:
             model_name: BAAI/bge-reranker-large
