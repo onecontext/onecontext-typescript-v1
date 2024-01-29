@@ -31,7 +31,7 @@ index:
           step_args:
             model_name: BAAI/bge-base-en-v1.5
             batch_size: 4
-          include_metadata: [ title, file_name ]
+            include_metadata: [ title, file_name ]
           depends_on: [ simple_chunker ]
 
     - stage: Scorer

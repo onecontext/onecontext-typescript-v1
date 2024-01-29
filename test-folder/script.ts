@@ -25,9 +25,8 @@ const file: string = fs.readFileSync(path, 'utf8')
 // })
 
 const runit = async () => {
-    return await OneContext.parseYaml({yaml: file}).then((res) => {
-        console.log(res)
-    })
+    const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})
+    return r
 }
 ( async () => await runit() )()
 

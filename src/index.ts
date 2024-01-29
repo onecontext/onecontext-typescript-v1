@@ -1,12 +1,13 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv'
 import {flatKey, sleep} from './utils';
-import {ocTypes} from "./ocTypes/ocTypes";
+import {generalArgs} from "./ocTypes/generalArgs";
 import * as yamlValidation from "./ocTypes/yamlValidation";
+import {ocErrors} from "./ocTypes/errors";
 import pl from 'nodejs-polars';
 import FormData = require('form-data');
+import * as z from "zod";
 import * as YAML from 'yaml';
-
 
 dotenv.config({path: __dirname + '/../.env'});
 const API_KEY = process.env.API_KEY;
@@ -14,7 +15,7 @@ const BASE_URL = process.env.BASE_URL;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // read yaml from file simple.yaml
-export const createKnowledgeBase = async (kbCreate : ocTypes.KnowledgeBaseCreateType ) => {
+export const createKnowledgeBase = async (kbCreate : generalArgs.KnowledgeBaseCreateType ) => {
     try {
         const response = await axios({
             method: 'post',
@@ -69,7 +70,7 @@ export const listKnowledgeBases = async (): Promise<{
 };
 
 
-export const query = async ({ queryArgs, polarOp }: { queryArgs: ocTypes.QuerySingleArgType, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
+export const query = async ({ queryArgs, polarOp }: { queryArgs: generalArgs.QuerySingleArgType, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
     try {
         const response = await axios({
             method: 'post',
@@ -203,7 +204,7 @@ export const generateQuest = async ({
 };
 
 type UploadFileOptions = {
-    files: ocTypes.FileType[];
+    files: generalArgs.FileType[];
     stream: boolean;
     knowledgeBaseName: string;
     metadataJson?: object;
@@ -221,7 +222,7 @@ export const uploadFile = async ({
             try {
                 // try and parse it as a content type file, i.e. if the user has passed a readable stream
                 // of text, and has also passed a name for the file
-                const f = ocTypes.ContentFileSchema.parse(file, {errorMap: ocTypes.customErrorMap});
+                const f = generalArgs.ContentFileSchema.parse(file, {errorMap: ocErrors.customErrorMap});
                 formData.append('files', f.readable, {
                     filename: f.name,
                     contentType: 'text/plain',
@@ -235,7 +236,7 @@ export const uploadFile = async ({
                 try {
                     // try and parse it as a path type file, i.e. the user has given a local file path,
                     // and we are to use the fs library to read the file stream from that file
-                    const f = ocTypes.PathFileSchema.parse(file, {errorMap: ocTypes.customErrorMap})
+                    const f = generalArgs.PathFileSchema.parse(file, {errorMap: ocErrors.customErrorMap})
                     formData.append('files', f.readable);
                 } catch (e) {throw Error(`Error parsing file ${e}`)
                 }
@@ -340,7 +341,7 @@ export const complete = async ({
     return result.data;
 };
 
-export const getChunks = async ({ chunkArgs, polarOp }: { chunkArgs: ocTypes.GetChunkArgs, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
+export const getChunks = async ({ chunkArgs, polarOp }: { chunkArgs: generalArgs.GetChunkArgs, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
     try {
         const response = await axios({
             method: 'get',
@@ -383,12 +384,22 @@ export const getPipe = async ({ pipelineName }: { pipelineName: string }): Promi
     }
 };
 
-export const parseYaml = async ({ yaml }: { yaml: string }): Promise<any> => {
+
+
+export const parseYaml = async ({ yaml, verboseErrorHandling }: { yaml: string , verboseErrorHandling: boolean }): Promise<yamlValidation.PipelineSchema> => {
     try {
-        return yamlValidation.PipelineSchema.parse(YAML.parse(yaml));
-    }
-    catch (error) {
-        console.error(error)
+        return yamlValidation.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            if (verboseErrorHandling) {
+               console.log(error.message)
+            }
+            else {
+                console.log(error.issues.map((issue) => issue.message).join("\n"));
+                return null;
+            }
+        }
+        throw error
     }
 }
 

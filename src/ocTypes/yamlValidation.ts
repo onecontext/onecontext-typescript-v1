@@ -34,99 +34,57 @@ export type queryStageEnum = z.infer<typeof queryStageEnum>;
 // tuples
 
 // index
-const preProcessorSteps = {
-    OCPreprocessor: "OCPreprocessor"
-} as const
+const preprocessorStepEnum = z.enum(["OCPreprocessor"]);
+const chunkerStepEnum = z.enum(["OCChunker", "BCChunker"]);
+const embedderStepEnum = z.enum(["SentenceTransformerEmbedder"]);
+const scorerStepEnum = z.enum(["LexRank"]);
+const clustererStepEnum = z.enum(["LouvainCommunityDetection"]);
 
-const chunkerSteps = {
-    OCChunker: "OCChunker"
-    // to be padded out
-} as const
+const rerankerStepEnum = z.enum(["OCReranker"]);
+const retrieverStepEnum = z.enum(["OCRetriever"]);
 
-const embedderSteps = {
-    SentenceTransformerEmbedder: "SentenceTransformerEmbedder"
-} as const
-
-const scorerSteps = {
-    LexRank: "LexRank"
-    // to be padded out
-} as const
-
-const clustererSteps = {
-    LouvainCommunityDetection: "LouvainCommunityDetection"
-    // to be padded out
-} as const
-
-const indexSteps = {
-    ...preProcessorSteps,
-    ...chunkerSteps,
-    ...embedderSteps,
-    ...scorerSteps,
-    ...clustererSteps
-} as const
-// index
-const indexStepEnum = z.nativeEnum(indexSteps);
-export type indexStepEnum = z.infer<typeof indexStepEnum>;
-
-// query
-const rerankerSteps = {
-    OCReranker: "OCReranker"
-} as const
-
-const retrieverSteps = {
-    OCRetriever: "OCRetriever"
-} as const
-
-const querySteps = {
-    ...rerankerSteps,
-    ...retrieverSteps
-} as const
-
-// query
-const queryStepEnum = z.nativeEnum(querySteps);
-export type queryStepEnum = z.infer<typeof queryStepEnum>;
 
 // ###
 // generics
 // ###
-export const IndexStageSchema = <StageName extends indexStageEnum, StepEnum extends indexStepEnum>(stageName: StageName, stepEnum: StepEnum) => {
+export const IndexStageSchema = <StageName extends indexStageEnum, StepEnum extends z.ZodEnum<any>>(stageName: StageName, stepEnum: StepEnum) => {
     return z.object({
         stage: z.literal(stageName),
         steps: z.array(z.object({
-            step: z.literal(stepEnum),
+            step: stepEnum,
+            name: z.string(),
+            step_args: z.object({}),
+            depends_on: z.array(z.string())
+        })),
+    });
+};
+export const QueryStageSchema = <StageName extends queryStageEnum, StepEnum extends z.ZodEnum<any>>(stageName: StageName, stepEnum: StepEnum) => {
+    return z.object({
+        stage: z.literal(stageName),
+        steps: z.array(z.object({
+            step: stepEnum,
             name: z.string(),
             step_args: z.object({}).partial().default({}),
             depends_on: z.array(z.string())
         })),
     });
 };
-export const QueryStageSchema = <StageName extends queryStageEnum, StepEnum extends queryStepEnum>(stageName: StageName, stepEnum: StepEnum) => {
-    return z.object({
-        stage: z.literal(stageName),
-        steps: z.array(z.object({
-            step: z.literal(stepEnum),
-            name: z.string(),
-            step_args: z.object({}).partial().default({}),
-            depends_on: z.array(z.string())
-        })),
-    });
-};
-export const PreprocessorStageSchema = IndexStageSchema("Preprocessor", "OCPreprocessor");
-export const ChunkerStageSchema = IndexStageSchema("Chunker", "OCChunker");
-export const EmbedderStageSchema = IndexStageSchema("Embedder", "SentenceTransformerEmbedder");
-export const ScorerStageSchema = IndexStageSchema("Scorer", "LexRank");
-export const ClustererStageSchema = IndexStageSchema("Clusterer", "LouvainCommunityDetection");
-export const RetrieverStageSchema = QueryStageSchema("Retriever", "OCRetriever");
-export const RerankerStageSchema = QueryStageSchema("Reranker", "OCReranker");
+export const PreprocessorStageSchema = IndexStageSchema("Preprocessor", preprocessorStepEnum);
+export const ChunkerStageSchema = IndexStageSchema("Chunker", chunkerStepEnum);
+export const EmbedderStageSchema = IndexStageSchema("Embedder", embedderStepEnum);
+export const ScorerStageSchema = IndexStageSchema("Scorer", scorerStepEnum);
+export const ClustererStageSchema = IndexStageSchema("Clusterer", clustererStepEnum);
+export const RetrieverStageSchema = QueryStageSchema("Retriever", retrieverStepEnum);
+export const RerankerStageSchema = QueryStageSchema("Reranker", rerankerStepEnum);
 
 export const IndexPipelineSchema = z.object({
     name: z.string(),
-    stages: z.array(z.union([PreprocessorStageSchema, ChunkerStageSchema, EmbedderStageSchema, ScorerStageSchema, ClustererStageSchema]))
+    stages: z.array(z.discriminatedUnion("stage",[PreprocessorStageSchema, ChunkerStageSchema, EmbedderStageSchema, ScorerStageSchema, ClustererStageSchema]))
 });
 
 export const QueryPipelineSchema = z.object({
     name: z.string(),
-    stages: z.array(z.union([RetrieverStageSchema, RerankerStageSchema]))
+    stages: z.array(z.discriminatedUnion("stage",[RetrieverStageSchema, RerankerStageSchema]))
 });
 
 export type IndexPipelineSchema = z.infer<typeof IndexPipelineSchema>;
@@ -136,3 +94,5 @@ export const PipelineSchema = z.object({
     index: IndexPipelineSchema,
     query: QueryPipelineSchema
 })
+
+export type PipelineSchema = z.infer<typeof PipelineSchema>;

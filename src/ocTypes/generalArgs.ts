@@ -78,30 +78,6 @@ export const GetChunkArgsSchema = z.object({
     metaDataJson: z.object({}).default({}),
 })
 
-export const customErrorMap: z.ZodErrorMap = (error, ctx) => {
-    /*
-    This is where you override the various error codes
-    */
-    switch (error.code) {
-        case z.ZodIssueCode.invalid_type:
-            if (error.expected === "string") {
-                return {message: `This isn't a string!`};
-            }
-            break;
-        case z.ZodIssueCode.custom:
-            // produce a custom message using error.params
-            // error.params won't be set unless you passed
-            // a `params` arguments into a custom validator
-            const params = error.params || {};
-            if (params.myField) {
-                return {message: `Bad input: ${params.myField}`};
-            }
-            break;
-    }
-
-    // fall back to default message!
-    return {message: ctx.defaultError};
-};
 
 export type ContentFileType = z.infer<typeof ContentFileSchema>;
 export type PathFileType = z.infer<typeof PathFileSchema>
@@ -112,4 +88,4 @@ export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
 export type QuerySingleArgType = z.infer<typeof QuerySingleArgTypeSchema>
 export type GetChunkArgs = z.infer<typeof GetChunkArgsSchema>
 
-export * as ocTypes from "./ocTypes";
+export * as generalArgs from "./generalArgs";
