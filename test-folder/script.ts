@@ -19,12 +19,12 @@ const newFile: string = fs.readFileSync(newPath, 'utf8')
 
 // OneContext.getChunks({
 //     chunkArgs: {
-//         knowledgeBaseName: "new-pipelines-gcp-10",
+//         knowledgeBaseName: "rm-dev",
 //         metaDataJson: {"file_name": {"in": ["Implicit_representations.pdf"]}},
 //     }, polarOp: (df) => {
 //         return df
 //     }
-// })
+// }).then((res) => {console.log(res)})
 
 // const runit = async () => {
 //     const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})
@@ -55,7 +55,6 @@ const newFile: string = fs.readFileSync(newPath, 'utf8')
 // }
 //
 // runMany({n: 1}).then((res) => {console.log(res)})
-
 
 const df = OneContext.query({
     queryArgs: {
