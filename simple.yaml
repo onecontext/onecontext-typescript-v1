@@ -39,9 +39,8 @@ index:
         - step: LexRank
           name: lexranker
           step_args:
-            threshold: 0.1
-            param_a: 1
-            param_b: 2
+            update_score_key: lexrank_score_test
+            update_percentile_key: lexrank_percentile_test
           depends_on: [ sentence-transformers ]
 
     - stage: Clusterer
@@ -49,8 +48,7 @@ index:
         - step: LouvainCommunityDetection
           name: louvain
           step_args:
-            random_state: 42
-            resolution: 0.4
+            update_label_key: louvain_cluster_test
             assign_labels: gpt-3.5-turbo # RateLimit later
           depends_on: [ lexranker ]
 

@@ -13,7 +13,7 @@ import YAML from 'yaml';
 // read yaml at the path
 // const file: string = fs.readFileSync(path, 'utf8')
 
-// OneContext.createKnowledgeBase({knowledgeBaseName: "rm-dev", pipelineYaml: file})
+// OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
 
 // OneContext.getChunks({
 //     chunkArgs: {
@@ -70,20 +70,25 @@ import YAML from 'yaml';
 //     // files: [{name: "test.txt", content: "test test test"}],
 //     metadataJson: {"description": "hello"},
 //     stream: false,
-//     knowledgeBaseName: "rm-dev",
+//     pipelineName: "rm-dev",
 // }).then((res) => {
 //     console.log(res)
 // })
 
 // OneContext.awaitEmbeddings({knowledgeBaseName:"ross-test-rm-dev", filename: "Implicit_representations.pdf"}).then((res)=>{console.log(res)})
 
-// OneContext.checkKbStatus({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
-// OneContext.listFiles({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
+OneContext.checkKbStatus({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
+OneContext.checkPipelineStatus({pipelineName:"rm-dev"}).then((res)=>{console.log(res)})
+OneContext.listFiles({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
 
 OneContext.generateQuiz({
-    userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {tupic}. Base the questions in your quiz on the information contained in the following pieces of text {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
+    userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
     metaDataFilters: {"file_name": {"in": ["Implicit_representations.pdf"]}},
-    knowledgeBaseName: "rm-dev",
+    pipelineName: "rm-dev",
+    scorePercentileLabel: "lexrank_percentile_test",
+    clusterLabel: "louvain_cluster_test",
     totalNumberOfQuestions: 8,
     extractPercentage: 0.8,
-}).then((res)=>{console.log(res)})
+}).then((res) => {
+    console.log(res)
+})

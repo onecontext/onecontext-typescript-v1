@@ -38,6 +38,32 @@ export const createKnowledgeBase = async (kbCreate : generalArgs.KnowledgeBaseCr
     }
 };
 
+export const createPipeline = async (pipelineCreate : generalArgs.PipelineCreateType ) => {
+    // this is basically the same method (and hits the same endpoint) as createKnowledgeBase, but as
+    // those two things are intrinsically linked, we can just use the same method
+
+    try {
+        const response = await axios({
+            method: 'post',
+            // this is fine even if it hits knowledgebase
+            url: BASE_URL + 'knowledgebase',
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+                name: pipelineCreate.pipelineName,
+                pipeline_yaml: pipelineCreate.pipelineYaml,
+            },
+        });
+        console.log("Created pipeline: " + pipelineCreate.pipelineName)
+        return response.data;
+    } catch (error) {
+        console.log("Failed to create pipeline: " + pipelineCreate.pipelineName)
+        console.log(error)
+        console.log(error.response.data.errors[0]);
+        return null;
+    }
+};
 export const deleteKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseName: string }) => {
     try {
         const response = await axios({
@@ -122,18 +148,22 @@ export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string
 type GenerateQuizOptions = {
     userPromptPerTopic: string;
     metaDataFilters: Record<string, Record<string, any>>;
-    knowledgeBaseName: string;
+    pipelineName: string;
+    clusterLabel?: string;
+    scorePercentileLabel?: string;
     totalNumberOfQuestions: number;
     extractPercentage: number;
 };
 
 export const generateQuiz = async ({
-                                     userPromptPerTopic,
-                                     metaDataFilters,
-                                     knowledgeBaseName,
-                                     totalNumberOfQuestions,
-                                     extractPercentage,
-                                 }: GenerateQuizOptions): Promise<{ topic: string; output: string }[]> => {
+                                       userPromptPerTopic,
+                                       metaDataFilters,
+                                       pipelineName,
+                                       clusterLabel,
+                                       scorePercentileLabel,
+                                       totalNumberOfQuestions,
+                                       extractPercentage,
+                                   }: GenerateQuizOptions): Promise<{ topic: string; output: string }[]> => {
 
 
     const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
@@ -154,7 +184,9 @@ export const generateQuiz = async ({
             data: {
                 metadata_filters: metaDataFilters,
                 prompt_per_topic: userPromptPerTopic,
-                knowledge_base_name: knowledgeBaseName,
+                pipeline_name: pipelineName,
+                cluster_label: clusterLabel,
+                score_percentile_label: scorePercentileLabel,
                 total_num_questions: totalNumberOfQuestions,
                 extract_percentage: extractPercentage,
                 openai_api_key: OPENAI_API_KEY,
@@ -221,14 +253,14 @@ export const generateQuest = async ({
 type UploadFileOptions = {
     files: generalArgs.FileType[];
     stream: boolean;
-    knowledgeBaseName: string;
+    pipelineName: string;
     metadataJson?: object;
 };
 
 export const uploadFile = async ({
                                      files,
                                      stream,
-                                     knowledgeBaseName,
+                                     pipelineName,
                                      metadataJson,
                                  }: UploadFileOptions): Promise<boolean> => {
     const formData = new FormData();
@@ -257,7 +289,7 @@ export const uploadFile = async ({
                 }
             }
     });
-    formData.append('knowledgebase_name', knowledgeBaseName);
+    formData.append('pipeline_name', pipelineName);
     if (metadataJson) {
         formData.append('metadata_json', JSON.stringify(metadataJson));
     }
@@ -297,6 +329,23 @@ export const checkKbStatus = async ({knowledgeBaseName}: {
     }
 };
 
+export const checkPipelineStatus = async ({pipelineName}: {
+    pipelineName: string;
+}) => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `knowledgebase/${pipelineName}/status`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.response.data.errors[0]);
+        return null;
+    }
+};
 export const awaitEmbeddings = async ({knowledgeBaseName, filename}: {
     filename: string;
     knowledgeBaseName: string;

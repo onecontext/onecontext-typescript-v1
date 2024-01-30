@@ -70,7 +70,11 @@ export const PathFileSchema = z.object({
 });
 
 export const KnowledgeBaseCreateSchema = z.object({
-    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledgebase name cannot be empty"}),
+    pipelineYaml: z.string().optional(),
+})
+export const PipelineCreateSchema = z.object({
+    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     pipelineYaml: z.string().optional(),
 })
 export const GetChunkArgsSchema = z.object({
@@ -85,6 +89,7 @@ export const FileSchema: z.ZodType = z.union([ContentFileSchema, PathFileSchema]
 
 export type FileType = z.infer<typeof FileSchema>
 export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
+export type PipelineCreateType = z.infer<typeof PipelineCreateSchema>
 export type QuerySingleArgType = z.infer<typeof QuerySingleArgTypeSchema>
 export type GetChunkArgs = z.infer<typeof GetChunkArgsSchema>
 
