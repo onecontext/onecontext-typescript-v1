@@ -4,30 +4,8 @@ import {Readable} from "stream";
 import {z} from "zod";
 
 export const QuerySingleArgTypeSchema = z.object({
-    query: z.string().optional(),
-    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
-    distanceMetric: z.enum(["cosine", "l2"]).default("cosine"),
-    topK: z.number().int().optional().transform((val, ctx) => {
-        if (val && val < 0) {
-            ctx.addIssue({code: z.ZodIssueCode.custom, message: "'topK' must be a positive integer"});
-        }
-        if (!val) {
-            return 10;
-        }
-    }),
-    rerank: z.object({
-        rerankPoolSize: z.number().int().optional().transform((val, ctx) => {
-            if (val && val < 0) {
-                ctx.addIssue({code: z.ZodIssueCode.custom, message: "'rerankPoolSize' must be a positive integer"});
-            } else {
-                return val;
-            }
-        }),
-        rerankFast: z.boolean(),
-    }).default(null),
-    out: z.enum(["id", "chunk", "content", "file", "embedding"]).default("chunk"),
-    metaDataJson: z.object({}).partial().default({}),
-    polarOp: z.function().optional()
+    oc_yaml: z.string().optional(),
+    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
 });
 
 export const ContentFileSchema = z.object({

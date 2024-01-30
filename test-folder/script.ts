@@ -8,12 +8,14 @@ import YAML from 'yaml';
 
 // OneContext.listFiles({knowledgeBaseName:"new-pipelines"}).then((res)=>{console.log(res)})
 
-// const path = __dirname+"/../simple.yaml"
+const path = __dirname+"/../simple.yaml"
+const newPath = __dirname+"/../new.yaml"
 
 // read yaml at the path
-// const file: string = fs.readFileSync(path, 'utf8')
+const file: string = fs.readFileSync(path, 'utf8')
+const newFile: string = fs.readFileSync(newPath, 'utf8')
 
-OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
+// OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
 
 // OneContext.getChunks({
 //     chunkArgs: {
@@ -29,7 +31,7 @@ OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
 //     return r
 // }
 // ( async () => await runit() )()
-
+//
 // const runMany = ({n}:{n: number}) => {
 //
 //     // create one task
@@ -55,14 +57,14 @@ OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
 // runMany({n: 1}).then((res) => {console.log(res)})
 
 
-const df = OneContext.query({queryArgs:{
-    query:"penis",
-    knowledgeBaseName:"rm-dev",
-    distanceMetric:"cosine",
-    topK:20,
-    out:"chunk",
-    metaDataJson:{"file_name":{"in" : ["Implicit_representations.pdf"]}},
-    }, polarOp: null}).then((df)=>{console.log(df)})
+const df = OneContext.query({
+    queryArgs: {
+        pipelineName: "rm-dev",
+        oc_yaml: newFile,
+    }, polarOp: null
+}).then((df) => {
+    console.log(df)
+})
 
 // OneContext.uploadFile({
 //     // you can upload a file EITHER by passing file path, or, by passing some content as text

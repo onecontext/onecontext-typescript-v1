@@ -41,23 +41,29 @@ export const createKnowledgeBase = async (kbCreate : generalArgs.KnowledgeBaseCr
 export const createPipeline = async (pipelineCreate : generalArgs.PipelineCreateType ) => {
 
     try {
-        const response = await axios({
-            method: 'post',
-            url: BASE_URL + 'pipeline',
-            headers: {
-                Authorization: `Bearer ${API_KEY}`,
-            },
-            data: {
-                name: pipelineCreate.pipelineName,
-                oc_yaml: pipelineCreate.pipelineYaml,
-            },
-        });
-        console.log("Created pipeline: " + pipelineCreate.pipelineName)
-        return response.data;
+        // first make sure it's a valid pipeline
+        const parsedYaml = await parseYaml({yaml: pipelineCreate.pipelineYaml, verboseErrorHandling: false})
+        if (parsedYaml == null) {
+            console.log("Failed to create pipeline: " + pipelineCreate.pipelineName)
+            return null
+        } else {
+            const response = await axios({
+                method: 'post',
+                url: BASE_URL + 'pipeline',
+                headers: {
+                    Authorization: `Bearer ${API_KEY}`,
+                },
+                data: {
+                    name: pipelineCreate.pipelineName,
+                    oc_yaml: pipelineCreate.pipelineYaml,
+                },
+            });
+            console.log("Created pipeline: " + pipelineCreate.pipelineName)
+            return response.data;
+        }
     } catch (error) {
         console.log("Failed to create pipeline: " + pipelineCreate.pipelineName)
-        console.log(error)
-        console.log(error.response.data.errors[0]);
+        console.log(error.response.data);
         return null;
     }
 };
@@ -102,13 +108,8 @@ export const query = async ({ queryArgs, polarOp }: { queryArgs: generalArgs.Que
                 Authorization: `Bearer ${API_KEY}`,
             },
             data: {
-                query: queryArgs.query,
-                knowledgebase_name: queryArgs.knowledgeBaseName,
-                metadata_filters: queryArgs.metaDataJson,
-                rerank: queryArgs.rerank,
-                distance_metric: queryArgs.distanceMetric,
-                top_k: queryArgs.topK,
-                out: queryArgs.out,
+                oc_yaml: queryArgs.oc_yaml,
+                pipeline_name: queryArgs.pipelineName,
             },
         });
 
@@ -451,16 +452,18 @@ export const getPipe = async ({ pipelineName }: { pipelineName: string }): Promi
 };
 
 
-
-export const parseYaml = async ({ yaml, verboseErrorHandling }: { yaml: string , verboseErrorHandling: boolean }): Promise<yamlValidation.PipelineSchema> => {
+export const parseYaml = async ({yaml, verboseErrorHandling}: {
+    yaml: string,
+    verboseErrorHandling: boolean
+}): Promise<yamlValidation.PipelineSchema> => {
     try {
         return yamlValidation.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
     } catch (error) {
         if (error instanceof z.ZodError) {
             if (verboseErrorHandling) {
-               console.log(error.message)
-            }
-            else {
+                console.log(error.message)
+                return null
+            } else {
                 console.log(error.issues.map((issue) => issue.message).join("\n"));
                 return null;
             }

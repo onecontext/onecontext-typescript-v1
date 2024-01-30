@@ -69,15 +69,3 @@ query:
             top_k: 100
             metadata_filters: { }
           depends_on: [ ]
-
-    - stage: Reranker
-
-      steps:
-        - step: OCReranker
-          name: simple_reranker
-          step_args:
-            query: how much wood could a woodchuck chuck if a woodchuck could chuck wood
-            model_name: BAAI/bge-reranker-large
-            top_k: 10
-            metadata_filters: { }
-          depends_on: [ retriever ]
