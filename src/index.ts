@@ -121,7 +121,7 @@ export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string
 
 type GenerateQuizOptions = {
     userPromptPerTopic: string;
-    metaDataFilters: { file_name: string[] } & Record<string, any>;
+    metaDataFilters: Record<string, Record<string, any>>;
     knowledgeBaseName: string;
     totalNumberOfQuestions: number;
     extractPercentage: number;
@@ -134,22 +134,37 @@ export const generateQuiz = async ({
                                      totalNumberOfQuestions,
                                      extractPercentage,
                                  }: GenerateQuizOptions): Promise<{ topic: string; output: string }[]> => {
-    const result = await axios({
-        method: 'get',
-        url: BASE_URL + 'quiz_completion',
-        headers: {
-            Authorization: `Bearer ${API_KEY}`,
-        },
-        data: {
-            metadata_filters: metaDataFilters,
-            prompt_per_topic: userPromptPerTopic,
-            knowledge_base_name: knowledgeBaseName,
-            total_num_questions: totalNumberOfQuestions,
-            extract_percentage: extractPercentage,
-            openai_api_key: OPENAI_API_KEY,
-        },
-    });
-    return result.data;
+
+
+    const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
+    const missingVariables: string[] = requiredVariables.filter(variable => !userPromptPerTopic.includes(variable));
+    if (missingVariables.length > 0) {
+        console.error(`You are missing a required variable in the string you passed to userPromptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`)
+        return null
+    }
+
+    try {
+
+        const result = await axios({
+            method: 'get',
+            url: BASE_URL + 'quiz_completion',
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+                metadata_filters: metaDataFilters,
+                prompt_per_topic: userPromptPerTopic,
+                knowledge_base_name: knowledgeBaseName,
+                total_num_questions: totalNumberOfQuestions,
+                extract_percentage: extractPercentage,
+                openai_api_key: OPENAI_API_KEY,
+            },
+        });
+        return result.data;
+    } catch (error) {
+        console.error(error.response.data.errors[0]);
+        return null;
+    }
 };
 
 type GenerateQuestOptions = {
@@ -267,14 +282,19 @@ export const uploadFile = async ({
 export const checkKbStatus = async ({knowledgeBaseName}: {
     knowledgeBaseName: string;
 }) => {
-    const response = await axios({
-        method: 'get',
-        url: BASE_URL + `knowledgebase/${knowledgeBaseName}/status`,
-        headers: {
-            Authorization: `Bearer ${API_KEY}`,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `knowledgebase/${knowledgeBaseName}/status`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.response.data.errors[0]);
+        return null;
+    }
 };
 
 export const awaitEmbeddings = async ({knowledgeBaseName, filename}: {

@@ -4,16 +4,16 @@ import YAML from 'yaml';
 
 // OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
 
-// OneContext.deleteKnowledgeBase({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
+// OneContext.deleteKnowledgeBase({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
 
-// OneContext.listFiles({knowledgeBaseName:"ross-test-rm-dev"}).then((res)=>{console.log(res)})
+// OneContext.listFiles({knowledgeBaseName:"new-pipelines"}).then((res)=>{console.log(res)})
 
-const path = __dirname+"/../simple.yaml"
+// const path = __dirname+"/../simple.yaml"
 
 // read yaml at the path
-const file: string = fs.readFileSync(path, 'utf8')
+// const file: string = fs.readFileSync(path, 'utf8')
 
-// OneContext.createKnowledgeBase({knowledgeBaseName: "new-pipelines-gcp-10", pipelineYaml: file})
+// OneContext.createKnowledgeBase({knowledgeBaseName: "rm-dev", pipelineYaml: file})
 
 // OneContext.getChunks({
 //     chunkArgs: {
@@ -24,11 +24,11 @@ const file: string = fs.readFileSync(path, 'utf8')
 //     }
 // })
 
-const runit = async () => {
-    const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})
-    return r
-}
-( async () => await runit() )()
+// const runit = async () => {
+//     const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})
+//     return r
+// }
+// ( async () => await runit() )()
 
 // const runMany = ({n}:{n: number}) => {
 //
@@ -36,7 +36,7 @@ const runit = async () => {
 //     let task = OneContext.query({
 //         queryArgs: {
 //             query: null,
-//             knowledgeBaseName: "ross-test-rm-dev",
+//             knowledgeBaseName: "new-pipelines",
 //             distanceMetric: "cosine",
 //             topK: 4,
 //             out: "chunk",
@@ -51,8 +51,8 @@ const runit = async () => {
 //     return Promise.all(tasks).then((res) => {return res})
 //
 // }
-
-// run({n: 100}).then((res) => {console.log(res)})
+//
+// runMany({n: 1}).then((res) => {console.log(res)})
 
 
 // const df = OneContext.query({queryArgs:{
@@ -70,11 +70,20 @@ const runit = async () => {
 //     // files: [{name: "test.txt", content: "test test test"}],
 //     metadataJson: {"description": "hello"},
 //     stream: false,
-//     knowledgeBaseName: "new-pipelines-gcp-10",
+//     knowledgeBaseName: "rm-dev",
 // }).then((res) => {
 //     console.log(res)
 // })
 
 // OneContext.awaitEmbeddings({knowledgeBaseName:"ross-test-rm-dev", filename: "Implicit_representations.pdf"}).then((res)=>{console.log(res)})
 
-// OneContext.checkKbStatus({knowledgeBaseName:"new-pipelines-gcp-10"}).then((res)=>{console.log(res)})
+// OneContext.checkKbStatus({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
+// OneContext.listFiles({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
+
+OneContext.generateQuiz({
+    userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {tupic}. Base the questions in your quiz on the information contained in the following pieces of text {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
+    metaDataFilters: {"file_name": {"in": ["Implicit_representations.pdf"]}},
+    knowledgeBaseName: "rm-dev",
+    totalNumberOfQuestions: 8,
+    extractPercentage: 0.8,
+}).then((res)=>{console.log(res)})
