@@ -39,20 +39,17 @@ export const createKnowledgeBase = async (kbCreate : generalArgs.KnowledgeBaseCr
 };
 
 export const createPipeline = async (pipelineCreate : generalArgs.PipelineCreateType ) => {
-    // this is basically the same method (and hits the same endpoint) as createKnowledgeBase, but as
-    // those two things are intrinsically linked, we can just use the same method
 
     try {
         const response = await axios({
             method: 'post',
-            // this is fine even if it hits knowledgebase
-            url: BASE_URL + 'knowledgebase',
+            url: BASE_URL + 'pipeline',
             headers: {
                 Authorization: `Bearer ${API_KEY}`,
             },
             data: {
                 name: pipelineCreate.pipelineName,
-                pipeline_yaml: pipelineCreate.pipelineYaml,
+                oc_yaml: pipelineCreate.pipelineYaml,
             },
         });
         console.log("Created pipeline: " + pipelineCreate.pipelineName)
@@ -122,7 +119,7 @@ export const query = async ({ queryArgs, polarOp }: { queryArgs: generalArgs.Que
             return flatKey({obj: response.data, key: 'metadata_json'});
         }
     } catch (error) {
-        console.error(error.response?.data?.errors[0] ?? error.message);
+        console.error(error.response?.data?.errors ?? error.message);
         return null;
     }
 };
