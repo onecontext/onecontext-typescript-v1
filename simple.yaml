@@ -37,10 +37,11 @@ index:
     - stage: Scorer
       steps:
         - step: LexRank
-          name: lexranker
+          name: lexranker_file
           step_args:
-            update_score_key: lexrank_score_test
-            update_percentile_key: lexrank_percentile_test
+            scope: file
+            update_score_key: lexrank_score_file
+            update_percentile_key: lexrank_percentile_file
           depends_on: [ sentence-transformers ]
 
     - stage: Clusterer
@@ -50,7 +51,7 @@ index:
           step_args:
             update_label_key: louvain_cluster_test
             assign_labels: gpt-3.5-turbo # RateLimit later
-          depends_on: [ lexranker ]
+          depends_on: [ lexranker_file ]
 
 
 query:
@@ -81,3 +82,36 @@ query:
             top_k: 10
             metadata_filters: { }
           depends_on: [ retriever ]
+
+
+hooks:
+
+  name: basic_hooks
+
+  stages:
+
+    - stage: Scorer
+
+      steps:
+        - step: LexRank
+          name: lexranker_global
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { }
+            update_score_key: lexrank_score_global
+            update_percentile_key: lexrank_percentile_global
+          depends_on: [ ]
+
+    - stage: Clusterer
+
+      steps:
+        - step: LouvainCommunityDetection
+          name: louvain_global
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { "lexrank_percentile_global": { "gt": 0.5 } }
+            update_label_key: louvain_cluster_global
+            assign_labels: gpt-3.5-turbo # RateLimit later
+          depends_on: [ ]

@@ -87,12 +87,19 @@ export const QueryPipelineSchema = z.object({
     stages: z.array(z.discriminatedUnion("stage",[RetrieverStageSchema, RerankerStageSchema]))
 });
 
+export const HooksPipelineSchema = z.object({
+    name: z.string(),
+    stages: z.array(z.discriminatedUnion("stage",[ClustererStageSchema, ScorerStageSchema]))
+});
+
 export type IndexPipelineSchema = z.infer<typeof IndexPipelineSchema>;
 export type QueryPipelineSchema = z.infer<typeof QueryPipelineSchema>;
+export type HooksPipelineSchema = z.infer<typeof HooksPipelineSchema>;
 
 export const PipelineSchema = z.object({
     index: IndexPipelineSchema,
-    query: QueryPipelineSchema
+    query: QueryPipelineSchema.optional(),
+    hooks: HooksPipelineSchema.optional()
 })
 
 export type PipelineSchema = z.infer<typeof PipelineSchema>;

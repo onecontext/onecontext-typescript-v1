@@ -15,7 +15,7 @@ const BASE_URL = process.env.BASE_URL;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // read yaml from file simple.yaml
-export const createKnowledgeBase = async (kbCreate : generalArgs.KnowledgeBaseCreateType ) => {
+export const createKnowledgeBase = async (kbCreate: generalArgs.KnowledgeBaseCreateType) => {
     try {
         const response = await axios({
             method: 'post',
@@ -38,11 +38,32 @@ export const createKnowledgeBase = async (kbCreate : generalArgs.KnowledgeBaseCr
     }
 };
 
-export const createPipeline = async (pipelineCreate : generalArgs.PipelineCreateType ) => {
+export const callPipelineHooks = async (pipelineName: string) => {
+
+    try {
+        const response = await axios({
+            method: 'post',
+            url: BASE_URL + `pipeline/${pipelineName}/hooks`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+            },
+        });
+        console.log("Called all hooks for pipeline: " + pipelineName)
+        return response.data;
+    } catch (error) {
+        console.log("Failed to call hooks for pipeline: " + pipelineName)
+        console.log(error.response.data);
+        return null;
+    }
+};
+
+export const createPipeline = async (pipelineCreate: generalArgs.PipelineCreateType) => {
 
     try {
         // first make sure it's a valid pipeline
-        const parsedYaml = await parseYaml({yaml: pipelineCreate.pipelineYaml, verboseErrorHandling: false})
+        const parsedYaml = await parseYaml({yaml: pipelineCreate.pipelineYaml, verboseErrorHandling: true})
         if (parsedYaml == null) {
             console.log("Failed to create pipeline: " + pipelineCreate.pipelineName)
             return null
@@ -99,7 +120,10 @@ export const listKnowledgeBases = async (): Promise<{
 };
 
 
-export const query = async ({ queryArgs, polarOp }: { queryArgs: generalArgs.QuerySingleArgType, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
+export const query = async ({queryArgs, polarOp}: {
+    queryArgs: generalArgs.QuerySingleArgType,
+    polarOp?: Function
+}): Promise<any[] | pl.DataFrame> => {
     try {
         const response = await axios({
             method: 'post',
@@ -212,18 +236,18 @@ type GenerateQuestOptions = {
 };
 
 export const generateQuest = async ({
-                                      vision,
-                                      mission,
-                                      quest,
-                                      introPrompt,
-                                      introContextBudget,
-                                      quizTotalContextBudget,
-                                      userPromptPerTopic,
-                                      metaDataFilters,
-                                      knowledgeBaseName,
-                                      totalNumberOfQuestions,
-                                      model,
-                                  }: GenerateQuestOptions): Promise<{ topic: string; output: string }[]> => {
+                                        vision,
+                                        mission,
+                                        quest,
+                                        introPrompt,
+                                        introContextBudget,
+                                        quizTotalContextBudget,
+                                        userPromptPerTopic,
+                                        metaDataFilters,
+                                        knowledgeBaseName,
+                                        totalNumberOfQuestions,
+                                        model,
+                                    }: GenerateQuestOptions): Promise<{ topic: string; output: string }[]> => {
     const result = await axios({
         method: 'get',
         url: BASE_URL + 'quest_gen',
@@ -272,20 +296,19 @@ export const uploadFile = async ({
                     filename: f.name,
                     contentType: 'text/plain',
                 })
-            }
-            catch (e) {
+            } catch (e) {
                 throw Error(`Error parsing file ${e}`)
-            }}
-
-            else {
-                try {
-                    // try and parse it as a path type file, i.e. the user has given a local file path,
-                    // and we are to use the fs library to read the file stream from that file
-                    const f = generalArgs.PathFileSchema.parse(file, {errorMap: ocErrors.customErrorMap})
-                    formData.append('files', f.readable);
-                } catch (e) {throw Error(`Error parsing file ${e}`)
-                }
             }
+        } else {
+            try {
+                // try and parse it as a path type file, i.e. the user has given a local file path,
+                // and we are to use the fs library to read the file stream from that file
+                const f = generalArgs.PathFileSchema.parse(file, {errorMap: ocErrors.customErrorMap})
+                formData.append('files', f.readable);
+            } catch (e) {
+                throw Error(`Error parsing file ${e}`)
+            }
+        }
     });
     formData.append('pipeline_name', pipelineName);
     if (metadataJson) {
@@ -408,7 +431,10 @@ export const complete = async ({
     return result.data;
 };
 
-export const getChunks = async ({ chunkArgs, polarOp }: { chunkArgs: generalArgs.GetChunkArgs, polarOp?: Function }): Promise<any[] | pl.DataFrame> => {
+export const getChunks = async ({chunkArgs, polarOp}: {
+    chunkArgs: generalArgs.GetChunkArgs,
+    polarOp?: Function
+}): Promise<any[] | pl.DataFrame> => {
     try {
         const response = await axios({
             method: 'get',
@@ -422,7 +448,10 @@ export const getChunks = async ({ chunkArgs, polarOp }: { chunkArgs: generalArgs
         })
 
         if (polarOp) {
-            const df: pl.DataFrame = pl.DataFrame(response.data.map((obj: object) => flatKey({obj: obj, key: 'metadata_json'})));
+            const df: pl.DataFrame = pl.DataFrame(response.data.map((obj: object) => flatKey({
+                obj: obj,
+                key: 'metadata_json'
+            })));
             return polarOp(df);
         } else {
             return response.data
@@ -434,7 +463,7 @@ export const getChunks = async ({ chunkArgs, polarOp }: { chunkArgs: generalArgs
 };
 
 
-export const getPipe = async ({ pipelineName }: { pipelineName: string }): Promise<any> => {
+export const getPipe = async ({pipelineName}: { pipelineName: string }): Promise<any> => {
     try {
         const response = await axios({
             method: 'get',
