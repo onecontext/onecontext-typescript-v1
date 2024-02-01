@@ -38,7 +38,7 @@ const preprocessorStepEnum = z.enum(["OCPreprocessor"]);
 const chunkerStepEnum = z.enum(["OCChunker", "BCChunker"]);
 const embedderStepEnum = z.enum(["SentenceTransformerEmbedder"]);
 const scorerStepEnum = z.enum(["LexRank"]);
-const clustererStepEnum = z.enum(["LouvainCommunityDetection"]);
+const clustererStepEnum = z.enum(["LouvainCommunityDetection", "KmeansClassifier"]);
 
 const rerankerStepEnum = z.enum(["OCReranker"]);
 const retrieverStepEnum = z.enum(["OCRetriever"]);

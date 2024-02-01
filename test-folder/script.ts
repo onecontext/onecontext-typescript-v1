@@ -4,7 +4,7 @@ import YAML from 'yaml';
 
 // OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
 
-// OneContext.deleteKnowledgeBase({knowledgeBaseName:"rm-dev-2"}).then((res)=>{console.log(res)})
+// OneContext.deleteKnowledgeBase({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
 
 // OneContext.listFiles({knowledgeBaseName:"new-pipelines"}).then((res)=>{console.log(res)})
 
