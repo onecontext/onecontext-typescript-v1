@@ -109,14 +109,19 @@ export const deleteKnowledgeBase = async ({knowledgeBaseName}: { knowledgeBaseNa
 export const listKnowledgeBases = async (): Promise<{
     id: string; name: string;
 }[]> => {
-    const response = await axios({
-        method: 'get',
-        url: BASE_URL + `knowledgebase`,
-        headers: {
-            Authorization: `Bearer ${API_KEY}`,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `knowledgebase`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.response.data.errors[0]);
+        return null;
+    }
 };
 
 
@@ -132,7 +137,7 @@ export const query = async ({queryArgs, polarOp}: {
                 Authorization: `Bearer ${API_KEY}`,
             },
             data: {
-                oc_yaml: queryArgs.oc_yaml,
+                override_oc_yaml: queryArgs.override_oc_yaml,
                 pipeline_name: queryArgs.pipelineName,
             },
         });

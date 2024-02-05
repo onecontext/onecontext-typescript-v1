@@ -4,7 +4,7 @@ import {Readable} from "stream";
 import {z} from "zod";
 
 export const QuerySingleArgTypeSchema = z.object({
-    oc_yaml: z.string().optional(),
+    override_oc_yaml: z.string().optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
 });
 
