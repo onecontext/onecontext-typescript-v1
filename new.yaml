@@ -66,6 +66,6 @@ query:
           step_args:
             query: return me the most important chunks for learning about spectral embeddings
             model_name: BAAI/bge-base-en-v1.5
-            top_k: 10
-            metadata_filters: {jsonb_path: '$.lexranker_file.lexranker_percentile_file ? (@ > 0.1)'}
+            top_k: 4
+            metadata_filters: { $jsonb_path: '$.lexranker_file.lexrank_percentile_file ? (@ > 0.6)'}
           depends_on: [ ]
