@@ -11,16 +11,19 @@
   "version": "1.0.8",
   "description": "OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on cloud infrastructure",
   "main": "./src/index.ts",
+  "types": "./src/ocTypes/**/*.ts",
+  "declaration": true,
   "compilerOptions": {
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   },
   "duevDependencies": {
     "ts-node": "^10.9.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "reload": "nodemon --watch './src/**/*.ts' --ext 'ts,js' --exec 'tsc ./src/index.ts && npm link'"
+    "reload": "nodemon --watch './src/**/*.ts' --ext 'ts,js' --exec 'tsc ./src/**/*.ts && npm link'"
   },
   "repository": {
     "type": "git",

@@ -1,18 +1,31 @@
-import { OneContext } from 'onecontext'
+import * as OneContext from 'onecontext'
 import fs from "fs";
 import YAML from 'yaml';
+import * as dotenv from "dotenv";
+
+// OneContext.PipelineDeleteArgs.parse({pipelineName: "rm-dev"})
+const pipeDelete: OneContext.generalTypes.PipelineDeleteType = {pipelineName: 400}
+console.log(pipeDelete)
+// OneContext.ocTypes.generalArgs.PipelineDeleteType({pipelineName: "rm-dev"})
+
+dotenv.config({path: __dirname + '/../.env'});
+
+const API_KEY = process.env.API_KEY;
+const BASE_URL = process.env.BASE_URL;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
 
-// OneContext.deleteKnowledgeBase({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
+// const deletePipe = generalArgs.DeletePipelineArgsSchema.parse({pipelineName: "rm-dev"})
+// OneContext.deletePipeline({pipelineName:"rm-dev"}).then((res)=>{console.log(res)})
 
-// OneContext.listFiles({knowledgeBaseName:"new-pipelines"}).then((res)=>{console.log(res)})
+// OneContext.listFiles({pipelineName:"new-pipelines"}).then((res)=>{console.log(res)})
 
-const path = __dirname+"/../simple.yaml"
+// const path = __dirname+"/../simple.yaml"
 // const newPath = __dirname+"/../new.yaml"
 
 // read yaml at the path
-const file: string = fs.readFileSync(path, 'utf8')
+// const file: string = fs.readFileSync(path, 'utf8')
 // const newFile: string = fs.readFileSync(newPath, 'utf8')
 
 // OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
@@ -94,4 +107,4 @@ const file: string = fs.readFileSync(path, 'utf8')
 // })
 
 // OneContext.callPipelineHooks("rm-dev").then((res) => {console.log(res)})
-OneContext.checkHooksCall({pipelineName :"rm-dev", callId: "41ef38daeebd4d3dac2b4d1fe5ce8334"}).then((res) => {console.log(res)})
+// OneContext.checkHooksCall({pipelineName :"rm-dev", callId: "41ef38daeebd4d3dac2b4d1fe5ce8334"}).then((res) => {console.log(res)})
