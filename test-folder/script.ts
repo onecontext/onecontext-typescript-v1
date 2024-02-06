@@ -9,11 +9,11 @@ import YAML from 'yaml';
 // OneContext.listFiles({knowledgeBaseName:"new-pipelines"}).then((res)=>{console.log(res)})
 
 const path = __dirname+"/../simple.yaml"
-const newPath = __dirname+"/../new.yaml"
+// const newPath = __dirname+"/../new.yaml"
 
 // read yaml at the path
 const file: string = fs.readFileSync(path, 'utf8')
-const newFile: string = fs.readFileSync(newPath, 'utf8')
+// const newFile: string = fs.readFileSync(newPath, 'utf8')
 
 // OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
 
@@ -56,14 +56,14 @@ const newFile: string = fs.readFileSync(newPath, 'utf8')
 //
 // runMany({n: 1}).then((res) => {console.log(res)})
 
-const df = OneContext.query({
-    queryArgs: {
-        pipelineName: "rm-dev",
-        override_oc_yaml: newFile,
-    }, polarOp: null
-}).then((df) => {
-    console.log(df)
-})
+// const df = OneContext.query({
+//     queryArgs: {
+//         pipelineName: "rm-dev",
+//         override_oc_yaml: newFile,
+//     }, polarOp: null
+// }).then((df) => {
+//     console.log(df)
+// })
 
 // OneContext.uploadFile({
 //     // you can upload a file EITHER by passing file path, or, by passing some content as text
@@ -78,7 +78,6 @@ const df = OneContext.query({
 
 // OneContext.awaitEmbeddings({knowledgeBaseName:"ross-test-rm-dev", filename: "Implicit_representations.pdf"}).then((res)=>{console.log(res)})
 
-// OneContext.checkKbStatus({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
 // OneContext.checkPipelineStatus({pipelineName:"rm-dev"}).then((res)=>{console.log(res)})
 // OneContext.listFiles({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
 
@@ -95,3 +94,4 @@ const df = OneContext.query({
 // })
 
 // OneContext.callPipelineHooks("rm-dev").then((res) => {console.log(res)})
+OneContext.checkHooksCall({pipelineName :"rm-dev", callId: "41ef38daeebd4d3dac2b4d1fe5ce8334"}).then((res) => {console.log(res)})

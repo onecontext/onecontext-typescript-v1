@@ -172,6 +172,29 @@ export const listFiles = async ({knowledgeBaseName}: { knowledgeBaseName: string
     }
 };
 
+export const checkHooksCall = async ({pipelineName, callId}: { pipelineName: string, callId: string }): Promise<{
+    status: boolean
+}> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `pipeline/${pipelineName}/${callId}`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        });
+        if (response.data == "Hook still in progress") {
+            return {status: false};
+        };
+        if (response.data == "Hook has completed") {
+            return {status: true};
+        }
+    } catch (error) {
+        console.log(error.response.data);
+        return null;
+    }
+};
+
 type GenerateQuizOptions = {
     userPromptPerTopic: string;
     metaDataFilters: Record<string, Record<string, any>>;
