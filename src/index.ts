@@ -36,7 +36,7 @@ export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipel
     }
 };
 
-export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType) => {
+export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType): Promise<any> => {
 
     try {
         // first make sure it's a valid pipeline
@@ -60,11 +60,8 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
             return response.data;
         }
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors || error.message);
             return null;
         }
         else {
@@ -73,6 +70,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
         }
     }
 };
+
 export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDeleteType): Promise<any | null> => {
     try {
         const response = await axios({
@@ -85,10 +83,7 @@ export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDe
         console.log("Deleted pipeline: " + pipelineDeleteArgs.pipelineName)
         return response.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
@@ -112,15 +107,13 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
         });
         return response.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -144,15 +137,13 @@ export const query = async (queryArgs: generalTypes.QuerySingleArgType,
         return response.data;
 
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -173,15 +164,13 @@ export const listFiles = async ( listFilesArgs: generalTypes.ListFilesType ): Pr
         });
         return response.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -205,15 +194,13 @@ export const checkHooksCall = async ( checkHooksArgs: generalTypes.CheckHooksTyp
             return {status: true};
         }
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -263,15 +250,13 @@ export const generateQuiz = async ({
         });
         return result.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -321,15 +306,13 @@ export const generateQuest = async ({
         });
         return result.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -385,15 +368,13 @@ export const uploadFile = async ({
         });
         return response.status === 200;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -412,15 +393,13 @@ export const checkPipelineStatus = async (
         });
         return response.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -479,15 +458,13 @@ export const complete = async ({
     });
     return result.data;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -504,20 +481,19 @@ export const getChunks = async (
             },
             data: {
                 metadata_filters: getChunksArgs.metaDataJson,
+                top_k: getChunksArgs.top_k
             },
         })
 
         return response.data
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }
@@ -535,15 +511,13 @@ export const getPipe = async (getPipe: generalTypes.GetPipeType ): Promise<any |
 
         return YAML.parse(response.data)
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
+        if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
         }
         else {
             console.error("Unknown error occurred")
+            console.error(error)
             return null
         }
     }

@@ -10,23 +10,20 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "lib": [
+      "es2015"
+    ]
   },
   "include": [
-    "src/**/*"
+    "./src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "rmUtils.ts",
-    "test-folder"
   ],
   "paths": {
-    "@types/": [
-      "./src/ocTypes/*.ts"
+    "@types/*": [
+      "./src/ocTypes/*"
     ]
   },
-  "sourceMap": true,
-  "lib": [
-    "es2015"
-  ]
 }

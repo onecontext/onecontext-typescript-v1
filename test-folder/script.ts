@@ -16,8 +16,8 @@ const overridePath = __dirname+"/../new.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
-const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm-dev', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
-OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm-dev', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const a = OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'rm-dev', BASE_URL: BASE_URL, API_KEY: API_KEY}
 OneContext.deletePipeline(pipeDelete).then((res)=>{console.log(res)})

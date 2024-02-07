@@ -114,6 +114,7 @@ export const CheckPipelineSchema = BaseArgsSchema.extend({
 export const GetChunkArgsSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     metaDataJson: z.object({}).default({}),
+    top_k: z.number().refine((val) => val > 0, {message: "Top k must be greater than 0"}),
 })
 export const GetPipeSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
