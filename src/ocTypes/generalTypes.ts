@@ -82,7 +82,7 @@ export const CallPipelineSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
 
-export const PathFileSchema = BaseArgsSchema.extend({
+export const PathFileSchema = z.object({
     path: z.string().nullable(),
     readable: z.instanceof(Readable).optional(),
 }).transform((data, ctx) => {
@@ -114,7 +114,7 @@ export const CheckPipelineSchema = BaseArgsSchema.extend({
 export const GetChunkArgsSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     metaDataJson: z.object({}).default({}),
-    top_k: z.number().refine((val) => val > 0, {message: "Top k must be greater than 0"}),
+    top_k: z.union([z.number().refine((val) => val > 0, {message: "Top k must be greater than 0"}),z.null()])
 })
 export const GetPipeSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),

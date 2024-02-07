@@ -64,8 +64,8 @@ query:
         - step: OCRetriever
           name: retriever
           step_args:
-            query: return me the most important chunks for learning about spectral embeddings
+            query: return to me the most important chunks for learning about spectral embeddings
             model_name: BAAI/bge-base-en-v1.5
             top_k: 4
-            metadata_filters: { file_name: {"$eq" : "Implicit_representations.pdf"}}
+            metadata_filters: { file_name: {"$eq" : "Implicit_representations.pdf"}, lexranker_file.percentile_score: {"$gt": 0.5}}
           depends_on: [ ]

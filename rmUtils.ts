@@ -9,3 +9,12 @@ export const runMany = ({n, callable, callableArgs}:{n: number, callable: (args:
 
     return Promise.all(tasks).then((res) => {return res})
 }
+
+// const runit = async () => {
+//     const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})
+//     return r
+// }
+// ( async () => await runit() )()
+
+// runMany({n: 1}).then((res) => {console.log(res)})
+
