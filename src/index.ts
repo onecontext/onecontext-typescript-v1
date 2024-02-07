@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {flatKey, sleep} from './utils';
+import {sleep} from './utils';
 import * as generalTypes from "./ocTypes/generalTypes";
 import * as yamlTypes from "./ocTypes/yamlTypes";
 import * as ocErrors from "./ocTypes/errors";
@@ -36,27 +36,27 @@ export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipel
     }
 };
 
-export const createPipeline = async (pipelineCreate: generalTypes.PipelineCreateType) => {
+export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType) => {
 
     try {
         // first make sure it's a valid pipeline
-        const parsedYaml = await parseYaml({yaml: pipelineCreate.pipelineYaml, verboseErrorHandling: true})
+        const parsedYaml = await parseYaml({yaml: pipelineCreateArgs.pipelineYaml, verboseErrorHandling: true})
         if (parsedYaml == null) {
-            console.log("Failed to create pipeline: " + pipelineCreate.pipelineName)
+            console.log("Failed to create pipeline: " + pipelineCreateArgs.pipelineName)
             return null
         } else {
             const response = await axios({
                 method: 'post',
-                url: pipelineCreate.BASE_URL + 'pipeline',
+                url: pipelineCreateArgs.BASE_URL + 'pipeline',
                 headers: {
-                    Authorization: `Bearer ${pipelineCreate.API_KEY}`,
+                    Authorization: `Bearer ${pipelineCreateArgs.API_KEY}`,
                 },
                 data: {
-                    name: pipelineCreate.pipelineName,
-                    oc_yaml: pipelineCreate.pipelineYaml,
+                    name: pipelineCreateArgs.pipelineName,
+                    oc_yaml: pipelineCreateArgs.pipelineYaml,
                 },
             });
-            console.log("Created pipeline: " + pipelineCreate.pipelineName)
+            console.log("Created pipeline: " + pipelineCreateArgs.pipelineName)
             return response.data;
         }
     } catch (error: unknown) {
@@ -73,7 +73,7 @@ export const createPipeline = async (pipelineCreate: generalTypes.PipelineCreate
         }
     }
 };
-export const deletePipeline = async ({pipelineDeleteArgs}: { pipelineDeleteArgs: generalTypes.PipelineDeleteType }): Promise<any | null> => {
+export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDeleteType): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'delete',
@@ -99,7 +99,7 @@ export const deletePipeline = async ({pipelineDeleteArgs}: { pipelineDeleteArgs:
     }
     };
 
-export const listPipelines = async ({listPipelinesArgs}: {listPipelinesArgs: generalTypes.ListPipelinesType}): Promise<{
+export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipelinesType): Promise<{
     id: string; name: string;
 }[] | null> => {
     try {
@@ -127,9 +127,8 @@ export const listPipelines = async ({listPipelinesArgs}: {listPipelinesArgs: gen
 };
 
 
-export const query = async ({queryArgs}: {
-    queryArgs: generalTypes.QuerySingleArgType,
-}): Promise<any[] | null> => {
+export const query = async (queryArgs: generalTypes.QuerySingleArgType,
+): Promise<any[] | null> => {
     try {
         const response = await axios({
             method: 'post',
@@ -159,7 +158,7 @@ export const query = async ({queryArgs}: {
     }
 };
 
-export const listFiles = async ({listFilesArgs}: { listFilesArgs: generalTypes.ListFilesType }): Promise<{
+export const listFiles = async ( listFilesArgs: generalTypes.ListFilesType ): Promise<{
     name: string;
     status: string;
     metadata_json: object;
@@ -189,7 +188,7 @@ export const listFiles = async ({listFilesArgs}: { listFilesArgs: generalTypes.L
 
 };
 
-export const checkHooksCall = async ({checkHooksArgs}: { checkHooksArgs: generalTypes.CheckHooksType }): Promise<{
+export const checkHooksCall = async ( checkHooksArgs: generalTypes.CheckHooksType ): Promise<{
     status: boolean } | null> => {
     try {
         const response = await axios({
@@ -401,9 +400,8 @@ export const uploadFile = async ({
 };
 
 
-export const checkPipelineStatus = async ({checkPipe}: {
-    checkPipe: generalTypes.CheckPipelineType;
-}): Promise<any | null> => {
+export const checkPipelineStatus = async (
+    checkPipe: generalTypes.CheckPipelineType): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -427,16 +425,14 @@ export const checkPipelineStatus = async ({checkPipe}: {
         }
     }
 };
-export const awaitEmbeddings = async ({awaitEmbeddings}: {
+export const awaitEmbeddings = async (
     awaitEmbeddings: generalTypes.AwaitEmbeddingsType
-}): Promise<void> => {
+): Promise<void> => {
     while (true) {
         const files = await listFiles({
-            listFilesArgs: {
                 pipelineName: awaitEmbeddings.pipelineName,
                 BASE_URL: awaitEmbeddings.BASE_URL,
                 API_KEY: awaitEmbeddings.API_KEY
-            }
         });
         if (!files) {
             throw new Error('file not found');
@@ -497,9 +493,8 @@ export const complete = async ({
     }
 };
 
-export const getChunks = async ({getChunksArgs}: {
-    getChunksArgs: generalTypes.GetChunksType
-}): Promise<{}[] | null> => {
+export const getChunks = async (
+    getChunksArgs: generalTypes.GetChunksType): Promise<{}[] | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -528,7 +523,7 @@ export const getChunks = async ({getChunksArgs}: {
     }
 };
 
-export const getPipe = async ({getPipe}: { getPipe: generalTypes.GetPipeType }): Promise<any | null> => {
+export const getPipe = async (getPipe: generalTypes.GetPipeType ): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'get',

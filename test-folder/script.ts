@@ -2,6 +2,7 @@ import * as OneContext from 'onecontext'
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
+import {runMany} from "../rmUtils";
 
 // import the variables from the .env
 dotenv.config({path: __dirname + '/../.env'});
@@ -10,102 +11,61 @@ const API_KEY: string = process.env.API_KEY!;
 const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
-const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'hi', BASE_URL: BASE_URL, API_KEY: API_KEY}
+const path = __dirname+"/../simple.yaml"
+const overridePath = __dirname+"/../new.yaml"
+const file: string = fs.readFileSync(path, 'utf8')
+const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
-// OneContext.ocTypes.generalArgs.PipelineDeleteType({pipelineName: "rm-dev"})
+const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm-dev', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
+const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'rm-dev', BASE_URL: BASE_URL, API_KEY: API_KEY}
+OneContext.deletePipeline(pipeDelete).then((res)=>{console.log(res)})
 
-// OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
-// const deletePipe = generalArgs.DeletePipelineArgsSchema.parse({pipelineName: "rm-dev"})
-// OneContext.deletePipeline({pipelineName:"rm-dev"}).then((res)=>{console.log(res)})
+// const deletePipes: OneContext.PipelineDeleteType = {pipelineName: 'hi', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.deletePipeline(deletePipes).then((res)=>{console.log(res)})
 
-// OneContext.listFiles({pipelineName:"new-pipelines"}).then((res)=>{console.log(res)})
+// const listFiles: OneContext.ListFilesType = {pipelineName: 'hi', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
-// const path = __dirname+"/../simple.yaml"
-// const newPath = __dirname+"/../new.yaml"
+// const getChunksArgs: OneContext.GetChunksType = {pipelineName: 'hi', metaDataJson: {"file_name": {"in": ["Implicit_representations.pdf"]}}, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.getChunks(getChunksArgs).then((res) => {console.log(res)})
 
-// read yaml at the path
-// const file: string = fs.readFileSync(path, 'utf8')
-// const newFile: string = fs.readFileSync(newPath, 'utf8')
+// const queryArgs: OneContext.QuerySingleArgType = {pipelineName: 'hi', override_oc_yaml: overrideFile, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.query(queryArgs).then((res) => {
+//     console.log(res)
+// })
 
-// OneContext.createPipeline({pipelineName: "rm-dev", pipelineYaml: file})
+// const uploadFileArgs: OneContext.UploadFileType = {files: [{path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}], metadataJson: {"description": "hello"}, pipelineName: "hi", BASE_URL: BASE_URL, API_KEY: API_KEY, stream: false}
+// OneContext.uploadFile(uploadFileArgs).then((res) => {
+//     console.log(res)
+// })
 
-// OneContext.getChunks({
-//     chunkArgs: {
-//         knowledgeBaseName: "rm-dev",
-//         metaDataJson: {"file_name": {"in": ["Implicit_representations.pdf"]}},
-//     }, polarOp: (df) => {
-//         return df
-//     }
-// }).then((res) => {console.log(res)})
+// const awaitEmbeddingArgs: OneContext.AwaitEmbeddingsType = {pipelineName: "hi", fileName: "Implicit_representations.pdf", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.awaitEmbeddings(awaitEmbeddingArgs).then((res)=>{console.log(res)})
+
+// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "hi", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
+
+// const generateQuizArgs: OneContext.GenerateQuizType = {userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.", metaDataFilters: {"file_name": {"$in": ["Implicit_representations.pdf"]}}, pipelineName: "hi", scorePercentileLabel: "lexrank_percentile_test", clusterLabel: "louvain_cluster_test", totalNumberOfQuestions: 8, extractPercentage: 0.8, BASE_URL: BASE_URL, API_KEY: API_KEY, OPENAI_API_KEY: OPENAI_API_KEY}
+// OneContext.generateQuiz(generateQuizArgs).then((res) => {
+//     console.log(res)
+// })
+
+// const callPipeArgs: OneContext.CallPipelineType = {pipelineName: "hi", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.callPipelineHooks(callPipeArgs).then((res) => {console.log(res)})
+
+// const checkHooksArgs: OneContext.CheckHooksType = {pipelineName: "hi", callId: "41ef38daeebd4d3dac2b4d1fe5ce8334", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.checkHooksCall(checkHooksArgs).then((res) => {console.log(res)})
 
 // const runit = async () => {
 //     const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})
 //     return r
 // }
 // ( async () => await runit() )()
-//
-// const runMany = ({n}:{n: number}) => {
-//
-//     // create one task
-//     let task = OneContext.query({
-//         queryArgs: {
-//             query: null,
-//             knowledgeBaseName: "new-pipelines",
-//             distanceMetric: "cosine",
-//             topK: 4,
-//             out: "chunk",
-//             metaDataJson: {"file_name": {"in": ["Implicit_representations.pdf"]}},
-//         },
-//         polarOp: (df) => {return df.sort("page")},
-//     });
-//
-//     // make n copies of the above task
-//     const tasks = Array.from({length:n}).map(x => task)
-//
-//     return Promise.all(tasks).then((res) => {return res})
-//
-// }
-//
+
 // runMany({n: 1}).then((res) => {console.log(res)})
 
-// const df = OneContext.query({
-//     queryArgs: {
-//         pipelineName: "rm-dev",
-//         override_oc_yaml: newFile,
-//     }, polarOp: null
-// }).then((df) => {
-//     console.log(df)
-// })
-
-// OneContext.uploadFile({
-//     // you can upload a file EITHER by passing file path, or, by passing some content as text
-//     files: [{path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
-//     // files: [{name: "test.txt", content: "test test test"}],
-//     metadataJson: {"description": "hello"},
-//     stream: false,
-//     pipelineName: "rm-dev",
-// }).then((res) => {
-//     console.log(res)
-// })
-
-// OneContext.awaitEmbeddings({knowledgeBaseName:"ross-test-rm-dev", filename: "Implicit_representations.pdf"}).then((res)=>{console.log(res)})
-
-// OneContext.checkPipelineStatus({pipelineName:"rm-dev"}).then((res)=>{console.log(res)})
-// OneContext.listFiles({knowledgeBaseName:"rm-dev"}).then((res)=>{console.log(res)})
-
-// OneContext.generateQuiz({
-//     userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-//     metaDataFilters: {"file_name": {"$in": ["Implicit_representations.pdf"]}},
-//     pipelineName: "rm-dev",
-//     scorePercentileLabel: "lexrank_percentile_test",
-//     clusterLabel: "louvain_cluster_test",
-//     totalNumberOfQuestions: 8,
-//     extractPercentage: 0.8,
-// }).then((res) => {
-//     console.log(res)
-// })
-
-// OneContext.callPipelineHooks("rm-dev").then((res) => {console.log(res)})
-// OneContext.checkHooksCall({pipelineName :"rm-dev", callId: "41ef38daeebd4d3dac2b4d1fe5ce8334"}).then((res) => {console.log(res)})
