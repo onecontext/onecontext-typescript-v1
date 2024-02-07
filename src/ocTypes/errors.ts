@@ -37,6 +37,3 @@ export const pipelineErrorMap: z.ZodErrorMap = (error, ctx) => {
     return {message: ctx.defaultError};
 };
 
-
-
-export * as ocErrors from "./errors";

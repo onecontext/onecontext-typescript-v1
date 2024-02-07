@@ -1,14 +1,13 @@
 import axios from 'axios';
 import {flatKey, sleep} from './utils';
-import * as generalTypes from "./ocTypes/generalArgs";
-import * as yamlTypes from "./ocTypes/yamlValidation";
+import * as generalTypes from "./ocTypes/generalTypes";
+import * as yamlTypes from "./ocTypes/yamlTypes";
 import * as ocErrors from "./ocTypes/errors";
-import pl from 'nodejs-polars';
-import FormData = require('form-data');
+import FormData from 'form-data';
 import * as z from "zod";
 import * as YAML from 'yaml';
 
-export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipelineType) => {
+export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipelineType): Promise<any | null> => {
 
     try {
         const response = await axios({
@@ -22,10 +21,18 @@ export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipel
         });
         console.log("Called all hooks for pipeline: " + callPipelineArgs.pipelineName)
         return response.data;
-    } catch (error) {
-        console.log("Failed to call hooks for pipeline: " + callPipelineArgs.pipelineName)
-        console.log(error.response.data);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
@@ -52,13 +59,21 @@ export const createPipeline = async (pipelineCreate: generalTypes.PipelineCreate
             console.log("Created pipeline: " + pipelineCreate.pipelineName)
             return response.data;
         }
-    } catch (error) {
-        console.log("Failed to create pipeline: " + pipelineCreate.pipelineName)
-        console.log(error.response.data);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
-export const deletePipeline = async ({pipelineDeleteArgs}: { pipelineDeleteArgs: generalTypes.PipelineDeleteType }) => {
+export const deletePipeline = async ({pipelineDeleteArgs}: { pipelineDeleteArgs: generalTypes.PipelineDeleteType }): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'delete',
@@ -69,16 +84,24 @@ export const deletePipeline = async ({pipelineDeleteArgs}: { pipelineDeleteArgs:
         });
         console.log("Deleted pipeline: " + pipelineDeleteArgs.pipelineName)
         return response.data;
-    } catch (error) {
-        console.log("Failed to delete pipeline: " + pipelineDeleteArgs.pipelineName)
-        console.error(error.response.data.errors[0]);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
-};
+    };
 
 export const listPipelines = async ({listPipelinesArgs}: {listPipelinesArgs: generalTypes.ListPipelinesType}): Promise<{
     id: string; name: string;
-}[]> => {
+}[] | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -88,17 +111,25 @@ export const listPipelines = async ({listPipelinesArgs}: {listPipelinesArgs: gen
             },
         });
         return response.data;
-    } catch (error) {
-        console.error(error.response.data.errors[0]);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
 
-export const query = async ({queryArgs, polarOp}: {
+export const query = async ({queryArgs}: {
     queryArgs: generalTypes.QuerySingleArgType,
-    polarOp?: Function
-}): Promise<any[] | pl.DataFrame> => {
+}): Promise<any[] | null> => {
     try {
         const response = await axios({
             method: 'post',
@@ -111,16 +142,20 @@ export const query = async ({queryArgs, polarOp}: {
                 pipeline_name: queryArgs.pipelineName,
             },
         });
+        return response.data;
 
-        if (polarOp) {
-            const df: pl.DataFrame = pl.DataFrame(response.data['chunks']);
-            return polarOp(df);
-        } else {
-            return flatKey({obj: response.data, key: 'metadata_json'});
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
         }
-    } catch (error) {
-        console.error(error.response?.data?.errors ?? error.message);
-        return null;
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
@@ -128,7 +163,7 @@ export const listFiles = async ({listFilesArgs}: { listFilesArgs: generalTypes.L
     name: string;
     status: string;
     metadata_json: object;
-}[]> => {
+}[] | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -138,15 +173,24 @@ export const listFiles = async ({listFilesArgs}: { listFilesArgs: generalTypes.L
             },
         });
         return response.data;
-    } catch (error) {
-        console.error(error.response.data.errors[0]);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
+
 };
 
 export const checkHooksCall = async ({checkHooksArgs}: { checkHooksArgs: generalTypes.CheckHooksType }): Promise<{
-    status: boolean
-}> => {
+    status: boolean } | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -161,10 +205,20 @@ export const checkHooksCall = async ({checkHooksArgs}: { checkHooksArgs: general
         if (response.data == "Hook has completed") {
             return {status: true};
         }
-    } catch (error) {
-        console.log(error.response.data);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
+    return null
 };
 
 
@@ -179,7 +233,7 @@ export const generateQuiz = async ({
                                        scorePercentileLabel,
                                        totalNumberOfQuestions,
                                        extractPercentage,
-                                   }: generalTypes.GenerateQuizType): Promise<{ topic: string; output: string }[]> => {
+                                   }: generalTypes.GenerateQuizType): Promise<{ topic: string; output: string }[] | null> => {
 
 
     const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
@@ -209,9 +263,18 @@ export const generateQuiz = async ({
             },
         });
         return result.data;
-    } catch (error) {
-        console.error(error.response.data.errors[0]);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
@@ -234,29 +297,43 @@ export const generateQuest = async ({
                                     }: generalTypes.GenerateQuestOptionsType): Promise<{
     topic: string;
     output: string
-}[]> => {
-    const result = await axios({
-        method: 'get',
-        url: BASE_URL + 'quest_gen',
-        headers: {
-            Authorization: `Bearer ${API_KEY}`,
-        },
-        data: {
-            vision: vision,
-            user_mission: mission,
-            quest: quest,
-            intro_prompt: introPrompt,
-            intro_context_budget: introContextBudget,
-            quiz_total_context_budget: quizTotalContextBudget,
-            metadata_filters: metaDataFilters,
-            prompt_per_topic: userPromptPerTopic,
-            knowledge_base_name: knowledgeBaseName,
-            total_num_questions: totalNumberOfQuestions,
-            model: model,
-            openai_api_key: OPENAI_API_KEY,
-        },
-    });
-    return result.data;
+}[] | null> => {
+    try {
+        const result = await axios({
+            method: 'get',
+            url: BASE_URL + 'quest_gen',
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+                vision: vision,
+                user_mission: mission,
+                quest: quest,
+                intro_prompt: introPrompt,
+                intro_context_budget: introContextBudget,
+                quiz_total_context_budget: quizTotalContextBudget,
+                metadata_filters: metaDataFilters,
+                prompt_per_topic: userPromptPerTopic,
+                knowledge_base_name: knowledgeBaseName,
+                total_num_questions: totalNumberOfQuestions,
+                model: model,
+                openai_api_key: OPENAI_API_KEY,
+            },
+        });
+        return result.data;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
+    }
 };
 
 
@@ -267,7 +344,7 @@ export const uploadFile = async ({
                                      metadataJson,
                                      BASE_URL,
                                      API_KEY,
-                                 }: generalTypes.UploadFileType): Promise<boolean> => {
+                                 }: generalTypes.UploadFileType): Promise<boolean | null> => {
     const formData = new FormData();
     files.forEach(file => {
         if (stream) {
@@ -308,16 +385,25 @@ export const uploadFile = async ({
             data: formData,
         });
         return response.status === 200;
-    } catch (error) {
-        console.error(error.response.data.errors[0]);
-        return false;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
 
 export const checkPipelineStatus = async ({checkPipe}: {
     checkPipe: generalTypes.CheckPipelineType;
-}) => {
+}): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -327,17 +413,32 @@ export const checkPipelineStatus = async ({checkPipe}: {
             },
         });
         return response.data;
-    } catch (error) {
-        console.error(error.response.data.errors[0]);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 export const awaitEmbeddings = async ({awaitEmbeddings}: {
     awaitEmbeddings: generalTypes.AwaitEmbeddingsType
-}) => {
+}): Promise<void> => {
     while (true) {
-        const files = await listFiles({listFilesArgs: {pipelineName: awaitEmbeddings.pipelineName}});
-        if (!files.some(it => it.name === awaitEmbeddings.fileName)) {
+        const files = await listFiles({
+            listFilesArgs: {
+                pipelineName: awaitEmbeddings.pipelineName,
+                BASE_URL: awaitEmbeddings.BASE_URL,
+                API_KEY: awaitEmbeddings.API_KEY
+            }
+        });
+        if (!files) {
             throw new Error('file not found');
         }
         if (files.some(it => it.name === awaitEmbeddings.fileName && it.status == "EMBEDDED")) {
@@ -360,7 +461,8 @@ export const complete = async ({
                                    BASE_URL,
                                    OPENAI_API_KEY,
                                    API_KEY,
-                               }: generalTypes.CompletionArgsType): Promise<any[]> => {
+                               }: generalTypes.CompletionArgsType): Promise<any[] | null> => {
+    try {
     const result = await axios({
         method: 'post',
         url: BASE_URL + 'context_completion',
@@ -380,11 +482,24 @@ export const complete = async ({
         },
     });
     return result.data;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
+    }
 };
 
 export const getChunks = async ({getChunksArgs}: {
     getChunksArgs: generalTypes.GetChunksType
-}): Promise<{}[]> => {
+}): Promise<{}[] | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -398,13 +513,22 @@ export const getChunks = async ({getChunksArgs}: {
         })
 
         return response.data
-    } catch (error) {
-        console.error(error.message);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
-export const getPipe = async ({getPipe}: { getPipe: generalTypes.GetPipeType }): Promise<any> => {
+export const getPipe = async ({getPipe}: { getPipe: generalTypes.GetPipeType }): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -415,9 +539,18 @@ export const getPipe = async ({getPipe}: { getPipe: generalTypes.GetPipeType }):
         })
 
         return YAML.parse(response.data)
-    } catch (error) {
-        console.error(error.message);
-        return null;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        } else if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return null;
+        }
+        else {
+            console.error("Unknown error occurred")
+            return null
+        }
     }
 };
 
@@ -425,21 +558,21 @@ export const getPipe = async ({getPipe}: { getPipe: generalTypes.GetPipeType }):
 export const parseYaml = async ({yaml, verboseErrorHandling}: {
     yaml: string,
     verboseErrorHandling: boolean
-}): Promise<yamlTypes.PipelineSchema> => {
+}): Promise<yamlTypes.PipelineSchema | null> => {
     try {
         return yamlTypes.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
     } catch (error) {
         if (error instanceof z.ZodError) {
             if (verboseErrorHandling) {
                 console.log(error.message)
-                return null
             } else {
                 console.log(error.issues.map((issue) => issue.message).join("\n"));
-                return null;
             }
         }
         throw error
     }
 }
 
-export * as OneContext from './index';
+export * from './ocTypes/generalTypes';
+export * from './ocTypes/yamlTypes';
+export * from './ocTypes/errors';

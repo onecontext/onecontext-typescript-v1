@@ -2,7 +2,7 @@ export function sleep({ms}: {ms:number}) {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-export function flatKey({obj, key}: {obj: object, key: string}): any {
+export function flatKey({obj, key}: {obj: Record<string, any>, key: string}): any {
     if (!obj[key]) {
         return obj;
     }

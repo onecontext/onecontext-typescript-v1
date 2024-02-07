@@ -101,7 +101,7 @@ export const PathFileSchema = BaseArgsSchema.extend({
 
 export const PipelineCreateSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    pipelineYaml: z.string().optional(),
+    pipelineYaml: z.string(),
 })
 export const PipelineDeleteSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
@@ -159,4 +159,3 @@ export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
 export type GetChunksType = z.infer<typeof GetChunkArgsSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>
 
-export * as generalArgs from "./generalArgs";

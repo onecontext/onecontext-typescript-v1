@@ -3,16 +3,17 @@ import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
 
-// OneContext.PipelineDeleteArgs.parse({pipelineName: "rm-dev"})
-const pipeDelete: OneContext.generalTypes.PipelineDeleteType = {pipelineName: 400}
-console.log(pipeDelete)
-// OneContext.ocTypes.generalArgs.PipelineDeleteType({pipelineName: "rm-dev"})
-
+// import the variables from the .env
 dotenv.config({path: __dirname + '/../.env'});
 
-const API_KEY = process.env.API_KEY;
-const BASE_URL = process.env.BASE_URL;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const API_KEY: string = process.env.API_KEY!;
+const BASE_URL: string = process.env.BASE_URL!;
+const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
+
+const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'hi', BASE_URL: BASE_URL, API_KEY: API_KEY}
+
+// OneContext.ocTypes.generalArgs.PipelineDeleteType({pipelineName: "rm-dev"})
+
 
 // OneContext.listKnowledgeBases().then((res)=>{console.log(res)})
 
