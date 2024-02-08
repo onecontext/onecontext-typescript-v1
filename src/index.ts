@@ -112,7 +112,7 @@ export const query = async (queryArgs: generalTypes.QuerySingleArgType,
     try {
         const response = await axios({
             method: 'post',
-            url: queryArgs.BASE_URL + `query`,
+            url: queryArgs.BASE_URL + `run_query`,
             headers: {
                 Authorization: `Bearer ${queryArgs.API_KEY}`,
             },

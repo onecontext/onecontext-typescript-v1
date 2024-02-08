@@ -16,7 +16,9 @@ const indexStages = {
 
 const queryStages = {
     Reranker: "Reranker",
-    Retriever: "Retriever"
+    Retriever: "Retriever",
+    Scorer: "Scorer",
+    Clusterer: "Clusterer"
 } as const;
 
 // enums

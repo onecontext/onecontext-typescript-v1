@@ -1,0 +1,130 @@
+index:
+
+  name: basic_index
+
+  stages:
+    - stage: Preprocessor
+      steps:
+        - step: OCPreprocessor
+          name: simple_pre_processor
+          step_args:
+            add_punctuation: false
+            remove_whitespace: false
+          depends_on: [ ]
+
+    - stage: Chunker
+      steps:
+        - step: OCChunker
+          name: simple_chunker
+          step_args:
+            chunk_size_words: 320
+            chunk_overlap: 30
+            split_by: word
+            split_respect_sentence_boundary: true
+            hard_split_max_chars: 2400
+          depends_on: [ simple_pre_processor ]
+
+    - stage: Embedder
+      steps:
+        - step: SentenceTransformerEmbedder
+          name: sentence-transformers
+          step_args:
+            model_name: BAAI/bge-base-en-v1.5
+            batch_size: 4
+            include_metadata: [ title, file_name ]
+          depends_on: [ simple_chunker ]
+
+    - stage: Scorer
+      steps:
+        - step: LexRank
+          name: lexranker_file
+          step_args:
+            scope: file
+          depends_on: [ sentence-transformers ]
+
+    - stage: Clusterer
+      steps:
+        - step: LouvainCommunityDetection
+          name: louvain
+          step_args:
+            assign_labels: gpt-3.5-turbo # RateLimit later
+          depends_on: [ lexranker_file ]
+
+
+query:
+
+  name: test_query
+
+  stages:
+    - stage: Retriever
+
+      steps:
+        - step: OCRetriever
+          name: retainit_retriever
+          step_args:
+            query: tell me all about large language models and their generalisation capabilities
+            model_name: BAAI/bge-base-en-v1.5
+            top_k: 100
+            metadata_filters: { }
+          depends_on: [ ]
+
+    - stage: Scorer
+
+      steps:
+        - step: LexRank
+          name: lexranker_retainit
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { }
+          depends_on: [ retainit_retriever ]
+
+    - stage: Clusterer
+
+      steps:
+        - step: LouvainCommunityDetection
+          name: louvain_retainit
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { }
+          depends_on: [ lexranker_retainit ]
+
+hooks:
+
+  name: basic_hooks
+
+  stages:
+
+    - stage: Scorer
+
+      steps:
+        - step: LexRank
+          name: lexranker_global
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { }
+          depends_on: [ ]
+
+    - stage: Clusterer
+
+      steps:
+        - step: LouvainCommunityDetection
+          name: louvain_global
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { "lexranker_global.percentile_score": { "$gt": 0.5 } }
+            assign_labels: gpt-3.5-turbo # RateLimit later
+          depends_on: [ ]
+
+        - step: KmeansClassifier
+          name: kmeans_global
+          step_args:
+            # you define the scope by metadata filters.
+            # no metadata filters means global, i.e. all chunks in the kb
+            scope_filters: { "lexranker_global.percentile_score": { "$gt": 0.5 } }
+            update_label_key: kmeans_global_test
+            assign_labels: gpt-3.5-turbo # RateLimit later
+          depends_on: [ ]
