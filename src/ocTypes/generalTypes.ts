@@ -9,40 +9,59 @@ export const BaseArgsSchema = z.object({
 });
 export const OpenAIBaseArgsSchema = BaseArgsSchema.extend({
     OPENAI_API_KEY: z.string(),
+    model: z.string().default("gpt-3.5-turbo").optional(),
 });
 
 export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
-    vision: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Vision cannot be empty"}),
-    mission: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Mission cannot be empty"}),
-    quest: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Quest cannot be empty"}),
-    introPrompt: z.string().refine((val: string):boolean => val.trim() !== '', {message: "Intro prompt cannot be empty"}),
+    vision: z.string().optional(),
+    mission: z.string().optional(),
+    quest: z.string().optional(),
+    introPrompt: z.string().optional(),
     introContextBudget: z.number().refine((val: number): boolean => val > 0, {message: "Intro context budget must be greater than 0"}),
     quizTotalContextBudget: z.number().refine((val: number): boolean => val > 0, {message: "Quiz total context budget must be greater than 0"}),
     userPromptPerTopic: z.string().refine((val: string): boolean => val.trim() !== '', {message: "User prompt cannot be empty"}),
     metaDataFilters: z.object({}).default({}),
-    knowledgeBaseName: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Knowledge base name cannot be empty"}),
+    pipelineName: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     totalNumberOfQuestions: z.number().refine((val: number): boolean => val > 0, {message: "Total number of questions must be greater than 0"}),
-    model: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Model cannot be empty"}),
-});
-
-
-export const GenerateQuizArgsSchema = OpenAIBaseArgsSchema.extend({
-    userPromptPerTopic: z.string().refine((val) => val.trim() !== '', {message: "User prompt cannot be empty"}).refine((val) => {
+    chunksLimit: z.union([z.number().refine((val: number): boolean => val > 0, {message: "Chunks limit must be greater than 0"}), z.null()]).default(30),
+    scorePercentileKey: z.string().optional(),
+    clusterLabelKey: z.string().optional(),
+}).superRefine((val, ctx) => {
+    // make sure they have passed the required variables in the userPromptPerTopic IF they have overridden
+    if (val.userPromptPerTopic !== undefined) {
         const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
-        const missingVariables: string[] = requiredVariables.filter(variable => !val.includes(variable));
+        const missingVariables: string[] = requiredVariables.filter(variable => !val.userPromptPerTopic.includes(variable));
         if (missingVariables.length > 0) {
-            console.error(`You are missing a required variable in the string you passed to userPromptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`)
+            ctx.addIssue({code: z.ZodIssueCode.custom, message: `You are missing a required variable in the override string you passed to userPromptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`, path: ['userPromptPerTopic']})
             return false
         }
         return true
-    }),
+    } else {
+        return true
+    }
+})
+
+
+export const GenerateQuizArgsSchema = OpenAIBaseArgsSchema.extend({
+    userPromptPerTopic: z.string().optional(),
     metaDataFilters: z.object({}).default({}),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     clusterLabel: z.string().optional(),
     scorePercentileLabel: z.string().optional(),
     totalNumberOfQuestions: z.number().refine((val) => val > 0, {message: "Total number of questions must be greater than 0"}),
     extractPercentage: z.number().refine((val) => val > 0 && val <= 100, {message: "Extract percentage must be between 0 and 100"}),
-});
+    chunksLimit: z.union([z.number().refine((val) => val > 0, {message: "Chunks limit must be greater than 0"}), z.null()]).default(30),
+}).superRefine((val, ctx) => {
+    if (val.userPromptPerTopic !== undefined) {
+        const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
+        const missingVariables: string[] = requiredVariables.filter(variable => !val.userPromptPerTopic?.includes(variable));
+        if (missingVariables.length > 0) {
+            ctx.addIssue({code: z.ZodIssueCode.custom, message: `You are missing a required variable in the override string you passed to userPromptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`, path: ['userPromptPerTopic']})
+            return false
+        }
+        return true
+    }
+})
 
 export const QuerySingleArgTypeSchema = BaseArgsSchema.extend({
     override_oc_yaml: z.string().optional(),
@@ -142,6 +161,8 @@ export const CompletionArgsSchema = OpenAIBaseArgsSchema.extend({
     stop: z.string(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     metadataFilters: z.object({}).default({}),
+    chunksLimit: z.union([z.number().refine((val)=> val >0, {message: "chunksLimit must be greater than 0"}), z.null()]),
+    scorePercentileKey: z.string().optional(),
 });
 
 export type CompletionArgsType = z.infer<typeof CompletionArgsSchema>

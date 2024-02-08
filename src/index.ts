@@ -16,8 +16,7 @@ export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipel
             headers: {
                 Authorization: `Bearer ${callPipelineArgs.API_KEY}`,
             },
-            data: {
-            },
+            data: {},
         });
         console.log("Called all hooks for pipeline: " + callPipelineArgs.pipelineName)
         return response.data;
@@ -28,8 +27,7 @@ export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipel
         } else if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return null;
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             return null
         }
@@ -60,8 +58,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors || error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
         }
     }
@@ -81,12 +78,11 @@ export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDe
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
         }
     }
-    };
+};
 
 export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipelinesType): Promise<{
     id: string; name: string;
@@ -103,8 +99,7 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
@@ -131,15 +126,14 @@ export const query = async (queryArgs: generalTypes.QuerySingleArgType,
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
     }
 };
 
-export const listFiles = async ( listFilesArgs: generalTypes.ListFilesType ): Promise<{
+export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Promise<{
     name: string;
     status: string;
     metadata_json: object;
@@ -157,8 +151,7 @@ export const listFiles = async ( listFilesArgs: generalTypes.ListFilesType ): Pr
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
             return []
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
             return []
@@ -166,8 +159,9 @@ export const listFiles = async ( listFilesArgs: generalTypes.ListFilesType ): Pr
     }
 };
 
-export const checkHooksCall = async ( checkHooksArgs: generalTypes.CheckHooksType ): Promise<{
-    status: boolean } | undefined> => {
+export const checkHooksCall = async (checkHooksArgs: generalTypes.CheckHooksType): Promise<{
+    status: boolean
+} | undefined> => {
     try {
         const response = await axios({
             method: 'get',
@@ -185,8 +179,7 @@ export const checkHooksCall = async ( checkHooksArgs: generalTypes.CheckHooksTyp
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
@@ -195,50 +188,42 @@ export const checkHooksCall = async ( checkHooksArgs: generalTypes.CheckHooksTyp
 };
 
 
-export const generateQuiz = async ({
-                                       OPENAI_API_KEY,
-                                       BASE_URL,
-                                       API_KEY,
-                                       userPromptPerTopic,
-                                       metaDataFilters,
-                                       pipelineName,
-                                       clusterLabel,
-                                       scorePercentileLabel,
-                                       totalNumberOfQuestions,
-                                       extractPercentage,
-                                   }: generalTypes.GenerateQuizType): Promise<{ topic: string; output: string }[] | undefined> => {
-
-
-    const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
-    const missingVariables: string[] = requiredVariables.filter(variable => !userPromptPerTopic.includes(variable));
-    if (missingVariables.length > 0) {
-         console.error(`You are missing a required variable in the string you passed to userPromptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`)
-        return
-    }
+export const generateQuiz = async (genQuizType: generalTypes.GenerateQuizType): Promise<{
+    topic: string;
+    output: string
+}[] | undefined> => {
 
     try {
 
+        const genQuizArgs = generalTypes.GenerateQuizArgsSchema.parse(
+            {...genQuizType}
+        )
+
         const result = await axios({
             method: 'get',
-            url: BASE_URL + 'quiz_completion',
+            url: genQuizType.BASE_URL + 'quiz_completion',
             headers: {
-                Authorization: `Bearer ${API_KEY}`,
+                Authorization: `Bearer ${genQuizArgs.API_KEY}`,
             },
             data: {
-                metadata_filters: metaDataFilters,
-                prompt_per_topic: userPromptPerTopic,
-                pipeline_name: pipelineName,
-                cluster_label: clusterLabel,
-                score_percentile_label: scorePercentileLabel,
-                total_num_questions: totalNumberOfQuestions,
-                extract_percentage: extractPercentage,
-                openai_api_key: OPENAI_API_KEY,
+                metadata_filters: genQuizArgs.metaDataFilters,
+                prompt_per_topic: genQuizArgs.userPromptPerTopic,
+                pipeline_name: genQuizArgs.pipelineName,
+                cluster_label: genQuizArgs.clusterLabel,
+                score_percentile_label: genQuizArgs.scorePercentileLabel,
+                total_num_questions: genQuizArgs.totalNumberOfQuestions,
+                extract_percentage: genQuizArgs.extractPercentage,
+                openai_api_key: genQuizArgs.OPENAI_API_KEY,
+                chunks_limit: genQuizArgs.chunksLimit
             },
         });
         return result.data;
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
+        }
+        if (error instanceof z.ZodError) {
+            console.log(`An error occurred in the validation of the arguments you passed. The validation error is: ${error}.`)
         }
         else {
             console.error("Unknown error occurred")
@@ -248,52 +233,50 @@ export const generateQuiz = async ({
 };
 
 
-export const generateQuest = async ({
-                                        vision,
-                                        mission,
-                                        quest,
-                                        introPrompt,
-                                        introContextBudget,
-                                        quizTotalContextBudget,
-                                        userPromptPerTopic,
-                                        metaDataFilters,
-                                        knowledgeBaseName,
-                                        totalNumberOfQuestions,
-                                        model,
-                                        BASE_URL,
-                                        API_KEY,
-                                        OPENAI_API_KEY,
-                                    }: generalTypes.GenerateQuestOptionsType): Promise<{
+export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOptionsType): Promise<{
     topic: string;
     output: string
 }[] | null> => {
+
     try {
+
+        const parsedGenQuestArgs = generalTypes.GenerateQuestOptionsSchema.parse(
+            {...genQuestArgs}
+        )
+
         const result = await axios({
             method: 'get',
-            url: BASE_URL + 'quest_gen',
+            url: parsedGenQuestArgs.BASE_URL + 'quest_gen',
             headers: {
-                Authorization: `Bearer ${API_KEY}`,
+                Authorization: `Bearer ${parsedGenQuestArgs.API_KEY}`,
             },
             data: {
-                vision: vision,
-                user_mission: mission,
-                quest: quest,
-                intro_prompt: introPrompt,
-                intro_context_budget: introContextBudget,
-                quiz_total_context_budget: quizTotalContextBudget,
-                metadata_filters: metaDataFilters,
-                prompt_per_topic: userPromptPerTopic,
-                knowledge_base_name: knowledgeBaseName,
-                total_num_questions: totalNumberOfQuestions,
-                model: model,
-                openai_api_key: OPENAI_API_KEY,
+                mission: parsedGenQuestArgs.mission,
+                vision: parsedGenQuestArgs.vision,
+                quest: parsedGenQuestArgs.quest,
+                intro_prompt: parsedGenQuestArgs.introPrompt,
+                intro_context_budget: parsedGenQuestArgs.introContextBudget,
+                quiz_total_context_budget: parsedGenQuestArgs.quizTotalContextBudget,
+                metadata_filters: parsedGenQuestArgs.metaDataFilters,
+                prompt_per_topic: parsedGenQuestArgs.userPromptPerTopic,
+                pipeline_name: parsedGenQuestArgs.pipelineName,
+                openai_api_key: parsedGenQuestArgs.OPENAI_API_KEY,
+                total_num_questions: parsedGenQuestArgs.totalNumberOfQuestions,
+                score_percentile_key: parsedGenQuestArgs.scorePercentileKey,
+                cluster_label_key: parsedGenQuestArgs.clusterLabelKey,
+                model: parsedGenQuestArgs.model,
+                chunks_limit: parsedGenQuestArgs.chunksLimit
             },
         });
         return result.data;
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        } else {
+        }
+        if (error instanceof z.ZodError) {
+            console.log(`An error occurred in the validation of the arguments you passed. The validation error is: ${error}.`)
+        }
+        else {
             console.error("Unknown error occurred")
             console.error(error)
         }
@@ -353,8 +336,7 @@ export const uploadFile = async ({
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
@@ -376,8 +358,7 @@ export const checkPipelineStatus = async (
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
@@ -385,12 +366,12 @@ export const checkPipelineStatus = async (
 };
 export const awaitEmbeddings = async (
     awaitEmbeddings: generalTypes.AwaitEmbeddingsType
-): Promise<string|undefined> => {
+): Promise<string | undefined> => {
     while (true) {
         const files = await listFiles({
-                pipelineName: awaitEmbeddings.pipelineName,
-                BASE_URL: awaitEmbeddings.BASE_URL,
-                API_KEY: awaitEmbeddings.API_KEY
+            pipelineName: awaitEmbeddings.pipelineName,
+            BASE_URL: awaitEmbeddings.BASE_URL,
+            API_KEY: awaitEmbeddings.API_KEY
         });
         if (!files) {
             throw new Error('file not found');
@@ -412,35 +393,38 @@ export const complete = async ({
                                    stop,
                                    pipelineName,
                                    metadataFilters,
+                                   scorePercentileKey,
                                    BASE_URL,
                                    OPENAI_API_KEY,
                                    API_KEY,
+                                   chunksLimit
                                }: generalTypes.CompletionArgsType): Promise<any[] | undefined> => {
     try {
-    const result = await axios({
-        method: 'post',
-        url: BASE_URL + 'context_completion',
-        headers: {
-            Authorization: `Bearer ${API_KEY}`,
-        },
-        data: {
-            prompt: prompt,
-            context_token_budget: contextTokenBudget,
-            openai_api_key: OPENAI_API_KEY,
-            model: model,
-            temperature: temperature,
-            max_tokens: maxTokens,
-            metadata_filters: metadataFilters,
-            pipeline_name: pipelineName,
-            stop: stop,
-        },
-    });
-    return result.data;
+        const result = await axios({
+            method: 'post',
+            url: BASE_URL + 'context_completion',
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+            data: {
+                prompt: prompt,
+                context_token_budget: contextTokenBudget,
+                openai_api_key: OPENAI_API_KEY,
+                model: model,
+                temperature: temperature,
+                max_tokens: maxTokens,
+                metadata_filters: metadataFilters,
+                pipeline_name: pipelineName,
+                score_percentile_key: scorePercentileKey,
+                stop: stop,
+                chunks_limit: chunksLimit
+            },
+        });
+        return result.data;
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
@@ -457,24 +441,22 @@ export const getChunks = async (
                 Authorization: `Bearer ${getChunksArgs.API_KEY}`,
             },
             data: {
-                metadata_filters: getChunksArgs.metaDataJson,
+                metadata_json: getChunksArgs.metaDataJson,
                 top_k: getChunksArgs.top_k
             },
         })
-
         return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
     }
 };
 
-export const getPipe = async (getPipe: generalTypes.GetPipeType ): Promise<any | null> => {
+export const getPipe = async (getPipe: generalTypes.GetPipeType): Promise<any | null> => {
     try {
         const response = await axios({
             method: 'get',
@@ -488,8 +470,7 @@ export const getPipe = async (getPipe: generalTypes.GetPipeType ): Promise<any |
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
