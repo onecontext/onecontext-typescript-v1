@@ -129,26 +129,40 @@ const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 // const awaitEmbeddingArgs: OneContext.AwaitEmbeddingsType = {pipelineName: "rm-dev", fileName: "faith_and_fate.pdf", BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.awaitEmbeddings(awaitEmbeddingArgs).then((res)=>{console.log(res)})
 
-const genQuestArgs: OneContext.GenerateQuestOptionsType = {
-    vision: "I want to understand the topic of the book Faith and Fate",
-    mission: "I want to understand the topic of the book Faith and Fate",
-    quest: "I want to understand the topic of the book Faith and Fate",
-    introPrompt: "Please provide me with a summary of the book Faith and Fate {chunks} {mission} {vision} {quest}",
-    introContextBudget: 1000,
-    quizTotalContextBudget: 1000,
-    userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-    metaDataFilters: {},
-    pipelineName: "rm-dev",
-    totalNumberOfQuestions: 8,
-    scorePercentileKey: "lexranker_global.percentile_score",
-    clusterLabelKey: "louvain.label",
-    chunksLimit: 30,
-    model: "gpt-4-1106-preview",
+// const genQuestArgs: OneContext.GenerateQuestOptionsType = {
+//     vision: "I want to know all about the generalisation capability of large language models",
+//     mission: "I want to be able to have a discussion with Kevin Murphy about the topic of large language models",
+//     quest: "I want to understand the content of the book Faith and Fate",
+//     introPrompt: "Please generate for me a quest that is full of learning content that will enable me in my goal: {quest}. I want to achieve my mission: {mission}, vision {vision}. Some excerpts from the book faith and fate are {chunks}",
+//     introContextBudget: 1200,
+//     quizTotalContextBudget: 8000,
+//     userPromptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
+//     metaDataFilters: {"file_name": {"$in": ["faith_and_fate.pdf"]}},
+//     pipelineName: "rm-dev",
+//     totalNumberOfQuestions: 8,
+//     scorePercentileKey: "lexranker_file.percentile_score",
+//     clusterLabelKey: "louvain.label",
+//     chunksLimit: 30,
+//     model: "gpt-4-1106-preview",
+//     BASE_URL: BASE_URL,
+//     API_KEY: API_KEY,
+//     OPENAI_API_KEY: OPENAI_API_KEY
+// }
+// OneContext.generateQuest(genQuestArgs).then((res) => {
+//     console.log(res)
+// })
+
+const contextCompleteArgs: OneContext.ContextCompletionArgsType = {
     BASE_URL: BASE_URL,
     API_KEY: API_KEY,
-    OPENAI_API_KEY: OPENAI_API_KEY
+    OPENAI_API_KEY: OPENAI_API_KEY,
+    pipelineName: "rm-dev",
+    prompt: "I want to know all about the generalisation capability of large language models. Include data from {chunks}",
+    contextTokenBudget: 1,
+    maxTokens: 2000,
+    scorePercentileKey: "lexranker_file.percentile_score",
 }
-OneContext.generateQuest(genQuestArgs).then((res) => {
+OneContext.contextCompletion(contextCompleteArgs).then((res) => {
     console.log(res)
 })
 

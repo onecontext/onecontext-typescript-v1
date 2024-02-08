@@ -152,20 +152,32 @@ export const UploadFileOptionsSchema = BaseArgsSchema.extend({
     metadataJson: z.object({}).optional(),
 });
 
-export const CompletionArgsSchema = OpenAIBaseArgsSchema.extend({
-    prompt: z.string(),
+export const ContextCompletionArgsSchema = OpenAIBaseArgsSchema.extend({
+    prompt: z.string().superRefine((val, ctx) => {
+        if (!val.includes("{chunks}")) {
+            ctx.addIssue({code: z.ZodIssueCode.custom, message: "Prompt must include the variable '{chunks}', which will serve as the entry-point into which the relevant context will be injected by OneContext."});
+            return false;
+        }
+        if (val.trim() === "") {
+            ctx.addIssue({code: z.ZodIssueCode.custom, message: "Prompt cannot be empty"});
+            return false;
+        }
+        return true
+    }),
     contextTokenBudget: z.number().refine((val) => val > 0, {message: "Context token budget must be greater than 0"}),
-    model: z.string(),
-    temperature: z.number().refine((val) => val > 0, {message: "Temperature must be greater than 0"}),
-    maxTokens: z.number().refine((val) => val > 0, {message: "Max tokens must be greater than 0"}),
-    stop: z.string(),
+    model: z.string().default("gpt-3.5-turbo").optional(),
+    temperature: z.number().refine((val) => val > 0, {message: "Temperature must be greater than 0"}).default(0.7).optional(),
+    maxTokens: z.number().refine((val) => val > 0, {message: "Max tokens must be greater than 0"}).optional().default(10_000),
+    stop: z.string().default("STOP").optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    metadataFilters: z.object({}).default({}),
-    chunksLimit: z.union([z.number().refine((val)=> val >0, {message: "chunksLimit must be greater than 0"}), z.null()]),
-    scorePercentileKey: z.string().optional(),
+    metadataFilters: z.object({}).default({}).optional(),
+    chunksLimit: z.number().refine((val) =>
+        val > 0, "Chunks limit must be greater than 0"
+    ).default(30).optional(),
+    scorePercentileKey: z.string().default("lexrank.percentile_score").optional(),
 });
 
-export type CompletionArgsType = z.infer<typeof CompletionArgsSchema>
+export type ContextCompletionArgsType = z.infer<typeof ContextCompletionArgsSchema>
 export type PipelineCreateType = z.infer<typeof PipelineCreateSchema>
 export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsArgs>
 export type PipelineDeleteType = z.infer<typeof PipelineDeleteSchema>

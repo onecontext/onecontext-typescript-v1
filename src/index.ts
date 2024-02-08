@@ -384,40 +384,26 @@ export const awaitEmbeddings = async (
 };
 
 
-export const complete = async ({
-                                   prompt,
-                                   contextTokenBudget,
-                                   model,
-                                   temperature,
-                                   maxTokens,
-                                   stop,
-                                   pipelineName,
-                                   metadataFilters,
-                                   scorePercentileKey,
-                                   BASE_URL,
-                                   OPENAI_API_KEY,
-                                   API_KEY,
-                                   chunksLimit
-                               }: generalTypes.CompletionArgsType): Promise<any[] | undefined> => {
+export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | undefined> => {
     try {
         const result = await axios({
-            method: 'post',
-            url: BASE_URL + 'context_completion',
+            method: 'get',
+            url: contextCompletionArgs.BASE_URL + 'context_completion',
             headers: {
-                Authorization: `Bearer ${API_KEY}`,
+                Authorization: `Bearer ${contextCompletionArgs.API_KEY}`,
             },
             data: {
-                prompt: prompt,
-                context_token_budget: contextTokenBudget,
-                openai_api_key: OPENAI_API_KEY,
-                model: model,
-                temperature: temperature,
-                max_tokens: maxTokens,
-                metadata_filters: metadataFilters,
-                pipeline_name: pipelineName,
-                score_percentile_key: scorePercentileKey,
-                stop: stop,
-                chunks_limit: chunksLimit
+                prompt: contextCompletionArgs.prompt,
+                context_token_budget: contextCompletionArgs.contextTokenBudget,
+                openai_api_key: contextCompletionArgs.OPENAI_API_KEY,
+                model: contextCompletionArgs.model,
+                temperature: contextCompletionArgs.temperature,
+                max_tokens: contextCompletionArgs.maxTokens,
+                stop: contextCompletionArgs.stop,
+                pipeline_name: contextCompletionArgs.pipelineName,
+                metadata_filters: contextCompletionArgs.metadataFilters,
+                score_percentile_key: contextCompletionArgs.scorePercentileKey,
+                chunks_limit: contextCompletionArgs.chunksLimit
             },
         });
         return result.data;
