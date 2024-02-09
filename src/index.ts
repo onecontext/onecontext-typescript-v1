@@ -12,11 +12,14 @@ export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipel
     try {
         const response = await axios({
             method: 'post',
-            url: callPipelineArgs.BASE_URL + `pipeline/${callPipelineArgs.pipelineName}/hooks`,
+            url: callPipelineArgs.BASE_URL + `pipeline/hooks`,
             headers: {
                 Authorization: `Bearer ${callPipelineArgs.API_KEY}`,
             },
-            data: {},
+            data: {
+                pipeline_name: callPipelineArgs.pipelineName,
+                override_oc_yaml: callPipelineArgs.overrideOcYaml,
+            },
         });
         console.log("Called all hooks for pipeline: " + callPipelineArgs.pipelineName)
         return response.data;

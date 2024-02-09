@@ -47,7 +47,6 @@ query:
 
   name: basic_query
 
-
   steps:
     - step: OCRetriever
       name: retriever

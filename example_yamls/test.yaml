@@ -77,6 +77,7 @@ query:
         value: 0.5
       depends_on: [ louvain_retainit ]
 
+
     - step: OCReranker
       name: oc_reranker_test
       step_args:
@@ -93,12 +94,23 @@ hooks:
   name: basic_hooks
 
   steps:
+
+    - step: GetChunks
+      name: test_get_chunks
+      step_args:
+        top_k: 20
+        metadata_filters: { }
+        distance_metric: cosine
+      # you define the scope by metadata filters.
+      # no metadata filters means global, i.e. all chunks in the kb
+      depends_on: [ ]
+
     - step: LexRank
       name: lexranker_global
       step_args:
         # you define the scope by metadata filters.
         # no metadata filters means global, i.e. all chunks in the kb
-      depends_on: [ ]
+      depends_on: [ test_get_chunks ]
 
     - step: LouvainCommunityDetection
       name: louvain_global
@@ -106,13 +118,20 @@ hooks:
         # you define the scope by metadata filters.
         # no metadata filters means global, i.e. all chunks in the kb
         assign_labels: gpt-3.5-turbo # RateLimit later
-      depends_on: [ ]
+      depends_on: [ lexranker_global ]
+
+    - step: UpdateOnDb
+      name: db_writer
+      step_args:
+        # you define the scope by metadata filters.
+        # no metadata filters means global, i.e. all chunks in the kb
+      depends_on: [ lexranker_global ]
 
     - step: KmeansClassifier
       name: kmeans_global
       step_args:
         # you define the scope by metadata filters.
         # no metadata filters means global, i.e. all chunks in the kb
-        update_label_key: kmeans_global_test
+        fit: true
         assign_labels: gpt-3.5-turbo # RateLimit later
-      depends_on: [ ]
+      depends_on: [ db_writer ]

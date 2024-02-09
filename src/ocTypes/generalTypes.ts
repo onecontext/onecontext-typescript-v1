@@ -116,6 +116,7 @@ export const ContentFileSchema = BaseArgsSchema.extend({
 
 export const CallPipelineSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
+    overrideOcYaml: z.string().optional(),
 });
 
 export const PathFileSchema = z.object({

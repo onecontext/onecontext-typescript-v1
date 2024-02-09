@@ -83,7 +83,6 @@ hooks:
       step_args:
         # you define the scope by metadata filters.
         # no metadata filters means global, i.e. all chunks in the kb
-        scope_filters: { "lexranker_global.percentile_score": { "$gt": 0.5 } }
         assign_labels: gpt-3.5-turbo # RateLimit later
       depends_on: [ ]
 
@@ -92,7 +91,6 @@ hooks:
       step_args:
         # you define the scope by metadata filters.
         # no metadata filters means global, i.e. all chunks in the kb
-        scope_filters: { "lexranker_global.percentile_score": { "$gt": 0.5 } }
         update_label_key: kmeans_global_test
         assign_labels: gpt-3.5-turbo # RateLimit later
       depends_on: [ ]
