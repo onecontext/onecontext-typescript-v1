@@ -133,6 +133,35 @@ export const query = async (queryArgs: generalTypes.QuerySingleArgType,
     }
 };
 
+export const quizPipe = async (quizPipeArgs: generalTypes.QuizPipeArgType,
+): Promise<any[] | undefined> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: quizPipeArgs.BASE_URL + `run_quiz`,
+            headers: {
+                Authorization: `Bearer ${quizPipeArgs.API_KEY}`,
+            },
+            data: {
+                override_oc_yaml: quizPipeArgs.overrideOcYaml,
+                cluster_label: quizPipeArgs.clusterLabel,
+                pipeline_name: quizPipeArgs.pipelineName,
+                openai_api_key: quizPipeArgs.OPENAI_API_KEY,
+                prompt_per_topic: quizPipeArgs.promptPerTopic,
+                total_num_questions: quizPipeArgs.totalNumQuestions
+            },
+        });
+        return response.data;
+
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+        }
+    }
+};
 export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Promise<{
     name: string;
     status: string;
@@ -207,7 +236,7 @@ export const generateQuiz = async (genQuizType: generalTypes.GenerateQuizType): 
             },
             data: {
                 metadata_filters: genQuizArgs.metaDataFilters,
-                prompt_per_topic: genQuizArgs.userPromptPerTopic,
+                prompt_per_topic: genQuizArgs.promptPerTopic,
                 pipeline_name: genQuizArgs.pipelineName,
                 cluster_label: genQuizArgs.clusterLabel,
                 score_percentile_label: genQuizArgs.scorePercentileLabel,
@@ -258,7 +287,7 @@ export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOpti
                 intro_context_budget: parsedGenQuestArgs.introContextBudget,
                 quiz_total_context_budget: parsedGenQuestArgs.quizTotalContextBudget,
                 metadata_filters: parsedGenQuestArgs.metaDataFilters,
-                prompt_per_topic: parsedGenQuestArgs.userPromptPerTopic,
+                prompt_per_topic: parsedGenQuestArgs.promptPerTopic,
                 pipeline_name: parsedGenQuestArgs.pipelineName,
                 openai_api_key: parsedGenQuestArgs.OPENAI_API_KEY,
                 total_num_questions: parsedGenQuestArgs.totalNumberOfQuestions,
