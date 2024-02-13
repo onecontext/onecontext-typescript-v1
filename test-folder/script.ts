@@ -15,19 +15,19 @@ const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
 const path = __dirname+"/../example_yamls/simple.yaml"
-const overridePath = __dirname+"/../example_yamls/hooks.yaml"
+const overridePath = __dirname+"/../example_yamls/wildcards.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
 const parsed = OneContext.parseYaml({
     yaml: overrideFile,
     verboseErrorHandling: true,
-    // overrides: {wildcardOverrides: {
-    //     "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
-    //         "$RERANKER_TOP_K_WILDCARD" : "20",
-    //         "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
-    //         "$QUERY_TOP_K": "80",
-    // }},
+    overrides: {wildcardOverrides: {
+        "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
+            "$RERANKER_TOP_K_WILDCARD" : "20",
+            "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
+            "$QUERY_TOP_K": "80",
+    }},
     asString: true
 }).then((res) => {
     // create a yaml out of the object response
