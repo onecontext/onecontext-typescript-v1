@@ -49,17 +49,15 @@ query:
     - step: OCRetriever
       name: retainit_retriever
       step_args:
-        query: tell me all about large language models and their generalisation capabilities
+        query: $QUERY_QUERY
         model_name: BAAI/bge-base-en-v1.5
-        top_k: 100
+        top_k: $QUERY_TOP_K
         metadata_filters: { }
       depends_on: [ ]
 
     - step: LexRank
       name: lexranker_retainit
       step_args:
-        # you define the scope by metadata filters.
-        # no metadata filters means global, i.e. all chunks in the kb
       depends_on: [ retainit_retriever ]
 
     - step: LouvainCommunityDetection
@@ -82,9 +80,9 @@ query:
       step_args:
         # you define the scope by metadata filters.
         # no metadata filters means global, i.e. all chunks in the kb
-        query: ARG
+        query: $RERANKER_QUERY_WILDCARD
         model_name: BAAI/bge-reranker-base
-        top_k: 30
+        top_k: $RERANKER_TOP_K_WILDCARD
       depends_on: [ retainit_filter ]
 
 

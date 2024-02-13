@@ -551,47 +551,43 @@ export const getPipe = async (getPipe: generalTypes.GetPipeType): Promise<any | 
 };
 
 
-export const parseYaml = async ({yaml, verboseErrorHandling, overrides}: {
-    yaml: string,
-    verboseErrorHandling: boolean
-    overrides?: {
-        nestedOverrides?: Record<string, any>
-        wildcardOverrides?: Record<string, string>
-    }
-}): Promise<yamlTypes.PipelineSchema | null> => {
+export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Promise<yamlTypes.PipelineSchema | string | null> => {
+
     try {
-        if (!overrides) {
-            return yamlTypes.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
+        if (!parseYamlArgs.overrides) {
+            return yamlTypes.PipelineSchema.parse(YAML.parse(parseYamlArgs.yaml), {errorMap: ocErrors.pipelineErrorMap})
         }
         else {
 
-            // put this string in this scope here, so you can update it if required
-            let stringYaml: string = yaml
-
             // if wildcard overrides are passed, just overwrite the values in the actual string
-            if (overrides.wildcardOverrides) {
-                for (const [overrideKey, overrideValue] of Object.entries(overrides.wildcardOverrides)) {
-                    stringYaml = yaml.replace(overrideKey, overrideValue)
+            const update = (stringYaml: string, updateObject: Record<string, string>) => {
+                for (const [key, value] of Object.entries(updateObject)) {
+                    stringYaml = stringYaml.replace(key, value)
                 }
+                return stringYaml
             }
-            else {}
+
+            const stringYaml = parseYamlArgs.overrides.wildcardOverrides ? update(parseYamlArgs.yaml, parseYamlArgs.overrides.wildcardOverrides) : parseYamlArgs.yaml
 
             // now parse that string into an object
             let objectYaml = YAML.parse(stringYaml)
 
-            if (overrides.nestedOverrides) {
-                let nestedOverriddenParsedYaml = {...objectYaml, ...overrides.nestedOverrides}
-                return yamlTypes.PipelineSchema.parse(nestedOverriddenParsedYaml, {errorMap: ocErrors.pipelineErrorMap})
+            if (parseYamlArgs.overrides.nestedOverrides) {
+                let nestedOverriddenParsedYaml = {...objectYaml, ...parseYamlArgs.overrides.nestedOverrides}
+                const pipe = yamlTypes.PipelineSchema.parse(nestedOverriddenParsedYaml, {errorMap: ocErrors.pipelineErrorMap})
+                return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
             }
 
             else {
-                return yamlTypes.PipelineSchema.parse(objectYaml, {errorMap: ocErrors.pipelineErrorMap})
+                console.log('string yaml',stringYaml)
+                const pipe = yamlTypes.PipelineSchema.parse(objectYaml, {errorMap: ocErrors.pipelineErrorMap})
+                return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
             }
 
         }
     } catch (error) {
         if (error instanceof z.ZodError) {
-            if (verboseErrorHandling) {
+            if (parseYamlArgs.verboseErrorHandling) {
                 console.log(error.message)
             } else {
                 console.log(error.issues.map((issue) => issue.message).join("\n"));

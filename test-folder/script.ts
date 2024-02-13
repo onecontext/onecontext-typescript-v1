@@ -2,6 +2,7 @@ import * as OneContext from 'onecontext'
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
+import {PipelineSchema} from "onecontext";
 // import {runMany} from "../rmUtils";
 
 // import the variables from the .env
@@ -18,6 +19,43 @@ const overridePath = __dirname+"/../example_yamls/test.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
+const parsed = OneContext.parseYaml({
+    yaml: file,
+    verboseErrorHandling: true,
+    overrides: {wildcardOverrides: {
+        "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
+            "$RERANKER_TOP_K_WILDCARD" : "20",
+            "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
+            "$QUERY_TOP_K": "80",
+    }},
+    asString: true
+}).then((res) => {
+    // create a yaml out of the object response
+    if (typeof res === "string") {
+        const queryArgs: OneContext.QuerySingleArgType = {
+            pipelineName: 'retainit_example',
+            override_oc_yaml: res,
+            BASE_URL: BASE_URL,
+            API_KEY: API_KEY
+        }
+        OneContext.query(queryArgs).then((res) => {
+            console.log(res)
+        })
+    }
+    else {console.log("error in response")}
+})
+
+// run the query pipeline. here we are passing the override yaml we defined above
+// const queryArgs: OneContext.QuerySingleArgType = {
+//     pipelineName: 'retainit_example',
+//     override_oc_yaml: file,
+//     BASE_URL: BASE_URL,
+//     API_KEY: API_KEY
+// }
+// OneContext.query(queryArgs).then((res) => {
+//     console.log(res)
+// })
+
 // const pipe = OneContext.parseYaml({
 //     yaml: file,
 //     verboseErrorHandling: true,
@@ -33,16 +71,16 @@ const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 // const a = OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 // upload a file through the pipeline
-const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
-    directory: "/Users/rossmurphy/embedpdf/",
-    metadataJson: {"description": "hello"},
-    pipelineName: "retainit_example",
-    BASE_URL: BASE_URL,
-    API_KEY: API_KEY,
-}
-OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
-    console.log(res)
-})
+// const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
+//     directory: "/Users/rossmurphy/embedpdf/",
+//     metadataJson: {"description": "hello"},
+//     pipelineName: "retainit_example",
+//     BASE_URL: BASE_URL,
+//     API_KEY: API_KEY,
+// }
+// OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
+//     console.log(res)
+// })
 
 
 // const uploadFileArgs: OneContext.UploadFileType = {
@@ -58,18 +96,17 @@ OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
 // })
 //
 
-
 // check on how that's going
-// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "rmtest", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "retainit_example", BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
-// const listFiles: OneContext.ListFilesType = {pipelineName: 'rmtest', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const listFiles: OneContext.ListFilesType = {pipelineName: 'retainit_example', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
 // get chunks associated with this pipeline
 // const getChunksArgs: OneContext.GetChunksType = {
-//     pipelineName: 'rmtest',
+//     pipelineName: 'retainit_example',
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 //     top_k: 5
@@ -77,16 +114,6 @@ OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
 //
 // OneContext.getChunks(getChunksArgs).then((res) => {console.log(res)})
 
-// run the query pipeline. here we are passing the override yaml we defined above
-// const queryArgs: OneContext.QuerySingleArgType = {
-//     pipelineName: 'rm-dev',
-//     override_oc_yaml: file,
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY
-// }
-// OneContext.query(queryArgs).then((res) => {
-//     console.log(res)
-// })
 
 // test new pipe
 // const quizPipeArgs: OneContext.QuizPipeArgType = {
