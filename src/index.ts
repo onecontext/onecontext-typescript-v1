@@ -506,7 +506,7 @@ export const parseYaml = async ({yaml, verboseErrorHandling, overrides}: {
     verboseErrorHandling: boolean
     overrides?: {
         nestedOverrides?: Record<string, any>
-        wildcardOverrides?: Record<string, string>[]
+        wildcardOverrides?: Record<string, string>
     }
 }): Promise<yamlTypes.PipelineSchema | null> => {
     try {
@@ -514,16 +514,23 @@ export const parseYaml = async ({yaml, verboseErrorHandling, overrides}: {
             return yamlTypes.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
         }
         else {
+
+            // put this string in this scope here, so you can update it if required
+            let stringYaml: string = yaml
+
             // if wildcard overrides are passed, just overwrite the values in the actual string
             if (overrides.wildcardOverrides) {
-                for (const override of overrides.wildcardOverrides) {
-                    yaml = yaml.replace(override.key, override.value)
+                for (const [overrideKey, overrideValue] of Object.entries(overrides.wildcardOverrides)) {
+                    stringYaml = yaml.replace(overrideKey, overrideValue)
+                    console.log("updated")
+                    console.log(stringYaml)
                 }
             }
             else {}
+            console.log(stringYaml)
 
             // now parse that string into an object
-            let objectYaml = YAML.parse(yaml)
+            let objectYaml = YAML.parse(stringYaml)
 
             if (overrides.nestedOverrides) {
                 let nestedOverriddenParsedYaml = {...objectYaml, ...overrides.nestedOverrides}

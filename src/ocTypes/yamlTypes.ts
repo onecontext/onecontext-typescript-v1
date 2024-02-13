@@ -9,7 +9,6 @@ const stepEnum = z.enum(
     ["OCPreprocessor", "OCChunker", "UpdateOnDb", "FilterInMemory", "GetChunks", "SentenceTransformerEmbedder", "LexRank", "LouvainCommunityDetection", "KmeansClassifier", "HdbScan", "OCReranker", "OCRetriever"]
 );
 
-
 export const SubPipelineSchema = z.object({
         name: z.string(),
         steps: z.array(z.object({

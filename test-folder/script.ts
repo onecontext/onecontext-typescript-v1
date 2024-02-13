@@ -22,7 +22,7 @@ const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 const pipe = OneContext.parseYaml({
     yaml: file,
     verboseErrorHandling: true,
-    // overrides: {wildcardOverrides: [{"ARG" : "query"}]}
+    overrides: {wildcardOverrides: {"ARG" : "query"}}
 }).then((res) => console.log(res?.query?.steps))
 
 // list your current pipelines
