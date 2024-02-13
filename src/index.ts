@@ -116,18 +116,18 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
 };
 
 
-export const query = async (queryArgs: generalTypes.QuerySingleArgType,
+export const run = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any[] | undefined> => {
     try {
         const response = await axios({
             method: 'post',
-            url: queryArgs.BASE_URL + `query`,
+            url: runArgs.BASE_URL + `run`,
             headers: {
-                Authorization: `Bearer ${queryArgs.API_KEY}`,
+                Authorization: `Bearer ${runArgs.API_KEY}`,
             },
             data: {
-                override_oc_yaml: queryArgs.override_oc_yaml,
-                pipeline_name: queryArgs.pipelineName,
+                override_oc_yaml: runArgs.override_oc_yaml,
+                pipeline_name: runArgs.pipelineName,
             },
         });
         return response.data;
@@ -226,49 +226,6 @@ export const checkHooksCall = async (checkHooksArgs: generalTypes.CheckHooksType
 };
 
 
-export const generateQuiz = async (genQuizType: generalTypes.GenerateQuizType): Promise<{
-    topic: string;
-    output: string
-}[] | undefined> => {
-
-    try {
-
-        const genQuizArgs = generalTypes.GenerateQuizArgsSchema.parse(
-            {...genQuizType}
-        )
-
-        const result = await axios({
-            method: 'get',
-            url: genQuizType.BASE_URL + 'quiz_completion',
-            headers: {
-                Authorization: `Bearer ${genQuizArgs.API_KEY}`,
-            },
-            data: {
-                metadata_filters: genQuizArgs.metaDataFilters,
-                prompt_per_topic: genQuizArgs.promptPerTopic,
-                pipeline_name: genQuizArgs.pipelineName,
-                cluster_label: genQuizArgs.clusterLabel,
-                score_percentile_label: genQuizArgs.scorePercentileLabel,
-                total_num_questions: genQuizArgs.totalNumberOfQuestions,
-                extract_percentage: genQuizArgs.extractPercentage,
-                openai_api_key: genQuizArgs.OPENAI_API_KEY,
-                chunks_limit: genQuizArgs.chunksLimit
-            },
-        });
-        return result.data;
-    } catch (error: unknown) {
-        if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
-        }
-        if (error instanceof z.ZodError) {
-            console.log(`An error occurred in the validation of the arguments you passed. The validation error is: ${error}.`)
-        }
-        else {
-            console.error("Unknown error occurred")
-            console.error(error)
-        }
-    }
-};
 
 
 export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOptionsType): Promise<{
@@ -295,7 +252,7 @@ export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOpti
                 intro_prompt: parsedGenQuestArgs.introPrompt,
                 intro_context_budget: parsedGenQuestArgs.introContextBudget,
                 quiz_total_context_budget: parsedGenQuestArgs.quizTotalContextBudget,
-                metadata_filters: parsedGenQuestArgs.metaDataFilters,
+                metadata_json: parsedGenQuestArgs.metadataJson,
                 prompt_per_topic: parsedGenQuestArgs.promptPerTopic,
                 pipeline_name: parsedGenQuestArgs.pipelineName,
                 openai_api_key: parsedGenQuestArgs.OPENAI_API_KEY,
@@ -488,7 +445,7 @@ export const contextCompletion = async (contextCompletionArgs: generalTypes.Cont
                 max_tokens: contextCompletionArgs.maxTokens,
                 stop: contextCompletionArgs.stop,
                 pipeline_name: contextCompletionArgs.pipelineName,
-                metadata_filters: contextCompletionArgs.metadataFilters,
+                metadata_json: contextCompletionArgs.metadataJson,
                 score_percentile_key: contextCompletionArgs.scorePercentileKey,
                 chunks_limit: contextCompletionArgs.chunksLimit
             },
@@ -555,7 +512,8 @@ export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Prom
 
     try {
         if (!parseYamlArgs.overrides) {
-            return yamlTypes.PipelineSchema.parse(YAML.parse(parseYamlArgs.yaml), {errorMap: ocErrors.pipelineErrorMap})
+            const pipe = yamlTypes.PipelineSchema.parse(YAML.parse(parseYamlArgs.yaml))
+            return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
         }
         else {
 
@@ -579,7 +537,6 @@ export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Prom
             }
 
             else {
-                console.log('string yaml',stringYaml)
                 const pipe = yamlTypes.PipelineSchema.parse(objectYaml, {errorMap: ocErrors.pipelineErrorMap})
                 return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
             }

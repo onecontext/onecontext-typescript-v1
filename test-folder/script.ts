@@ -14,36 +14,70 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const path = __dirname+"/../example_yamls/test.yaml"
-const overridePath = __dirname+"/../example_yamls/test.yaml"
+const path = __dirname+"/../example_yamls/simple.yaml"
+const overridePath = __dirname+"/../example_yamls/hooks.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
 const parsed = OneContext.parseYaml({
-    yaml: file,
+    yaml: overrideFile,
     verboseErrorHandling: true,
-    overrides: {wildcardOverrides: {
-        "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
-            "$RERANKER_TOP_K_WILDCARD" : "20",
-            "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
-            "$QUERY_TOP_K": "80",
-    }},
+    // overrides: {wildcardOverrides: {
+    //     "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
+    //         "$RERANKER_TOP_K_WILDCARD" : "20",
+    //         "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
+    //         "$QUERY_TOP_K": "80",
+    // }},
     asString: true
 }).then((res) => {
     // create a yaml out of the object response
     if (typeof res === "string") {
-        const queryArgs: OneContext.QuerySingleArgType = {
+        const runArgs: OneContext.RunArgsType = {
             pipelineName: 'retainit_example',
             override_oc_yaml: res,
             BASE_URL: BASE_URL,
             API_KEY: API_KEY
         }
-        OneContext.query(queryArgs).then((res) => {
+        OneContext.run(runArgs).then((res) => {
             console.log(res)
         })
     }
     else {console.log("error in response")}
 })
+
+
+// const parsed = OneContext.parseYaml({
+//     yaml: overrideFile,
+//     verboseErrorHandling: true,
+//     overrides: {
+//         wildcardOverrides: {
+//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+//             "$RERANKER_TOP_K_WILDCARD": "20",
+//             "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
+//             "$QUERY_TOP_K": "80",
+//         }
+//     },
+//     asString: true
+// }).then((res) => {
+//         if (typeof res === "string") {
+//             const quizPipeArgs: OneContext.QuizPipeArgType = {
+//                 pipelineName: 'retainit_example',
+//                 overrideOcYaml: res,
+//                 BASE_URL: BASE_URL,
+//                 API_KEY: API_KEY,
+//                 OPENAI_API_KEY: OPENAI_API_KEY,
+//                 promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
+//                 clusterLabel: "louvain_retainit.label",
+//                 totalNumQuestions: 8,
+//             }
+//             OneContext.quizPipe(quizPipeArgs).then((res) => {
+//                 console.log(res)
+//             })
+//         } else {
+//         }
+//     }
+// )
+
 
 // run the query pipeline. here we are passing the override yaml we defined above
 // const queryArgs: OneContext.QuerySingleArgType = {
@@ -55,12 +89,6 @@ const parsed = OneContext.parseYaml({
 // OneContext.query(queryArgs).then((res) => {
 //     console.log(res)
 // })
-
-// const pipe = OneContext.parseYaml({
-//     yaml: file,
-//     verboseErrorHandling: true,
-//     overrides: {wildcardOverrides: {"ARG" : "query"}}
-// }).then((res) => console.log(res?.query?.steps))
 
 // list your current pipelines
 // const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
@@ -81,7 +109,6 @@ const parsed = OneContext.parseYaml({
 // OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
 //     console.log(res)
 // })
-
 
 // const uploadFileArgs: OneContext.UploadFileType = {
 //     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}, {path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
@@ -109,44 +136,12 @@ const parsed = OneContext.parseYaml({
 //     pipelineName: 'retainit_example',
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
-//     top_k: 5
+//     top_k: 200
 // }
 //
 // OneContext.getChunks(getChunksArgs).then((res) => {console.log(res)})
 
 
-// test new pipe
-// const quizPipeArgs: OneContext.QuizPipeArgType = {
-//     pipelineName: 'rm-dev',
-//     overrideOcYaml: overrideFile,
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY,
-//     OPENAI_API_KEY: OPENAI_API_KEY,
-//     promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-//     clusterLabel: "louvain_retainit.label",
-//     totalNumQuestions: 8,
-// }
-// OneContext.quizPipe(quizPipeArgs).then((res) => {
-//     console.log(res)
-// })
-
-// generate a quiz from the chunks that have been generated by this pipeline
-// const generateQuizArgs: OneContext.GenerateQuizType = {
-//     promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-//     metaDataFilters: {"file_name": {"$in": ["Implicit_representations.pdf"]}},
-//     pipelineName: "rm-dev",
-//     scorePercentileLabel: "lexranker_file.percentile_score",
-//     clusterLabel: "louvain.label",
-//     chunksLimit: 30,
-//     totalNumberOfQuestions: 8,
-//     extractPercentage: 0.8,
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY,
-//     OPENAI_API_KEY: OPENAI_API_KEY
-// }
-// OneContext.generateQuiz(generateQuizArgs).then((res) => {
-//     console.log(res)
-// })
 
 // call the hooks for this pipeline
 // const callPipeArgs: OneContext.CallPipelineType = {
@@ -222,7 +217,7 @@ const parsed = OneContext.parseYaml({
 //     OPENAI_API_KEY: OPENAI_API_KEY,
 //     pipelineName: "rm-dev",
 //     prompt: "I want to know all about the generalisation capability of large language models. Include data from {chunks}",
-//     contextTokenBudget: 1,
+//     contextTokenBudget: 1000,
 //     maxTokens: 2000,
 //     scorePercentileKey: "lexranker_file.percentile_score",
 // }

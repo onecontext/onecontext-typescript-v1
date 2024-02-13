@@ -20,7 +20,7 @@ export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
     introContextBudget: z.number().refine((val: number): boolean => val > 0, {message: "Intro context budget must be greater than 0"}),
     quizTotalContextBudget: z.number().refine((val: number): boolean => val > 0, {message: "Quiz total context budget must be greater than 0"}),
     promptPerTopic: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Prompt per topic cannot be empty"}),
-    metaDataFilters: z.object({}).default({}),
+    metadataJson: z.object({}).default({}),
     pipelineName: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     totalNumberOfQuestions: z.number().refine((val: number): boolean => val > 0, {message: "Total number of questions must be greater than 0"}),
     chunksLimit: z.union([z.number().refine((val: number): boolean => val > 0, {message: "Chunks limit must be greater than 0"}), z.null()]).default(30),
@@ -41,29 +41,7 @@ export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
     }
 })
 
-
-export const GenerateQuizArgsSchema = OpenAIBaseArgsSchema.extend({
-    promptPerTopic: z.string().optional(),
-    metaDataFilters: z.object({}).default({}),
-    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    clusterLabel: z.string().optional(),
-    scorePercentileLabel: z.string().optional(),
-    totalNumberOfQuestions: z.number().refine((val) => val > 0, {message: "Total number of questions must be greater than 0"}),
-    extractPercentage: z.number().refine((val) => val > 0 && val <= 100, {message: "Extract percentage must be between 0 and 100"}),
-    chunksLimit: z.union([z.number().refine((val) => val > 0, {message: "Chunks limit must be greater than 0"}), z.null()]).default(30),
-}).superRefine((val, ctx) => {
-    if (val.promptPerTopic !== undefined) {
-        const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
-        const missingVariables: string[] = requiredVariables.filter(variable => !val.promptPerTopic?.includes(variable));
-        if (missingVariables.length > 0) {
-            ctx.addIssue({code: z.ZodIssueCode.custom, message: `You are missing a required variable in the override string you passed to promptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`, path: ['promptPerTopic']})
-            return false
-        }
-        return true
-    }
-})
-
-export const QuerySingleArgTypeSchema = BaseArgsSchema.extend({
+export const RunArgsSchema = BaseArgsSchema.extend({
     override_oc_yaml: z.string().optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
@@ -209,7 +187,7 @@ export const ContextCompletionArgsSchema = OpenAIBaseArgsSchema.extend({
     maxTokens: z.number().refine((val) => val > 0, {message: "Max tokens must be greater than 0"}).optional().default(10_000),
     stop: z.string().default("STOP").optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    metadataFilters: z.object({}).default({}).optional(),
+    metadataJson: z.object({}).default({}).optional(),
     chunksLimit: z.number().refine((val) =>
         val > 0, "Chunks limit must be greater than 0"
     ).default(30).optional(),
@@ -221,13 +199,12 @@ export type PipelineCreateType = z.infer<typeof PipelineCreateSchema>
 export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsArgs>
 export type PipelineDeleteType = z.infer<typeof PipelineDeleteSchema>
 export type CheckPipelineType = z.infer<typeof CheckPipelineSchema>
-export type QuerySingleArgType = z.infer<typeof QuerySingleArgTypeSchema>
+export type RunArgsType = z.infer<typeof RunArgsSchema>
 export type QuizPipeArgType = z.infer<typeof QuizPipeArgTypeSchema>
 export type CallPipelineType = z.infer<typeof CallPipelineSchema>
 export type ListPipelinesType = z.infer<typeof ListPipelinesSchema>
 export type ListFilesType = z.infer<typeof ListFilesArgs>
 export type CheckHooksType = z.infer<typeof CheckHooksArgs>
-export type GenerateQuizType = z.infer<typeof GenerateQuizArgsSchema>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectoryOptionsSchema>
