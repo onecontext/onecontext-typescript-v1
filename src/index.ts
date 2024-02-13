@@ -98,7 +98,12 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
                 Authorization: `Bearer ${listPipelinesArgs.API_KEY}`,
             },
         });
-        return response.data;
+        if (!listPipelinesArgs.verbose) {
+            return response.data.map((it: { name: string; spec: string;}): string  => { return it.name });
+        }
+        else {
+            return response.data
+        }
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
@@ -496,12 +501,40 @@ export const getPipe = async (getPipe: generalTypes.GetPipeType): Promise<any | 
 };
 
 
-export const parseYaml = async ({yaml, verboseErrorHandling}: {
+export const parseYaml = async ({yaml, verboseErrorHandling, overrides}: {
     yaml: string,
     verboseErrorHandling: boolean
+    overrides?: {
+        nestedOverrides?: Record<string, any>
+        wildcardOverrides?: Record<string, string>[]
+    }
 }): Promise<yamlTypes.PipelineSchema | null> => {
     try {
-        return yamlTypes.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
+        if (!overrides) {
+            return yamlTypes.PipelineSchema.parse(YAML.parse(yaml), {errorMap: ocErrors.pipelineErrorMap})
+        }
+        else {
+            // if wildcard overrides are passed, just overwrite the values in the actual string
+            if (overrides.wildcardOverrides) {
+                for (const override of overrides.wildcardOverrides) {
+                    yaml = yaml.replace(override.key, override.value)
+                }
+            }
+            else {}
+
+            // now parse that string into an object
+            let objectYaml = YAML.parse(yaml)
+
+            if (overrides.nestedOverrides) {
+                let nestedOverriddenParsedYaml = {...objectYaml, ...overrides.nestedOverrides}
+                return yamlTypes.PipelineSchema.parse(nestedOverriddenParsedYaml, {errorMap: ocErrors.pipelineErrorMap})
+            }
+
+            else {
+                return yamlTypes.PipelineSchema.parse(objectYaml, {errorMap: ocErrors.pipelineErrorMap})
+            }
+
+        }
     } catch (error) {
         if (error instanceof z.ZodError) {
             if (verboseErrorHandling) {

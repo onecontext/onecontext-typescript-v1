@@ -144,6 +144,7 @@ export const PipelineDeleteSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 })
 export const ListPipelinesSchema = BaseArgsSchema.extend({
+    verbose: z.boolean().default(false).optional()
 })
 export const CheckPipelineSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),

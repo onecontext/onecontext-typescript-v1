@@ -6,7 +6,7 @@ import * as z from "zod";
 
 // steps
 const stepEnum = z.enum(
-    ["OCPreprocessor", "OCChunker", "UpdateOnDb", "FilterInMemory", "SentenceTransformerEmbedder", "LexRank", "LouvainCommunityDetection", "KmeansClassifier", "HdbScan", "OCReranker", "OCRetriever"]
+    ["OCPreprocessor", "OCChunker", "UpdateOnDb", "FilterInMemory", "GetChunks", "SentenceTransformerEmbedder", "LexRank", "LouvainCommunityDetection", "KmeansClassifier", "HdbScan", "OCReranker", "OCRetriever"]
 );
 
 
@@ -15,18 +15,18 @@ export const SubPipelineSchema = z.object({
         steps: z.array(z.object({
             step: stepEnum,
             name: z.string(),
-            step_args: z.object({}),
-            depends_on: z.array(z.string())
+            step_args: z.union([z.object({
+            }).passthrough().optional(),z.null()]),
+            depends_on: z.array(z.string().optional())
         })),
     });
 
-
-export type SubPipelineSchema = z.infer<typeof SubPipelineSchema>;
 
 export const PipelineSchema = z.object({
     index: SubPipelineSchema,
     query: SubPipelineSchema.optional(),
     hooks: SubPipelineSchema.optional()
 })
+
 
 export type PipelineSchema = z.infer<typeof PipelineSchema>;

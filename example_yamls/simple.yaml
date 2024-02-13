@@ -65,32 +65,3 @@ query:
       depends_on: [ retriever ]
 
 
-hooks:
-
-  name: basic_hooks
-
-  steps:
-    - step: LexRank
-      name: lexranker_global
-      step_args:
-        # you define the scope by metadata filters.
-        # no metadata filters means global, i.e. all chunks in the kb
-        scope_filters: { }
-      depends_on: [ ]
-
-    - step: LouvainCommunityDetection
-      name: louvain_global
-      step_args:
-        # you define the scope by metadata filters.
-        # no metadata filters means global, i.e. all chunks in the kb
-        assign_labels: gpt-3.5-turbo # RateLimit later
-      depends_on: [ ]
-
-    - step: KmeansClassifier
-      name: kmeans_global
-      step_args:
-        # you define the scope by metadata filters.
-        # no metadata filters means global, i.e. all chunks in the kb
-        update_label_key: kmeans_global_test
-        assign_labels: gpt-3.5-turbo # RateLimit later
-      depends_on: [ ]

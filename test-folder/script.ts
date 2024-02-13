@@ -14,13 +14,19 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const path = __dirname+"/../example_yamls/simple.yaml"
+const path = __dirname+"/../example_yamls/test.yaml"
 const overridePath = __dirname+"/../example_yamls/test.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
+const pipe = OneContext.parseYaml({
+    yaml: file,
+    verboseErrorHandling: true,
+    // overrides: {wildcardOverrides: [{"ARG" : "query"}]}
+}).then((res) => console.log(res?.query?.steps))
+
 // list your current pipelines
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // create a pipeline
