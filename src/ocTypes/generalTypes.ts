@@ -62,7 +62,7 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
         return true
     }
 })
-export const CheckHooksArgs = BaseArgsSchema.extend({
+export const CheckRunArgs = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     callId: z.string().refine((val) => val.trim() !== '', {message: "Call id cannot be empty"}),
 });
@@ -204,7 +204,7 @@ export type QuizPipeArgType = z.infer<typeof QuizPipeArgTypeSchema>
 export type CallPipelineType = z.infer<typeof CallPipelineSchema>
 export type ListPipelinesType = z.infer<typeof ListPipelinesSchema>
 export type ListFilesType = z.infer<typeof ListFilesArgs>
-export type CheckHooksType = z.infer<typeof CheckHooksArgs>
+export type CheckRunType = z.infer<typeof CheckRunArgs>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectoryOptionsSchema>

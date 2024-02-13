@@ -8,36 +8,6 @@ import * as z from "zod";
 import * as YAML from 'yaml';
 import * as fs from 'fs';
 
-export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipelineType): Promise<any | null> => {
-
-    try {
-        const response = await axios({
-            method: 'post',
-            url: callPipelineArgs.BASE_URL + `pipeline/hooks`,
-            headers: {
-                Authorization: `Bearer ${callPipelineArgs.API_KEY}`,
-            },
-            data: {
-                pipeline_name: callPipelineArgs.pipelineName,
-                override_oc_yaml: callPipelineArgs.overrideOcYaml,
-            },
-        });
-        console.log("Called all hooks for pipeline: " + callPipelineArgs.pipelineName)
-        return response.data;
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error(error.message);
-            return null;
-        } else if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
-            return null;
-        } else {
-            console.error("Unknown error occurred")
-            return null
-        }
-    }
-};
-
 export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType): Promise<any> => {
 
     try {
@@ -197,15 +167,15 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
     }
 };
 
-export const checkHooksCall = async (checkHooksArgs: generalTypes.CheckHooksType): Promise<{
+export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Promise<{
     status: boolean
 } | undefined> => {
     try {
         const response = await axios({
             method: 'get',
-            url: checkHooksArgs.BASE_URL + `pipeline/${checkHooksArgs.pipelineName}/${checkHooksArgs.callId}`,
+            url: checkRunArgs.BASE_URL + `pipeline/${checkRunArgs.pipelineName}/${checkRunArgs.callId}`,
             headers: {
-                Authorization: `Bearer ${checkHooksArgs.API_KEY}`,
+                Authorization: `Bearer ${checkRunArgs.API_KEY}`,
             },
         });
         if (response.data == "Hook still in progress") {
@@ -225,9 +195,7 @@ export const checkHooksCall = async (checkHooksArgs: generalTypes.CheckHooksType
     return
 };
 
-
-
-
+// TODO - just make it a pipeline
 export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOptionsType): Promise<{
     topic: string;
     output: string
@@ -451,31 +419,6 @@ export const contextCompletion = async (contextCompletionArgs: generalTypes.Cont
             },
         });
         return result.data;
-    } catch (error: unknown) {
-        if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
-        } else {
-            console.error("Unknown error occurred")
-            console.error(error)
-        }
-    }
-};
-
-export const getChunks = async (
-    getChunksArgs: generalTypes.GetChunksType): Promise<{}[] | undefined> => {
-    try {
-        const response = await axios({
-            method: 'get',
-            url: getChunksArgs.BASE_URL + `knowledgebase/${getChunksArgs.pipelineName}/chunks`,
-            headers: {
-                Authorization: `Bearer ${getChunksArgs.API_KEY}`,
-            },
-            data: {
-                metadata_json: getChunksArgs.metaDataJson,
-                top_k: getChunksArgs.top_k
-            },
-        })
-        return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
