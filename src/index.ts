@@ -6,6 +6,7 @@ import * as ocErrors from "./ocTypes/errors";
 import FormData from 'form-data';
 import * as z from "zod";
 import * as YAML from 'yaml';
+import * as fs from 'fs';
 
 export const callPipelineHooks = async (callPipelineArgs: generalTypes.CallPipelineType): Promise<any | null> => {
 
@@ -322,6 +323,55 @@ export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOpti
 };
 
 
+export const uploadDirectory = async ({
+                                     directory,
+                                     pipelineName,
+                                     metadataJson,
+                                     BASE_URL,
+                                     API_KEY,
+                                 }: generalTypes.UploadDirectoryType): Promise<boolean | undefined> => {
+
+
+    const formData = new FormData();
+
+    const files = await fs.promises.readdir(directory)
+
+    files.forEach(file => {
+        try {
+            const f = generalTypes.PathFileSchema.parse({path: directory + file}, {errorMap: ocErrors.customErrorMap})
+            formData.append('files', f.readable);
+        } catch (e) {
+            console.error(`Error parsing file ${e}`)
+        }
+    });
+
+    formData.append('pipeline_name', pipelineName);
+
+    if (metadataJson) {
+        formData.append('metadata_json', JSON.stringify(metadataJson));
+    }
+
+    try {
+        const response = await axios({
+            method: 'post',
+            url: BASE_URL + 'upload',
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+                ...formData.getHeaders(),
+            },
+            data: formData,
+        });
+        return response.status === 200;
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+        }
+    }
+};
+
 export const uploadFile = async ({
                                      files,
                                      stream,
@@ -522,12 +572,9 @@ export const parseYaml = async ({yaml, verboseErrorHandling, overrides}: {
             if (overrides.wildcardOverrides) {
                 for (const [overrideKey, overrideValue] of Object.entries(overrides.wildcardOverrides)) {
                     stringYaml = yaml.replace(overrideKey, overrideValue)
-                    console.log("updated")
-                    console.log(stringYaml)
                 }
             }
             else {}
-            console.log(stringYaml)
 
             // now parse that string into an object
             let objectYaml = YAML.parse(stringYaml)

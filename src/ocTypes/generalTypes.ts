@@ -120,7 +120,7 @@ export const CallPipelineSchema = BaseArgsSchema.extend({
 });
 
 export const PathFileSchema = z.object({
-    path: z.string().nullable(),
+    path: z.string().refine((val) => val.trim() !== '', {message: "Path cannot be empty"}),
     readable: z.instanceof(Readable).optional(),
 }).transform((data, ctx) => {
     // Ensure 'path' is a non-empty string and 'readable' is not already provided
@@ -135,6 +135,8 @@ export const PathFileSchema = z.object({
     }
     return data;
 });
+
+
 
 export const PipelineCreateSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
@@ -167,6 +169,13 @@ export const FileSchema: z.ZodType = z.union([ContentFileSchema, PathFileSchema]
 export const UploadFileOptionsSchema = BaseArgsSchema.extend({
     files: z.array(FileSchema),
     stream: z.boolean(),
+    directory: z.union([z.null(),z.string()]).default(null).optional(),
+    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
+    metadataJson: z.object({}).optional(),
+});
+
+export const UploadDirectoryOptionsSchema = BaseArgsSchema.extend({
+    directory: z.string().refine((val) => val.endsWith("/"), {message: "Directory must end with /"}),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     metadataJson: z.object({}).optional(),
 });
@@ -210,6 +219,7 @@ export type CheckHooksType = z.infer<typeof CheckHooksArgs>
 export type GenerateQuizType = z.infer<typeof GenerateQuizArgsSchema>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
+export type UploadDirectoryType = z.infer<typeof UploadDirectoryOptionsSchema>
 export type GetChunksType = z.infer<typeof GetChunkArgsSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>
 

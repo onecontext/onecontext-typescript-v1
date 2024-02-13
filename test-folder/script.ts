@@ -3,7 +3,6 @@ import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
 // import {runMany} from "../rmUtils";
-import {SafeParseError, SafeParseSuccess} from "zod";
 
 // import the variables from the .env
 dotenv.config({path: __dirname + '/../.env'});
@@ -19,25 +18,37 @@ const overridePath = __dirname+"/../example_yamls/test.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
-const pipe = OneContext.parseYaml({
-    yaml: file,
-    verboseErrorHandling: true,
-    overrides: {wildcardOverrides: {"ARG" : "query"}}
-}).then((res) => console.log(res?.query?.steps))
+// const pipe = OneContext.parseYaml({
+//     yaml: file,
+//     verboseErrorHandling: true,
+//     overrides: {wildcardOverrides: {"ARG" : "query"}}
+// }).then((res) => console.log(res?.query?.steps))
 
 // list your current pipelines
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // create a pipeline
-// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm-dev', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'retainit_example', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
 // const a = OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 // upload a file through the pipeline
+const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
+    directory: "/Users/rossmurphy/embedpdf/",
+    metadataJson: {"description": "hello"},
+    pipelineName: "retainit_example",
+    BASE_URL: BASE_URL,
+    API_KEY: API_KEY,
+}
+OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
+    console.log(res)
+})
+
+
 // const uploadFileArgs: OneContext.UploadFileType = {
-//     files: [{path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
+//     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}, {path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
 //     metadataJson: {"description": "hello"},
-//     pipelineName: "rm-dev",
+//     pipelineName: "retainit_example",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 //     stream: false
@@ -45,6 +56,8 @@ const pipe = OneContext.parseYaml({
 // OneContext.uploadFile(uploadFileArgs).then((res) => {
 //     console.log(res)
 // })
+//
+
 
 // check on how that's going
 // const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "rmtest", BASE_URL: BASE_URL, API_KEY: API_KEY}
