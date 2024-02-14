@@ -29,56 +29,41 @@ index:
       depends_on: [ simple_chunker ]
 
     - step: LexRank
-      name: lexranker_file
+      name: lexranker_indexing
       step_args:
-        scope: file
+        update_score_key: lexrank_score_test
+        update_percentile_key: lexrank_percentile_test
       depends_on: [ sentence-transformers ]
 
     - step: LouvainCommunityDetection
       name: louvain
       step_args:
-        assign_labels: gpt-3.5-turbo
-      depends_on: [ lexranker_file ]
+        update_label_key: louvain_cluster_test
+        assign_labels: gpt-3.5-turbo # RateLimit later
+      depends_on: [ lexranker_indexing ]
 
 
 query:
 
-  name: test_query
+  name: basic_query
 
   steps:
-    - step: OCRetriever
-      name: demo_retriever
+    - step: GetChunks
+      name: get_chunks
       step_args:
-        query: $RETRIEVER_QUERY
-        model_name: BAAI/bge-base-en-v1.5
-        top_k: $RETRIEVER_TOP_K
-        metadata_json: { }
+          metadata_json: { label :
+                           $in: {  [] }
+          }
+          top_k: null
       depends_on: [ ]
 
-    - step: LexRank
-      name: lexranker_demo
+    - step: AddMetadata
+      name: add_metadata
       step_args:
-      depends_on: [ demo_retriever ]
+        meta_addition: { user_upvoted: true }
+      depends_on: [ get_chunks ]
 
-    - step: LouvainCommunityDetection
-      name: louvain_demo
+    - step: UpdateOnDb
+      name: update_db
       step_args:
-      depends_on: [ lexranker_demo ]
-
-    - step: FilterInMemory
-      name: demo_filter
-      step_args:
-        key: lexranker_demo.percentile_score
-        comparator: $gt
-        value: $EXTRACT_PERCENTAGE
-      depends_on: [ louvain_demo ]
-
-    - step: OCReranker
-      name: oc_reranker_test
-      step_args:
-        query: $RERANKER_QUERY_WILDCARD
-        model_name: BAAI/bge-reranker-base
-        top_k: $RERANKER_TOP_K_WILDCARD
-      depends_on: [ demo_filter ]
-
-
+      depends_on: [ add_metadata ]

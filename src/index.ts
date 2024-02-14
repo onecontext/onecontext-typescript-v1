@@ -96,7 +96,7 @@ export const run = async (runArgs: generalTypes.RunArgsType,
                 Authorization: `Bearer ${runArgs.API_KEY}`,
             },
             data: {
-                override_oc_yaml: runArgs.override_oc_yaml,
+                override_oc_yaml: runArgs.overrideOcYaml,
                 pipeline_name: runArgs.pipelineName,
             },
         });

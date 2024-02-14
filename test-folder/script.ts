@@ -3,6 +3,7 @@ import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
 import {PipelineSchema} from "onecontext";
+import {runMany} from "../rmUtils";
 // import {runMany} from "../rmUtils";
 
 // import the variables from the .env
@@ -30,11 +31,11 @@ const parsed = OneContext.parseYaml({
     }},
     asString: true
 }).then((res) => {
-    // create a yaml out of the object response
+
     if (typeof res === "string") {
         const runArgs: OneContext.RunArgsType = {
             pipelineName: 'retainit_example',
-            override_oc_yaml: res,
+            overrideOcYaml: res,
             BASE_URL: BASE_URL,
             API_KEY: API_KEY
         }
@@ -80,23 +81,30 @@ const parsed = OneContext.parseYaml({
 
 
 // run the query pipeline. here we are passing the override yaml we defined above
-// const queryArgs: OneContext.QuerySingleArgType = {
-//     pipelineName: 'retainit_example',
-//     override_oc_yaml: file,
+// const queryArgs: OneContext.RunArgsType = {
+//     pipelineName: 'rm-dev',
+//     overrideOcYaml: file,
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY
 // }
-// OneContext.query(queryArgs).then((res) => {
+// OneContext.run(queryArgs).then((res) => {
 //     console.log(res)
 // })
 
+// const runManyArgs = {
+//     n: 10,
+//     callable: OneContext.run,
+//     callableArgs: queryArgs
+// }
+// runMany(runManyArgs).then((res) => {})
+
 // list your current pipelines
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // create a pipeline
-// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'retainit_example', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
-// const a = OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
+const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'arse', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 // upload a file through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {

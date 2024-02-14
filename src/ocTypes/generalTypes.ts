@@ -42,7 +42,7 @@ export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
 })
 
 export const RunArgsSchema = BaseArgsSchema.extend({
-    override_oc_yaml: z.string().optional(),
+    overrideOcYaml: z.string().optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
 export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({

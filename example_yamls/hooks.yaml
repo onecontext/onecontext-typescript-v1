@@ -65,6 +65,11 @@ query:
       step_args:
       depends_on: [ lexranker_hook ]
 
+    - step: HDBSCAN
+      name: hdb
+      step_args:
+      depends_on: [ lexranker_hook ]
+
     - step: UpdateOnDb
       name: update_db
       step_args:
