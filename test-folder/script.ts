@@ -2,11 +2,11 @@ import * as OneContext from 'onecontext'
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
-import {PipelineSchema} from "onecontext";
+import { PipelineSchema } from "onecontext";
 // import {runMany} from "../rmUtils";
 
 // import the variables from the .env
-dotenv.config({path: __dirname + '/../.env'});
+dotenv.config({ path: __dirname + '/../.env' });
 
 // make sure they are being read correctly and instantiate as global variables
 const API_KEY: string = process.env.API_KEY!;
@@ -14,22 +14,81 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const path = __dirname+"/../example_yamls/simple.yaml"
-const overridePath = __dirname+"/../example_yamls/wildcards.yaml"
+const path = __dirname + "/../example_yamls/simple.yaml"
+const overridePath = __dirname + "/../example_yamls/wildcards.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
+
+const util = require('util')
+
+
+// const parsed = OneContext.parseYaml({
+//     yaml: overrideFile,
+//     verboseErrorHandling: true,
+//     overrides: {
+//         wildcardOverrides: {
+//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+//             "$RERANKER_TOP_K_WILDCARD": "5",
+//             "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
+//             "$QUERY_TOP_K": "20",
+//         }
+//     },
+//     asString: true
+// }).then((res) => {
+//     // create a yaml out of the object response
+//     if (typeof res === "string") {
+//         const runArgs: OneContext.RunArgsType = {
+//             pipelineName: 'retainit_example',
+//             override_oc_yaml: res,
+//             BASE_URL: BASE_URL,
+//             API_KEY: API_KEY
+//         }
+//         OneContext.run(runArgs).then((res) => {
+//             console.log(res)
+//         })
+//     }
+//     else { console.log("error in response") }
+// })
+
+
+// Run the topics  pipeline
+//
+
+// const overridePathTopics = __dirname + "/../example_yamls/topics.yaml"
+// const overrideFileTopics: string = fs.readFileSync(overridePathTopics, 'utf8')
+
+// const parsed = OneContext.parseYaml({
+//     yaml: overrideFileTopics,
+//     verboseErrorHandling: true,
+//     asString: true
+// }).then((res) => {
+//     // create a yaml out of the object response
+//     if (typeof res === "string") {
+//         const runArgs: OneContext.RunArgsType = {
+//             pipelineName: 'retainit_example',
+//             override_oc_yaml: res,
+//             BASE_URL: BASE_URL,
+//             API_KEY: API_KEY
+//         }
+//         OneContext.submitRun(runArgs).then((res) => {
+//             console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
+//         })
+//     }
+//     else { console.log("error in response") }
+// })
+
+// Update the metadata
+
+const overridePathUpdateMeta = __dirname + "/../example_yamls/update_metadata.yaml"
+const overrideFileUpdateMeta: string = fs.readFileSync(overridePathUpdateMeta, 'utf8')
+
 const parsed = OneContext.parseYaml({
-    yaml: overrideFile,
+    yaml: overrideFileUpdateMeta,
     verboseErrorHandling: true,
-    overrides: {wildcardOverrides: {
-        "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
-            "$RERANKER_TOP_K_WILDCARD" : "20",
-            "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
-            "$QUERY_TOP_K": "80",
-    }},
     asString: true
 }).then((res) => {
+
     // create a yaml out of the object response
     if (typeof res === "string") {
         const runArgs: OneContext.RunArgsType = {
@@ -39,10 +98,10 @@ const parsed = OneContext.parseYaml({
             API_KEY: API_KEY
         }
         OneContext.run(runArgs).then((res) => {
-            console.log(res)
+            console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
         })
     }
-    else {console.log("error in response")}
+    else { console.log("error in response") }
 })
 
 
@@ -79,7 +138,7 @@ const parsed = OneContext.parseYaml({
 // )
 
 
-// run the query pipeline. here we are passing the override yaml we defined above
+// // run the query pipeline. here we are passing the override yaml we defined above
 // const queryArgs: OneContext.QuerySingleArgType = {
 //     pipelineName: 'retainit_example',
 //     override_oc_yaml: file,
@@ -95,13 +154,14 @@ const parsed = OneContext.parseYaml({
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // create a pipeline
+//
 // const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'retainit_example', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
 // const a = OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 // upload a file through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
-//     directory: "/Users/rossmurphy/embedpdf/",
-//     metadataJson: {"description": "hello"},
+//     directory: "/Users/serge/pdfs_test/",
+//     metadataJson: {"user_created": true},
 //     pipelineName: "retainit_example",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
@@ -110,24 +170,25 @@ const parsed = OneContext.parseYaml({
 //     console.log(res)
 // })
 
-// const uploadFileArgs: OneContext.UploadFileType = {
-//     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}, {path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
-//     metadataJson: {"description": "hello"},
-//     pipelineName: "retainit_example",
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY,
-//     stream: false
-// }
-// OneContext.uploadFile(uploadFileArgs).then((res) => {
-//     console.log(res)
-// })
-//
+ // const uploadFileArgs: OneContext.UploadFileType = {
+ //     files: [{path: "/Users/serge/pdfs_test/turing.pdf"} ],
+ //     metadataJson: {"description": "hello"},
+ //     pipelineName: "retainit_example",
+ //     BASE_URL: BASE_URL,
+ //     API_KEY: API_KEY,
+ //     stream: false
+ // }
+ // OneContext.uploadFile(uploadFileArgs).then((res) => {
+ //     console.log(res)
+ // })
+
 
 // check on how that's going
 // const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "retainit_example", BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
+//
 // const listFiles: OneContext.ListFilesType = {pipelineName: 'retainit_example', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
@@ -143,7 +204,7 @@ const parsed = OneContext.parseYaml({
 
 
 
-// call the hooks for this pipeline
+// // submit pipeline run
 // const callPipeArgs: OneContext.CallPipelineType = {
 //     pipelineName: "rm-dev", overrideOcYaml: overrideFile,
 //     BASE_URL: BASE_URL, API_KEY: API_KEY

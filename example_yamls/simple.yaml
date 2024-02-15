@@ -51,7 +51,7 @@ query:
       step_args:
         query: how much wood could a woodchuck chuck if a woodchuck could chuck wood
         model_name: BAAI/bge-base-en-v1.5
-        top_k: 100
+        top_k: 50
         metadata_json: { }
       depends_on: [ ]
 

@@ -33,6 +33,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors || error.message);
         } else {
+            console.log(error)
             console.error("Unknown error occurred")
         }
     }
@@ -92,6 +93,32 @@ export const run = async (runArgs: generalTypes.RunArgsType,
         const response = await axios({
             method: 'post',
             url: runArgs.BASE_URL + `run`,
+            headers: {
+                Authorization: `Bearer ${runArgs.API_KEY}`,
+            },
+            data: {
+                override_oc_yaml: runArgs.override_oc_yaml,
+                pipeline_name: runArgs.pipelineName,
+            },
+        });
+        return response.data;
+
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+        }
+    }
+};
+
+export const submitRun = async (runArgs: generalTypes.RunArgsType,
+): Promise<any[] | undefined> => {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: runArgs.BASE_URL + `submit-run`,
             headers: {
                 Authorization: `Bearer ${runArgs.API_KEY}`,
             },
@@ -173,7 +200,7 @@ export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Pro
     try {
         const response = await axios({
             method: 'get',
-            url: checkRunArgs.BASE_URL + `pipeline/${checkRunArgs.pipelineName}/${checkRunArgs.callId}`,
+            url: checkRunArgs.BASE_URL + `run_results/${checkRunArgs.callId}`,
             headers: {
                 Authorization: `Bearer ${checkRunArgs.API_KEY}`,
             },

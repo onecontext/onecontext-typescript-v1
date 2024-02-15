@@ -60,10 +60,10 @@ query:
       step_args:
       depends_on: [ retainit_retriever ]
 
-    - step: LouvainCommunityDetection
-      name: louvain_retainit
-      step_args:
-      depends_on: [ lexranker_retainit ]
+    # - step: LouvainCommunityDetection
+    #   name: louvain_retainit
+    #   step_args:
+    #   depends_on: [ lexranker_retainit ]
 
     - step: FilterInMemory
       name: retainit_filter
@@ -71,7 +71,7 @@ query:
         key: lexranker_retainit.percentile_score
         comparator: $gt
         value: 0.5
-      depends_on: [ louvain_retainit ]
+      depends_on: [ lexranker_retainit ]
 
     - step: OCReranker
       name: oc_reranker_test
