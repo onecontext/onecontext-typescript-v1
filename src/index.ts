@@ -87,7 +87,7 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
 
 
 export const run = async (runArgs: generalTypes.RunArgsType,
-): Promise<any[] | undefined> => {
+): Promise<any | undefined> => {
     try {
         const response = await axios({
             method: 'post',

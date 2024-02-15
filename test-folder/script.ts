@@ -4,6 +4,7 @@ import YAML from 'yaml';
 import * as dotenv from "dotenv";
 import {PipelineSchema} from "onecontext";
 import {runMany} from "../rmUtils";
+import pl from 'nodejs-polars';
 // import {runMany} from "../rmUtils";
 
 // import the variables from the .env
@@ -16,20 +17,14 @@ const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
 const path = __dirname+"/../example_yamls/simple.yaml"
-const overridePath = __dirname+"/../example_yamls/wildcards.yaml"
+// const overridePath = __dirname+"/../example_yamls/hooks_get.yaml"
+const overridePath = __dirname+"/../example_yamls/hooks_update.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
 const parsed = OneContext.parseYaml({
     yaml: overrideFile,
     verboseErrorHandling: true,
-    overrides: {wildcardOverrides: {
-        "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
-            "$RERANKER_TOP_K_WILDCARD" : "20",
-            "$RETRIEVER_QUERY": "transformer architectures and how they apply to large language models",
-            "$RETRIEVER_TOP_K": "80",
-            "$EXTRACT_PERCENTAGE" : "0.8",
-    }},
     asString: true
 }).then((res) => {
 
@@ -41,7 +36,11 @@ const parsed = OneContext.parseYaml({
             API_KEY: API_KEY
         }
         OneContext.run(runArgs).then((res) => {
-            console.log(res)
+            if (res?.chunks) {
+                const labelsPolars = pl.DataFrame(res.chunks.map((x:any) => ({"label": x.metadata_json.louvain_hook.label, "id": x.id, "content" : x.content})))
+                console.log(labelsPolars.select("label").unique().toJSON())
+            }
+            else {console.log("error in response")}
         })
     }
     else {console.log("error in response")}
