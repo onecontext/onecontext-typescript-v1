@@ -113,7 +113,7 @@ export const run = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
-export const submitRun = async (runArgs: generalTypes.RunArgsType,
+export const runSummary = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any[] | undefined> => {
     try {
         const response = await axios({

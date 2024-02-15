@@ -55,7 +55,8 @@ const util = require('util')
 // Run the topics  pipeline
 //
 
-const overridePathTopics = __dirname + "/../example_yamls/topics.yaml"
+// const overridePathTopics = __dirname + "/../example_yamls/topics.yaml"
+const overridePathTopics = __dirname + "/../example_yamls/update_metadata.yaml"
 const overrideFileTopics: string = fs.readFileSync(overridePathTopics, 'utf8')
 
 const parsed = OneContext.parseYaml({
@@ -71,7 +72,7 @@ const parsed = OneContext.parseYaml({
             BASE_URL: BASE_URL,
             API_KEY: API_KEY
         }
-        OneContext.submitRun(runArgs).then((res) => {
+        OneContext.run(runArgs).then((res) => {
             console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
         })
     }

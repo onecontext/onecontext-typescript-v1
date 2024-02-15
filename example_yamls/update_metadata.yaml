@@ -49,7 +49,7 @@ query:
     - step: GetChunks
       name: get_chunks
       step_args:
-        metadata_json: {"topic.label" : {"$in" : ['Artificial Intelligence and Computing']}}
+        metadata_json: {"topic.label" : {"$in" : ['Cluster Label: Performance Testing and Verification']}}
         top_k: null
       depends_on: [ ]
 
