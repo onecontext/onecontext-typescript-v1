@@ -29,30 +29,48 @@ index:
       depends_on: [ simple_chunker ]
 
     - step: LexRank
-      name: lexranker_indexing
+      name: lexranker_file
       step_args:
-        update_score_key: lexrank_score_test
-        update_percentile_key: lexrank_percentile_test
+        scope: file
       depends_on: [ sentence-transformers ]
 
     - step: LouvainCommunityDetection
       name: louvain
       step_args:
-        update_label_key: louvain_cluster_test
         assign_labels: gpt-3.5-turbo # RateLimit later
-      depends_on: [ lexranker_indexing ]
+      depends_on: [ lexranker_file ]
+
 
 
 query:
 
   name: basic_query
-
   steps:
-    - step: OCRetriever
-      name: retriever
+    - step: GetChunks
+      name: get_chunks
       step_args:
-        query: return to me the most important chunks for learning about spectral embeddings
-        model_name: BAAI/bge-base-en-v1.5
-        top_k: 4
-        metadata_json: { file_name: {"$eq" : "Implicit_representations.pdf"}, lexranker_file.percentile_score: {"$gt": 0.5}}
+          metadata_json: {}
+          top_k: null
       depends_on: [ ]
+
+    - step: HdbScan
+      name: topic
+      step_args:
+        # you define the scope by metadata filters.
+        # no metadata filters means global, i.e. all chunks in the kb
+        fit: true
+        assign_labels: gpt-3.5-turbo-1106 # RateLimit later
+        min_cluster_size: 5
+      depends_on: [ get_chunks ]
+
+    # - step: LouvainCommunityDetection
+    #   name: louvain
+    #   step_args:
+    #     assign_labels: gpt-3.5-turbo # RateLimit later
+    #   depends_on: [ get_chunks ]
+
+    - step: UpdateOnDb
+      name: update_db
+      step_args:
+      depends_on: [ topic ]
+

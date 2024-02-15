@@ -22,6 +22,45 @@ const overridePath = __dirname+"/../example_yamls/hooks_update.yaml"
 const file: string = fs.readFileSync(path, 'utf8')
 const overrideFile: string = fs.readFileSync(overridePath, 'utf8')
 
+import util from "util"
+
+
+// const parsed = OneContext.parseYaml({
+//     yaml: overrideFile,
+//     verboseErrorHandling: true,
+//     overrides: {
+//         wildcardOverrides: {
+//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+//             "$RERANKER_TOP_K_WILDCARD": "5",
+//             "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
+//             "$QUERY_TOP_K": "20",
+//         }
+//     },
+//     asString: true
+// }).then((res) => {
+//     // create a yaml out of the object response
+//     if (typeof res === "string") {
+//         const runArgs: OneContext.RunArgsType = {
+//             pipelineName: 'retainit_example',
+//             override_oc_yaml: res,
+//             BASE_URL: BASE_URL,
+//             API_KEY: API_KEY
+//         }
+//         OneContext.run(runArgs).then((res) => {
+//             console.log(res)
+//         })
+//     }
+//     else { console.log("error in response") }
+// })
+
+
+// Run the topics  pipeline
+//
+
+// const overridePathTopics = __dirname + "/../example_yamls/topics.yaml"
+const overridePathTopics = __dirname + "/../example_yamls/update_metadata.yaml"
+const overrideFileTopics: string = fs.readFileSync(overridePathTopics, 'utf8')
+
 const parsed = OneContext.parseYaml({
     yaml: overrideFile,
     verboseErrorHandling: true,
@@ -45,6 +84,32 @@ const parsed = OneContext.parseYaml({
     }
     else {console.log("error in response")}
 })
+
+// Update the metadata
+
+// const overridePathUpdateMeta = __dirname + "/../example_yamls/update_metadata.yaml"
+// const overrideFileUpdateMeta: string = fs.readFileSync(overridePathUpdateMeta, 'utf8')
+
+// const parsed = OneContext.parseYaml({
+//     yaml: overrideFileUpdateMeta,
+//     verboseErrorHandling: true,
+//     asString: true
+// }).then((res) => {
+
+//     // create a yaml out of the object response
+//     if (typeof res === "string") {
+//         const runArgs: OneContext.RunArgsType = {
+//             pipelineName: 'retainit_example',
+//             override_oc_yaml: res,
+//             BASE_URL: BASE_URL,
+//             API_KEY: API_KEY
+//         }
+//         OneContext.run(runArgs).then((res) => {
+//             console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
+//         })
+//     }
+//     else { console.log("error in response") }
+// })
 
 
 // const parsed = OneContext.parseYaml({
