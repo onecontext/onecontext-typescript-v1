@@ -63,8 +63,14 @@ query:
         min_cluster_size: 5
       depends_on: [ get_chunks ]
 
+    # - step: LouvainCommunityDetection
+    #   name: louvain
+    #   step_args:
+    #     assign_labels: gpt-3.5-turbo # RateLimit later
+    #   depends_on: [ get_chunks ]
+
     - step: UpdateOnDb
       name: update_db
       step_args:
-      depends_on: [ hdbscan_global ]
+      depends_on: [ topic ]
 

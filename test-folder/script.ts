@@ -55,40 +55,14 @@ const util = require('util')
 // Run the topics  pipeline
 //
 
-// const overridePathTopics = __dirname + "/../example_yamls/topics.yaml"
-// const overrideFileTopics: string = fs.readFileSync(overridePathTopics, 'utf8')
-
-// const parsed = OneContext.parseYaml({
-//     yaml: overrideFileTopics,
-//     verboseErrorHandling: true,
-//     asString: true
-// }).then((res) => {
-//     // create a yaml out of the object response
-//     if (typeof res === "string") {
-//         const runArgs: OneContext.RunArgsType = {
-//             pipelineName: 'retainit_example',
-//             override_oc_yaml: res,
-//             BASE_URL: BASE_URL,
-//             API_KEY: API_KEY
-//         }
-//         OneContext.submitRun(runArgs).then((res) => {
-//             console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
-//         })
-//     }
-//     else { console.log("error in response") }
-// })
-
-// Update the metadata
-
-const overridePathUpdateMeta = __dirname + "/../example_yamls/update_metadata.yaml"
-const overrideFileUpdateMeta: string = fs.readFileSync(overridePathUpdateMeta, 'utf8')
+const overridePathTopics = __dirname + "/../example_yamls/topics.yaml"
+const overrideFileTopics: string = fs.readFileSync(overridePathTopics, 'utf8')
 
 const parsed = OneContext.parseYaml({
-    yaml: overrideFileUpdateMeta,
+    yaml: overrideFileTopics,
     verboseErrorHandling: true,
     asString: true
 }).then((res) => {
-
     // create a yaml out of the object response
     if (typeof res === "string") {
         const runArgs: OneContext.RunArgsType = {
@@ -97,12 +71,38 @@ const parsed = OneContext.parseYaml({
             BASE_URL: BASE_URL,
             API_KEY: API_KEY
         }
-        OneContext.run(runArgs).then((res) => {
+        OneContext.submitRun(runArgs).then((res) => {
             console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
         })
     }
     else { console.log("error in response") }
 })
+
+// Update the metadata
+
+// const overridePathUpdateMeta = __dirname + "/../example_yamls/update_metadata.yaml"
+// const overrideFileUpdateMeta: string = fs.readFileSync(overridePathUpdateMeta, 'utf8')
+
+// const parsed = OneContext.parseYaml({
+//     yaml: overrideFileUpdateMeta,
+//     verboseErrorHandling: true,
+//     asString: true
+// }).then((res) => {
+
+//     // create a yaml out of the object response
+//     if (typeof res === "string") {
+//         const runArgs: OneContext.RunArgsType = {
+//             pipelineName: 'retainit_example',
+//             override_oc_yaml: res,
+//             BASE_URL: BASE_URL,
+//             API_KEY: API_KEY
+//         }
+//         OneContext.run(runArgs).then((res) => {
+//             console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
+//         })
+//     }
+//     else { console.log("error in response") }
+// })
 
 
 // const parsed = OneContext.parseYaml({
@@ -171,7 +171,7 @@ const parsed = OneContext.parseYaml({
 // })
 
  // const uploadFileArgs: OneContext.UploadFileType = {
- //     files: [{path: "/Users/serge/pdfs_test/turing.pdf"} ],
+ //     files: [{path: "/Users/serge/pdfs/some.txt"} ],
  //     metadataJson: {"description": "hello"},
  //     pipelineName: "retainit_example",
  //     BASE_URL: BASE_URL,
