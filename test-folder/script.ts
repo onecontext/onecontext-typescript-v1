@@ -26,8 +26,9 @@ const parsed = OneContext.parseYaml({
     overrides: {wildcardOverrides: {
         "$RERANKER_QUERY_WILDCARD" : "transformer architectures and how they apply to large language models",
             "$RERANKER_TOP_K_WILDCARD" : "20",
-            "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
-            "$QUERY_TOP_K": "80",
+            "$RETRIEVER_QUERY": "transformer architectures and how they apply to large language models",
+            "$RETRIEVER_TOP_K": "80",
+            "$EXTRACT_PERCENTAGE" : "0.8",
     }},
     asString: true
 }).then((res) => {
@@ -54,8 +55,9 @@ const parsed = OneContext.parseYaml({
 //         wildcardOverrides: {
 //             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
 //             "$RERANKER_TOP_K_WILDCARD": "20",
-//             "$QUERY_QUERY": "transformer architectures and how they apply to large language models",
-//             "$QUERY_TOP_K": "80",
+//             "$RETRIEVER_QUERY": "transformer architectures and how they apply to large language models",
+//             "$RETRIEVER_TOP_K": "80",
+//             "$EXTRACT_PERCENTAGE" : "0.8",
 //         }
 //     },
 //     asString: true
@@ -68,7 +70,7 @@ const parsed = OneContext.parseYaml({
 //                 API_KEY: API_KEY,
 //                 OPENAI_API_KEY: OPENAI_API_KEY,
 //                 promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-//                 clusterLabel: "louvain_retainit.label",
+//                 clusterLabel: "louvain_demo.label",
 //                 totalNumQuestions: 8,
 //             }
 //             OneContext.quizPipe(quizPipeArgs).then((res) => {
@@ -103,8 +105,8 @@ const parsed = OneContext.parseYaml({
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // create a pipeline
-const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'arse', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
-OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'arse', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 // upload a file through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
