@@ -7,6 +7,7 @@ import FormData from 'form-data';
 import * as z from "zod";
 import * as YAML from 'yaml';
 import * as fs from 'fs';
+import * as path from "path"
 
 export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType): Promise<any> => {
 
@@ -114,7 +115,7 @@ export const run = async (runArgs: generalTypes.RunArgsType,
 };
 
 export const runSummary = async (runArgs: generalTypes.RunArgsType,
-): Promise<any[] | undefined> => {
+): Promise<any | undefined> => {
     try {
         const response = await axios({
             method: 'post',
@@ -144,7 +145,7 @@ export const quizPipe = async (quizPipeArgs: generalTypes.QuizPipeArgType,
     try {
         const response = await axios({
             method: 'get',
-            url: quizPipeArgs.BASE_URL + `run_quiz`,
+            url: quizPipeArgs.BASE_URL + `run-quiz`,
             headers: {
                 Authorization: `Bearer ${quizPipeArgs.API_KEY}`,
             },
@@ -194,9 +195,9 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
     }
 };
 
-export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Promise<{
-    status: boolean
-} | undefined> => {
+export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Promise<
+    {id: string, steps: any, status: string}
+    | undefined> => {
     try {
         const response = await axios({
             method: 'get',
@@ -205,12 +206,7 @@ export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Pro
                 Authorization: `Bearer ${checkRunArgs.API_KEY}`,
             },
         });
-        if (response.data == "Hook still in progress") {
-            return {status: false};
-        }
-        if (response.data == "Hook has completed") {
-            return {status: true};
-        }
+        return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
@@ -283,15 +279,17 @@ export const uploadDirectory = async ({
                                      API_KEY,
                                  }: generalTypes.UploadDirectoryType): Promise<boolean | undefined> => {
 
-
     const formData = new FormData();
 
     const files = await fs.promises.readdir(directory)
 
     files.forEach(file => {
         try {
-            const f = generalTypes.PathFileSchema.parse({path: directory + file}, {errorMap: ocErrors.customErrorMap})
-            formData.append('files', f.readable);
+            if ([".txt", ".pdf", ".docx", ".doc"].includes(path.extname(file).toLowerCase())) {
+                console.log(`Adding file: ${file}`)
+                const f = generalTypes.PathFileSchema.parse({path: directory + file}, {errorMap: ocErrors.customErrorMap})
+                formData.append('files', f.readable);
+            }
         } catch (e) {
             console.error(`Error parsing file ${e}`)
         }

@@ -49,7 +49,7 @@ query:
     - step: GetChunks
       name: get_chunks
       step_args:
-        metadata_json: {"topic.label" : {"$in" : ['Cluster Label: Performance Testing and Verification']}}
+        metadata_json: {"topic.label" : {"$in" : ['Topic: TLS Handshake and Performance Checklist']}}
         top_k: null
       depends_on: [ ]
 
