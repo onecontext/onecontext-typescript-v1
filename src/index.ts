@@ -231,7 +231,7 @@ export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOpti
         )
 
         const result = await axios({
-            method: 'get',
+            method: 'post',
             url: parsedGenQuestArgs.BASE_URL + 'quest_gen',
             headers: {
                 Authorization: `Bearer ${parsedGenQuestArgs.API_KEY}`,
@@ -424,7 +424,7 @@ export const awaitEmbeddings = async (
 export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | undefined> => {
     try {
         const result = await axios({
-            method: 'get',
+            method: 'post',
             url: contextCompletionArgs.BASE_URL + 'context_completion',
             headers: {
                 Authorization: `Bearer ${contextCompletionArgs.API_KEY}`,
