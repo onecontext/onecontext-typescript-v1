@@ -6,8 +6,8 @@ import {awaitEmbeddings, PipelineSchema} from "onecontext";
 import {runMany} from "../rmUtils";
 import pl from 'nodejs-polars';
 // import {runMany} from "../rmUtils";
-
 import util from "util"
+
 // import the variables from the .env
 dotenv.config({path: __dirname + '/../.env'});
 
@@ -306,10 +306,10 @@ const wildCards = OneContext.parseYaml({
 // we will use the "quiz" yaml, to create the quiz only based on the topics that the user has upvoted
 
 // DEMO QUIZ PIPE
-
-const quizPath = __dirname+"/../example_yamls/quiz.yaml"
-const quizFile: string = fs.readFileSync(quizPath, 'utf8')
-
+//
+// const quizPath = __dirname+"/../example_yamls/quiz.yaml"
+// const quizFile: string = fs.readFileSync(quizPath, 'utf8')
+//
 // const parsed = OneContext.parseYaml({
 //     yaml: quizFile,
 //     verboseErrorHandling: true,
@@ -317,7 +317,7 @@ const quizFile: string = fs.readFileSync(quizPath, 'utf8')
 //         wildcardOverrides: {
 //             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
 //             "$RERANKER_TOP_K_WILDCARD": "20",
-//             "$RETRIEVER_QUERY": "transformer architectures and how they apply to large language models",
+//             "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
 //             "$RETRIEVER_TOP_K": "80",
 //             "$EXTRACT_PERCENTAGE" : "0.8",
 //         }
@@ -342,7 +342,7 @@ const quizFile: string = fs.readFileSync(quizPath, 'utf8')
 //         }
 //     }
 // )
-
+//
 
 // For other types of tasks, context completion works like the below
 // const contextCompleteArgs: OneContext.ContextCompletionArgsType = {

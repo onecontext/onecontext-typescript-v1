@@ -145,7 +145,7 @@ export const quizPipe = async (quizPipeArgs: generalTypes.QuizPipeArgType,
     try {
         const response = await axios({
             method: 'get',
-            url: quizPipeArgs.BASE_URL + `run-quiz`,
+            url: quizPipeArgs.BASE_URL + `run_quiz`,
             headers: {
                 Authorization: `Bearer ${quizPipeArgs.API_KEY}`,
             },

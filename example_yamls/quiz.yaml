@@ -52,7 +52,8 @@ query:
         query: $QUERY_WILDCARD
         model_name: BAAI/bge-base-en-v1.5
         top_k: $RETRIEVER_TOP_K
-        metadata_json: { user_selected : { $eq : True}}
+#        metadata_json: { user_selected : { $eq : True}}
+        metadata_json: {}
       depends_on: [ ]
 
     - step: LexRank
@@ -72,12 +73,12 @@ query:
         comparator: $gt
         value: $EXTRACT_PERCENTAGE
       depends_on: [ louvain_demo ]
-#
-#    - step: OCReranker
-#      name: oc_reranker_test
-#      step_args:
-#        query: $RERANKER_QUERY_WILDCARD
-#        model_name: BAAI/bge-reranker-base
-#        top_k: $RERANKER_TOP_K_WILDCARD
-#      depends_on: [ demo_filter ]
+
+    - step: OCReranker
+      name: oc_reranker_test
+      step_args:
+        query: $RERANKER_QUERY_WILDCARD
+        model_name: BAAI/bge-reranker-base
+        top_k: $RERANKER_TOP_K_WILDCARD
+      depends_on: [ demo_filter ]
 
