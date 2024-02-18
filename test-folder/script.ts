@@ -146,35 +146,35 @@ const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 // you will see that this step will retrieve the top 20 chunks pertaining to the supplied query
 // it will then add a lexrank score and a louvain cluster to each of those 20 (in the context of the 20)
 // and then extract the top 50% of them, and return them to us. i.e. we can expect around 10 chunks in the response.
-const wildCards = OneContext.parseYaml({
-    yaml: wildcardFile,
-    verboseErrorHandling: true,
-    overrides: {
-        wildcardOverrides: {
-            "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
-            "$RETRIEVER_TOP_K": "50",
-            // "$EXTRACT_PERCENTAGE" : "0.8",
-            "$RERANKER_TOP_K_WILDCARD": "4",
-            "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models"
-        }
-    },
-    asString: true
-}).then((res) => {
-    // create a yaml out of the object response
-    if (typeof res === "string") {
-        const runArgs: OneContext.RunArgsType = {
-            pipelineName: 'wildcard',
-            overrideOcYaml: res,
-            BASE_URL: BASE_URL,
-            API_KEY: API_KEY
-        }
-        OneContext.run(runArgs).then((res) => {
-            // console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
-            console.log(res)
-        })
-    }
-    else { console.log("error in response") }
-})
+// const wildCards = OneContext.parseYaml({
+//     yaml: wildcardFile,
+//     verboseErrorHandling: true,
+//     overrides: {
+//         wildcardOverrides: {
+//             "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+//             "$RETRIEVER_TOP_K": "50",
+//             "$EXTRACT_PERCENTAGE" : "0.5",
+//             "$RERANKER_TOP_K_WILDCARD": "",
+//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models"
+//         }
+//     },
+//     asString: true
+// }).then((res) => {
+//     // create a yaml out of the object response
+//     if (typeof res === "string") {
+//         const runArgs: OneContext.RunArgsType = {
+//             pipelineName: 'wildcard',
+//             overrideOcYaml: res,
+//             BASE_URL: BASE_URL,
+//             API_KEY: API_KEY
+//         }
+//         OneContext.run(runArgs).then((res) => {
+//             // console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}))
+//             console.log(res)
+//         })
+//     }
+//     else { console.log("error in response") }
+// })
 
 
 // CLUSTERING AND ASSIGNING TOPICS TO THE ALL THE FILES IN THE PIPELINE
@@ -307,41 +307,41 @@ const wildCards = OneContext.parseYaml({
 
 // DEMO QUIZ PIPE
 //
-// const quizPath = __dirname+"/../example_yamls/quiz.yaml"
-// const quizFile: string = fs.readFileSync(quizPath, 'utf8')
-//
-// const parsed = OneContext.parseYaml({
-//     yaml: quizFile,
-//     verboseErrorHandling: true,
-//     overrides: {
-//         wildcardOverrides: {
-//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
-//             "$RERANKER_TOP_K_WILDCARD": "20",
-//             "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
-//             "$RETRIEVER_TOP_K": "80",
-//             "$EXTRACT_PERCENTAGE" : "0.8",
-//         }
-//     },
-//     asString: true
-// }).then((res) => {
-//         if (typeof res === "string") {
-//             const quizPipeArgs: OneContext.QuizPipeArgType = {
-//                 pipelineName: 'wildcard',
-//                 overrideOcYaml: res,
-//                 BASE_URL: BASE_URL,
-//                 API_KEY: API_KEY,
-//                 OPENAI_API_KEY: OPENAI_API_KEY,
-//                 promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-//                 clusterLabel: "louvain_demo.label",
-//                 totalNumQuestions: 8,
-//             }
-//             OneContext.quizPipe(quizPipeArgs).then((res) => {
-//                 console.log(res)
-//             })
-//         } else {
-//         }
-//     }
-// )
+const quizPath = __dirname+"/../example_yamls/quiz.yaml"
+const quizFile: string = fs.readFileSync(quizPath, 'utf8')
+
+const parsed = OneContext.parseYaml({
+    yaml: quizFile,
+    verboseErrorHandling: true,
+    overrides: {
+        wildcardOverrides: {
+            "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+            "$RERANKER_TOP_K_WILDCARD": "20",
+            "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+            "$RETRIEVER_TOP_K": "80",
+            "$EXTRACT_PERCENTAGE" : "0.6",
+        }
+    },
+    asString: true
+}).then((res) => {
+        if (typeof res === "string") {
+            const quizPipeArgs: OneContext.QuizPipeArgType = {
+                pipelineName: 'wildcard',
+                overrideOcYaml: res,
+                BASE_URL: BASE_URL,
+                API_KEY: API_KEY,
+                OPENAI_API_KEY: OPENAI_API_KEY,
+                promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
+                clusterLabel: "louvain_demo.label",
+                totalNumQuestions: 8,
+            }
+            OneContext.quizPipe(quizPipeArgs).then((res) => {
+                console.log(res)
+            })
+        } else {
+        }
+    }
+)
 //
 
 // For other types of tasks, context completion works like the below

@@ -55,23 +55,23 @@ query:
         metadata_json: { }
       depends_on: [ ]
 
-#    - step: LexRank
-#      name: lexranker_demo
-#      step_args:
-#      depends_on: [ demo_retriever ]
-#
-#    - step: LouvainCommunityDetection
-#      name: louvain_demo
-#      step_args:
-#      depends_on: [ lexranker_demo ]
-#
-#    - step: FilterInMemory
-#      name: demo_filter
-#      step_args:
-#        key: lexranker_demo.percentile_score
-#        comparator: $gt
-#        value: $EXTRACT_PERCENTAGE
-#      depends_on: [ louvain_demo ]
+    - step: LexRank
+      name: lexranker_demo
+      step_args:
+      depends_on: [ demo_retriever ]
+
+    - step: LouvainCommunityDetection
+      name: louvain_demo
+      step_args:
+      depends_on: [ lexranker_demo ]
+
+    - step: FilterInMemory
+      name: demo_filter
+      step_args:
+        key: lexranker_demo.percentile_score
+        comparator: $gt
+        value: $EXTRACT_PERCENTAGE
+      depends_on: [ louvain_demo ]
 
     - step: OCReranker
       name: oc_reranker_test
@@ -79,5 +79,5 @@ query:
         query: $RERANKER_QUERY_WILDCARD
         model_name: BAAI/bge-reranker-base
         top_k: $RERANKER_TOP_K_WILDCARD
-      depends_on: [ demo_retriever ]
+      depends_on: [ demo_filter ]
 
