@@ -310,38 +310,38 @@ const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 const quizPath = __dirname+"/../example_yamls/quiz.yaml"
 const quizFile: string = fs.readFileSync(quizPath, 'utf8')
 
-const parsed = OneContext.parseYaml({
-    yaml: quizFile,
-    verboseErrorHandling: true,
-    overrides: {
-        wildcardOverrides: {
-            "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
-            "$RERANKER_TOP_K_WILDCARD": "20",
-            "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
-            "$RETRIEVER_TOP_K": "80",
-            "$EXTRACT_PERCENTAGE" : "0.6",
-        }
-    },
-    asString: true
-}).then((res) => {
-        if (typeof res === "string") {
-            const quizPipeArgs: OneContext.QuizPipeArgType = {
-                pipelineName: 'wildcard',
-                overrideOcYaml: res,
-                BASE_URL: BASE_URL,
-                API_KEY: API_KEY,
-                OPENAI_API_KEY: OPENAI_API_KEY,
-                promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
-                clusterLabel: "louvain_demo.label",
-                totalNumQuestions: 8,
-            }
-            OneContext.quizPipe(quizPipeArgs).then((res) => {
-                console.log(res)
-            })
-        } else {
-        }
-    }
-)
+// const parsed = OneContext.parseYaml({
+//     yaml: quizFile,
+//     verboseErrorHandling: true,
+//     overrides: {
+//         wildcardOverrides: {
+//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+//             "$RERANKER_TOP_K_WILDCARD": "20",
+//             "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
+//             "$RETRIEVER_TOP_K": "80",
+//             "$EXTRACT_PERCENTAGE" : "0.6",
+//         }
+//     },
+//     asString: true
+// }).then((res) => {
+//         if (typeof res === "string") {
+//             const quizPipeArgs: OneContext.QuizPipeArgType = {
+//                 pipelineName: 'wildcard',
+//                 overrideOcYaml: res,
+//                 BASE_URL: BASE_URL,
+//                 API_KEY: API_KEY,
+//                 OPENAI_API_KEY: OPENAI_API_KEY,
+//                 promptPerTopic: "Please create a multiple choice quiz for me about the topic of {topic}. Base the questions in your quiz on the information contained in the following pieces of text: {chunks}. There should be {num_questions_topic} questions on this topic. For each multiple choice question, include 1 correct answer, and 3 plausible (but incorrect) answers. Clearly state which is the correct answer at the end of each question.",
+//                 clusterLabel: "louvain_demo.label",
+//                 totalNumQuestions: 8,
+//             }
+//             OneContext.quizPipe(quizPipeArgs).then((res) => {
+//                 console.log(res)
+//             })
+//         } else {
+//         }
+//     }
+// )
 //
 
 // For other types of tasks, context completion works like the below

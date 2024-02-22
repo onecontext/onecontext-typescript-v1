@@ -13,11 +13,11 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
 
     try {
         // first make sure it's a valid pipeline
-        const parsedYaml = await parseYaml({yaml: pipelineCreateArgs.pipelineYaml, verboseErrorHandling: true})
+        const parsedYaml = await parseYaml({ yaml: pipelineCreateArgs.pipelineYaml, verboseErrorHandling: true })
         if (parsedYaml == null) {
             console.log("Failed to create pipeline: " + pipelineCreateArgs.pipelineName)
         } else {
-            const response = await axios({
+            await axios({
                 method: 'post',
                 url: pipelineCreateArgs.BASE_URL + 'pipeline',
                 headers: {
