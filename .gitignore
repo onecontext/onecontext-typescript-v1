@@ -1,6 +1,5 @@
 .env
 package-lock.json
 .idea
-test-folder
 ./node_modules
 .gitignore
