@@ -32,6 +32,8 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
+
+
 // You can then upload a whole directory of files through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
 //     directory: "/Users/rossmurphy/embedpdf/",
@@ -93,12 +95,12 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // }
 // const runManyArgs = {
 //     n: 100,
-//     callable: OneContext.run,
+//     callable: (args: any) => {OneContext.run(args).then((res)=>console.log(res))},
 //     callableArgs: queryArgs
 // }
-//
+// //
 // runMany(runManyArgs).then((res) => {console.log("Complete!")})
-
+//
 
 
 // OVERRIDES
@@ -106,16 +108,16 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // If the yaml you created your pipeline with has wildcards, you can override them at runtime.
 
 // let's create a pipeline with wildcards so we can have a look at how to do this
-const wildcardPath = __dirname + "/../example_yamls/wildcards.yaml"
-const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
+// const wildcardPath = __dirname + "/../example_yamls/wildcards.yaml"
+// const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 // const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'wildcard', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.createPipeline(pipeCreate).then((res)=>{})
 //
 
 // list your current pipelines to confirm that the above pipeline now exists
 
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
-// OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
+const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
+OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // let's upload some files again, but now to this new "wildcard" pipeline.
 // Here, we're not going to use the uploadDirectory method, but instead the uploadFile method, and we are
@@ -307,8 +309,8 @@ const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 
 // DEMO QUIZ PIPE
 //
-const quizPath = __dirname+"/../example_yamls/quiz.yaml"
-const quizFile: string = fs.readFileSync(quizPath, 'utf8')
+// const quizPath = __dirname+"/../example_yamls/quiz.yaml"
+// const quizFile: string = fs.readFileSync(quizPath, 'utf8')
 
 // const parsed = OneContext.parseYaml({
 //     yaml: quizFile,

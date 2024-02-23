@@ -18,7 +18,7 @@ function textWithColor(message: string, color: keyof typeof colors): string {
     return`${colors[color]}${message}${colors.reset}`;
 }
 
-export const runMany = ({n, callable, callableArgs}:{n: number, callable: (args: any) => any, callableArgs: any}) => {
+export const runMany = async ({n, callable, callableArgs}:{n: number, callable: (args: any) => any, callableArgs: any}) => {
 
     // create one task
     const t0 = performance.now()
