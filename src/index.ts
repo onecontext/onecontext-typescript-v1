@@ -421,7 +421,7 @@ export const awaitEmbeddings = async (
 };
 
 
-export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | null> => {
+export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | string> => {
     try {
         const result = await axios({
             method: 'post',
@@ -451,7 +451,7 @@ export const contextCompletion = async (contextCompletionArgs: generalTypes.Cont
         } else {
             console.error("Unknown error occurred")
             console.error(error)
-            return null
+            return "Pipeline not found"
         }
     }
 };
