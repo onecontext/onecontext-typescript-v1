@@ -421,7 +421,7 @@ export const awaitEmbeddings = async (
 };
 
 
-export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | undefined> => {
+export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | null> => {
     try {
         const result = await axios({
             method: 'post',
@@ -447,9 +447,11 @@ export const contextCompletion = async (contextCompletionArgs: generalTypes.Cont
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
+            return(error.response?.data?.errors ?? error.message)
         } else {
             console.error("Unknown error occurred")
             console.error(error)
+            return null
         }
     }
 };

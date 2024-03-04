@@ -10,7 +10,7 @@
     "zod": "^3.22.4"
   },
   "name": "onecontext",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on cloud infrastructure",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

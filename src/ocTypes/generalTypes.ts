@@ -63,6 +63,12 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
     }
 })
 
+
+export const CheckDiffArgs = BaseArgsSchema.extend({
+
+
+})
+
 export const CheckRunArgs = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     callId: z.string().refine((val) => val.trim() !== '', {message: "Call id cannot be empty"}),
