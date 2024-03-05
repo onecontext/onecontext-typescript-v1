@@ -29,7 +29,7 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // OneContext.createPipeline(pipeCreate).then((res)=>{})
 
 // list your current pipelines to confirm that the above pipeline now exists
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 
@@ -37,8 +37,8 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // You can then upload a whole directory of files through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
 //     directory: "/Users/rossmurphy/embedpdf/",
-//     metadataJson: {"description": "ross_description"},
-//     pipelineName: "wildcard",
+//     metadataJson: {"description": "chat"},
+//     pipelineName: "chat",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 // }
@@ -66,8 +66,8 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
-// const listFiles: OneContext.ListFilesType = {pipelineName: 'wildcard', BASE_URL: BASE_URL, API_KEY: API_KEY}
-// OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
+const listFiles: OneContext.ListFilesType = {pipelineName: 'chat', BASE_URL: BASE_URL, API_KEY: API_KEY}
+OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
 
 
@@ -76,7 +76,7 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // you don't actually need to pass the yaml if you just want to run the default one attached to the pipeline
 
 // const queryArgs: OneContext.RunArgsType = {
-//     pipelineName: 'rm_prod',
+//     pipelineName: 'chat',
 //     overrideOcYaml: file,
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY
@@ -108,16 +108,15 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // If the yaml you created your pipeline with has wildcards, you can override them at runtime.
 
 // let's create a pipeline with wildcards so we can have a look at how to do this
-// const wildcardPath = __dirname + "/../example_yamls/wildcards.yaml"
-// const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
-// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'wildcard', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
-// OneContext.createPipeline(pipeCreate).then((res)=>{})
-//
+const wildcardPath = __dirname + "/../example_yamls/chat.yaml"
+const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'chat', pipelineYaml: wildcardFile, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
 // list your current pipelines to confirm that the above pipeline now exists
 
-const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
-OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
+// OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // let's upload some files again, but now to this new "wildcard" pipeline.
 // Here, we're not going to use the uploadDirectory method, but instead the uploadFile method, and we are
@@ -125,15 +124,15 @@ OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // const uploadFileArgs: OneContext.UploadFileType = {
 //     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}],
-//     metadataJson: {"description": "hello"},
-//     pipelineName: "wildcard",
+//     metadataJson: {"description": "debug"},
+//     pipelineName: "chat",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 //     stream: false
 // }
 //
 // OneContext.uploadFile(uploadFileArgs).then((res) => {
-//     awaitEmbeddings({pipelineName: "wildcard", fileName: "faith_and_fate.pdf", BASE_URL: BASE_URL, API_KEY: API_KEY}).then((res) => {
+//     awaitEmbeddings({pipelineName: "chat", fileName: "faith_and_fate.pdf", BASE_URL: BASE_URL, API_KEY: API_KEY}).then((res) => {
 //         console.log("Uploaded and embedded")
 //     })
 // })
@@ -153,11 +152,8 @@ OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 //     verboseErrorHandling: true,
 //     overrides: {
 //         wildcardOverrides: {
-//             "$QUERY_WILDCARD": "transformer architectures and how they apply to large language models",
-//             "$RETRIEVER_TOP_K": "50",
-//             "$EXTRACT_PERCENTAGE" : "0.5",
-//             "$RERANKER_TOP_K_WILDCARD": "",
-//             "$RERANKER_QUERY_WILDCARD": "transformer architectures and how they apply to large language models"
+//             "$QUERY": "transformer architectures and how they apply to large language models",
+//             "$TOP_K": "5",
 //         }
 //     },
 //     asString: true
@@ -165,7 +161,7 @@ OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 //     // create a yaml out of the object response
 //     if (typeof res === "string") {
 //         const runArgs: OneContext.RunArgsType = {
-//             pipelineName: 'wildcard',
+//             pipelineName: 'chat',
 //             overrideOcYaml: res,
 //             BASE_URL: BASE_URL,
 //             API_KEY: API_KEY
@@ -177,7 +173,7 @@ OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 //     }
 //     else { console.log("error in response") }
 // })
-
+//
 
 // CLUSTERING AND ASSIGNING TOPICS TO THE ALL THE FILES IN THE PIPELINE
 
@@ -363,7 +359,7 @@ OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // delete the pipeline
 // note that doing this will also delete all the associated files, embeddings, and chunks
-// const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'wildcard', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'chat', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.deletePipeline(pipeDelete).then((res)=>{console.log(res)})
 
 
