@@ -1,22 +1,34 @@
 {
   "type": "module",
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
   "dependencies": {
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "form-data": "^4.0.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "nodejs-polars": "^0.8.4",
+    "ora": "^8.0.1",
+    "path": "^0.12.7",
+    "typescript": "^5.4.4",
+    "url": "^0.11.3",
+    "yaml": "^2.3.4",
+    "zod": "^3.22.4"
   },
   "name": "onecontext",
-  "version": "1.0.0",
+  "version": "1.0.18",
   "description": "OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on cloud infrastructure",
-  "main": "src/index.ts",
-  "devDependencies": {},
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "reload": "nodemon --watch './src/**/*.ts' --ext 'ts,js' --exec 'tsc && npm link'",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onecontext/js_sdk.git"
+    "url": "git+https://github.com/onecontext/ts_sdk.git"
   },
   "keywords": [
     "RAG",
@@ -25,7 +37,12 @@
   "author": "Ross Murphy <ross@onecontext.ai>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/onecontext/js_sdk/issues"
+    "url": "https://github.com/onecontext/ts_sdk/issues"
   },
-  "homepage": "https://github.com/onecontext/js_sdk#readme"
+  "homepage": "https://github.com/onecontext/ts_sdk#readme",
+  "devDependencies": {
+    "@types/node": "^20.12.4",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.2"
+  }
 }

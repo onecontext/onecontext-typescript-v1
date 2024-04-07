@@ -1,12 +1,25 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "target": "es6",
-    "moduleResolution": "node",
+    "target": "es2020",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "lib": [
+      "es2015"
+    ]
   },
-  "lib": ["es2015"]
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
