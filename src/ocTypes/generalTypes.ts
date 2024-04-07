@@ -12,6 +12,8 @@ export const OpenAIBaseArgsSchema = BaseArgsSchema.extend({
     model: z.string().default("gpt-3.5-turbo").optional(),
 });
 
+type PollMethodArgsType = z.infer<typeof BaseArgsSchema> & Record<string, unknown> 
+
 export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
     vision: z.string().optional(),
     mission: z.string().optional(),
@@ -63,11 +65,6 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
     }
 })
 
-
-export const CheckDiffArgs = BaseArgsSchema.extend({
-
-
-})
 
 export const CheckRunArgs = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
@@ -219,3 +216,7 @@ export type GetChunksType = z.infer<typeof GetChunkArgsSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>
 export type ParseYamlType = z.infer<typeof ParseYamlSchema>
 
+export interface PollArgsType {
+    method: (pollMethodArgs:PollMethodArgsType) => Promise<string>
+    fnArgs: PollMethodArgsType
+}

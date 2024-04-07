@@ -14,8 +14,19 @@ function logWithColor(message: string, color: keyof typeof colors): void {
     console.log(`${colors[color]}${message}${colors.reset}`);
 }
 
-function textWithColor(message: string, color: keyof typeof colors): string {
+export function textWithColor(message: string, color: keyof typeof colors): string {
     return`${colors[color]}${message}${colors.reset}`;
+}
+export function textWithIntSelectedColor(message: string, integerSelect: number, returnColor: boolean): any {
+    // for cycling through updates and changing colors on the go
+    const choices: (keyof typeof colors)[] = Object.keys(colors).filter((color) => color !== "reset") as (keyof typeof colors)[];
+    const index = (integerSelect - 1) % choices.length; // Subtracting 1 because arrays are 0-indexed
+    const colorChoice: keyof typeof colors = choices[index];
+    if (!returnColor) {
+        return `${colors[colorChoice]}${message}${colors.reset}`;
+    } else {
+        return {text: `${colors[colorChoice]}${message}${colors.reset}`, color: colorChoice};
+    }
 }
 
 export const runMany = async ({n, callable, callableArgs}:{n: number, callable: (args: any) => any, callableArgs: any}) => {

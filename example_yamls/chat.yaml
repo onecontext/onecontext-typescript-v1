@@ -4,7 +4,7 @@ index:
 
   steps:
 
-    - step: FileInput
+    - step: 
       name: input
       step_args: {} 
       depends_on: []
@@ -32,7 +32,6 @@ index:
         scope: file
       depends_on: [ sentence-transformers ]
 
-
     - step: LouvainCommunityDetection
       name: louvain
       step_args:
@@ -53,11 +52,41 @@ query:
     - step: OCRetriever
       name: retriever
       step_args:
-        query: $QUERY
+        query: tell me about language models 
         model_name: BAAI/bge-base-en-v1.5
-        top_k: $TOP_K 
+        top_k: 50 
         metadata_filters: { }
       depends_on: [ ]
+      
+    - step: LexRank
+      name: lexranker_demo
+      step_args:
+      depends_on: [ retriever ]
+
+    - step: LouvainCommunityDetection
+      name: louvain_demo
+      step_args:
+      depends_on: [ lexranker_demo ]
+
+    - step: FilterInMemory
+      name: demo_filter
+      step_args:
+        key: lexranker_demo.percentile_score
+        comparator: $gt
+        value: $EXTRACT_PERCENTAGE
+      depends_on: [ louvain_demo ]
+
+    - step: OCReranker
+      name: oc_reranker_test
+      step_args:
+        query: tell me about language models 
+        model_name: BAAI/bge-reranker-base
+        top_k: 10
+      depends_on: [ demo_filter ]
+
+
+
+
 
 
 

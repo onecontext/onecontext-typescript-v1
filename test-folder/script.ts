@@ -2,8 +2,13 @@ import * as OneContext from 'onecontext'
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
-import {awaitEmbeddings, PipelineSchema} from "onecontext";
-import {runMany} from "../rmUtils";
+import {awaitEmbeddings, getRunResults, PipelineSchema} from "onecontext";
+import {runMany} from "../src/rmUtils.js";
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
+
 import pl from 'nodejs-polars';
 // import {runMany} from "../rmUtils";
 import util from "util"
@@ -17,34 +22,33 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const path = __dirname+"/../example_yamls/simple.yaml"
+const fpath = __dirname+"/../example_yamls/wildcards.yaml"
 const otherPath = __dirname+"/../example_yamls/wildcards.yaml"
-const file: string = fs.readFileSync(path, 'utf8')
+const file: string = fs.readFileSync(fpath, 'utf8')
 const otherFile: string = fs.readFileSync(otherPath, 'utf8')
-
 
 // The first step is to create a pipeline
 // here we create one with the configuration in the "simple" yaml file
-// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm_prod', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm_test', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.createPipeline(pipeCreate).then((res)=>{})
 
 // list your current pipelines to confirm that the above pipeline now exists
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
-
 
 
 // You can then upload a whole directory of files through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
 //     directory: "/Users/rossmurphy/embedpdf/",
-//     metadataJson: {"description": "chat"},
-//     pipelineName: "chat",
+//     metadataJson: {"description": "demo_example"},
+//     pipelineName: "rm_test",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 // }
-// OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
+// const runId = OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
 //     console.log(res)
 // })
+// const out = getRunResults({BASE_URL: BASE_URL, API_KEY: API_KEY, runID: "10a69fc242d0434984b92aca0db0f718"}).then((res) => {console.log(res)})
 
 // Of course, you can also choose to upload just one file, or an array of files, if you prefer
 
@@ -62,28 +66,33 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 
 
 // check on how that's going
-// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "rm_prod", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "rm_test", BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
-const listFiles: OneContext.ListFilesType = {pipelineName: 'chat', BASE_URL: BASE_URL, API_KEY: API_KEY}
-OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
-
-
+// const listFiles: OneContext.ListFilesType = {pipelineName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
 // QUERY DEMO
 // run the query pipeline. here we are passing the simple yaml we defined above
 // you don't actually need to pass the yaml if you just want to run the default one attached to the pipeline
 
-// const queryArgs: OneContext.RunArgsType = {
-//     pipelineName: 'chat',
-//     overrideOcYaml: file,
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY
-// }
+const wildcardPath = __dirname + "/../example_yamls/wildcards.yaml"
+const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
+const queryArgs: OneContext.RunArgsType = {
+    pipelineName: 'rm_test',
+    overrideOcYaml: wildcardFile,
+    BASE_URL: BASE_URL,
+    API_KEY: API_KEY
+}
 // OneContext.run(queryArgs).then((res) => {
 //     console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}) )
 // })
+// @ts-ignore
+OneContext.poll({fnArgs: queryArgs, method: OneContext.arun})
+
+// OneContext.arun(queryArgs).then((res) => {console.log(res)})
+// OneContext.runSummary(queryArgs).then((res) => {console.log(res)})
 //
 
 // Run this call multiple times concurrently and see how long it takes
@@ -108,8 +117,6 @@ OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 // If the yaml you created your pipeline with has wildcards, you can override them at runtime.
 
 // let's create a pipeline with wildcards so we can have a look at how to do this
-const wildcardPath = __dirname + "/../example_yamls/chat.yaml"
-const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 // const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'chat', pipelineYaml: wildcardFile, BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
@@ -359,7 +366,7 @@ const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 
 // delete the pipeline
 // note that doing this will also delete all the associated files, embeddings, and chunks
-// const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'chat', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.deletePipeline(pipeDelete).then((res)=>{console.log(res)})
 
 

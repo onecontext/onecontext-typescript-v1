@@ -1,13 +1,17 @@
 import axios from 'axios';
-import {sleep} from './utils';
-import * as generalTypes from "./ocTypes/generalTypes";
-import * as yamlTypes from "./ocTypes/yamlTypes";
-import * as ocErrors from "./ocTypes/errors";
+import {sleep} from './utils.js';
+import * as generalTypes from "./ocTypes/generalTypes.js";
+import * as yamlTypes from "./ocTypes/yamlTypes.js";
+import * as ocErrors from "./ocTypes/errors.js";
 import FormData from 'form-data';
 import * as z from "zod";
 import * as YAML from 'yaml';
 import * as fs from 'fs';
 import * as path from "path"
+import {PollArgsType} from "./ocTypes/generalTypes.js";
+import {textWithColor, textWithIntSelectedColor} from "./rmUtils.js";
+import ora from "ora";
+
 
 export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType): Promise<any> => {
 
@@ -114,6 +118,32 @@ export const run = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
+export const arun = async (runArgs: generalTypes.RunArgsType,
+): Promise<any | undefined> => {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: runArgs.BASE_URL + `submit-run`,
+            headers: {
+                Authorization: `Bearer ${runArgs.API_KEY}`,
+            },
+            data: {
+                override_oc_yaml: runArgs.overrideOcYaml,
+                pipeline_name: runArgs.pipelineName,
+            },
+        });
+        return response.data;
+
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            console.log(error.response?.data ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+        }
+    }
+};
 export const runSummary = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any | undefined> => {
     try {
@@ -140,35 +170,6 @@ export const runSummary = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
-export const quizPipe = async (quizPipeArgs: generalTypes.QuizPipeArgType,
-): Promise<any[] | undefined> => {
-    try {
-        const response = await axios({
-            method: 'post',
-            url: quizPipeArgs.BASE_URL + `run-quiz`,
-            headers: {
-                Authorization: `Bearer ${quizPipeArgs.API_KEY}`,
-            },
-            data: {
-                override_oc_yaml: quizPipeArgs.overrideOcYaml,
-                cluster_label: quizPipeArgs.clusterLabel,
-                pipeline_name: quizPipeArgs.pipelineName,
-                openai_api_key: quizPipeArgs.OPENAI_API_KEY,
-                prompt_per_topic: quizPipeArgs.promptPerTopic,
-                total_num_questions: quizPipeArgs.totalNumQuestions
-            },
-        });
-        return response.data;
-
-    } catch (error: unknown) {
-        if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
-        } else {
-            console.error("Unknown error occurred")
-            console.error(error)
-        }
-    }
-};
 export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Promise<{
     name: string;
     status: string;
@@ -196,8 +197,8 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
 };
 
 export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Promise<
-    {id: string, steps: any, status: string}
-    | undefined> => {
+  {id: string, steps: any, status: string}
+  | undefined> => {
     try {
         const response = await axios({
             method: 'get',
@@ -218,66 +219,84 @@ export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Pro
     return
 };
 
-// TODO - just make it a pipeline
-export const generateQuest = async (genQuestArgs: generalTypes.GenerateQuestOptionsType): Promise<{
-    topic: string;
-    output: string
-}[] | null> => {
 
+export const poll = async (pollArgs: PollArgsType): Promise<any | undefined> => {
     try {
-
-        const parsedGenQuestArgs = generalTypes.GenerateQuestOptionsSchema.parse(
-            {...genQuestArgs}
-        )
-
-        const result = await axios({
-            method: 'post',
-            url: parsedGenQuestArgs.BASE_URL + 'quest_gen',
-            headers: {
-                Authorization: `Bearer ${parsedGenQuestArgs.API_KEY}`,
-            },
-            data: {
-                mission: parsedGenQuestArgs.mission,
-                vision: parsedGenQuestArgs.vision,
-                quest: parsedGenQuestArgs.quest,
-                intro_prompt: parsedGenQuestArgs.introPrompt,
-                intro_context_budget: parsedGenQuestArgs.introContextBudget,
-                quiz_total_context_budget: parsedGenQuestArgs.quizTotalContextBudget,
-                metadata_json: parsedGenQuestArgs.metadataJson,
-                prompt_per_topic: parsedGenQuestArgs.promptPerTopic,
-                pipeline_name: parsedGenQuestArgs.pipelineName,
-                openai_api_key: parsedGenQuestArgs.OPENAI_API_KEY,
-                total_num_questions: parsedGenQuestArgs.totalNumberOfQuestions,
-                score_percentile_key: parsedGenQuestArgs.scorePercentileKey,
-                cluster_label_key: parsedGenQuestArgs.clusterLabelKey,
-                model: parsedGenQuestArgs.model,
-                chunks_limit: parsedGenQuestArgs.chunksLimit
-            },
-        });
-        return result.data;
+        const spinner = ora({text: `Initialising Workflow.`, spinner: 'dots'}).start();
+        const runID = await pollArgs.method(pollArgs.fnArgs)
+        spinner.text = `\u2710 Workflow Created. Got RunID: ${textWithColor(runID,"green")}\n`
+        while (true) {
+            if (runID) {
+                const runResults = await getRunResults({
+                    BASE_URL: pollArgs.fnArgs.BASE_URL,
+                    API_KEY: pollArgs.fnArgs.API_KEY,
+                    runID: runID
+                })
+                if (runResults.status === "FAILED") {
+                    spinner.text = `\u1F6A8 Workflow hit an error along the way!. Please check the logs for more information.\n`
+                    spinner.stopAndPersist()
+                    return runResults
+                }
+                if (runResults.status === "SUCCESSFUL") {
+                    spinner.text = `\u2705  Workflow Completed Successfully! Please check the logs for full details\n`
+                    spinner.stopAndPersist()
+                    return runResults
+                }
+                if (runResults.status === "RUNNING") {
+                    await sleep({ms: 1000});
+                    if (Object.keys(runResults.steps).length == 0) {
+                        spinner.text = `Workflow is running. No steps have been completed yet.`
+                    }
+                    if (Object.keys(runResults.steps).length > 0) {
+                        const { text, color } = textWithIntSelectedColor(runResults.steps[Object.keys(runResults.steps).at(-1) as string].step_name,Object.keys(runResults.steps).length, true)
+                        spinner.color = color;
+                        spinner.text = `Currently on step name: ${text}`
+                        } else {
+                        
+                    }
+                }
+            } else {
+                console.log("No run ID was ever generated")
+                break
+            }
+        }
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-        }
-        if (error instanceof z.ZodError) {
-            console.log(`An error occurred in the validation of the arguments you passed. The validation error is: ${error}.`)
-        }
-        else {
+        } else {
             console.error("Unknown error occurred")
             console.error(error)
         }
     }
-    return null;
-};
-
-
+}
+export const getRunResults = async({BASE_URL, API_KEY, runID}:{ BASE_URL: string, API_KEY: string, runID: string }): Promise<any | undefined> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: BASE_URL + `run_results/${runID}`,
+            headers: {
+                Authorization: `Bearer ${API_KEY}`,
+            },
+        });
+        return response.data;
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+            return []
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+            return []
+        }
+    }
+}
 export const uploadDirectory = async ({
-                                     directory,
-                                     pipelineName,
-                                     metadataJson,
-                                     BASE_URL,
-                                     API_KEY,
-                                 }: generalTypes.UploadDirectoryType): Promise<boolean | undefined> => {
+                                          directory,
+                                          pipelineName,
+                                          metadataJson,
+                                          BASE_URL,
+                                          API_KEY,
+                                      }: generalTypes.UploadDirectoryType): Promise<any | undefined> => {
 
     const formData = new FormData();
 
@@ -312,7 +331,7 @@ export const uploadDirectory = async ({
             data: formData,
         });
         // TODO: add run id and to return type
-        return response.status === 200;
+        return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
@@ -383,7 +402,7 @@ export const uploadFile = async ({
 
 
 export const checkPipelineStatus = async (
-    checkPipe: generalTypes.CheckPipelineType): Promise<any> => {
+  checkPipe: generalTypes.CheckPipelineType): Promise<any> => {
     try {
         const response = await axios({
             method: 'get',
@@ -403,7 +422,7 @@ export const checkPipelineStatus = async (
     }
 };
 export const awaitEmbeddings = async (
-    awaitEmbeddings: generalTypes.AwaitEmbeddingsType
+  awaitEmbeddings: generalTypes.AwaitEmbeddingsType
 ): Promise<string | undefined> => {
     while (true) {
         const files = await listFiles({
@@ -525,6 +544,6 @@ export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Prom
     }
 }
 
-export * from './ocTypes/generalTypes';
-export * from './ocTypes/yamlTypes';
-export * from './ocTypes/errors';
+export * from './ocTypes/generalTypes.js';
+export * from './ocTypes/yamlTypes.js';
+export * from './ocTypes/errors.js';

@@ -3,14 +3,14 @@ index:
   name: basic_index
 
   steps:
-    - step: OCPreprocessor
+    - step: FileInput
       name: simple_pre_processor
       step_args:
         add_punctuation: false
         remove_whitespace: false
       depends_on: [ ]
 
-    - step: OCChunker
+    - step: Chunker
       name: simple_chunker
       step_args:
         chunk_size_words: 320
@@ -40,8 +40,15 @@ index:
         assign_labels: gpt-3.5-turbo
       depends_on: [ lexranker_file ]
 
+    - step: ChunkWriter
+      name: save
+      step_args:
+        duplicates: overwrite
+      depends_on: [ louvain ] 
 
-query:
+
+
+hooks:
 
   name: test_query
 
@@ -49,10 +56,11 @@ query:
     - step: OCRetriever
       name: demo_retriever
       step_args:
-        query: $QUERY_WILDCARD
+        query: tell me about language models 
         model_name: BAAI/bge-base-en-v1.5
-        top_k: $RETRIEVER_TOP_K
+        top_k: 10 
         metadata_json: { }
+        return_embeddings: true
       depends_on: [ ]
 
     - step: LexRank
@@ -70,14 +78,14 @@ query:
       step_args:
         key: lexranker_demo.percentile_score
         comparator: $gt
-        value: $EXTRACT_PERCENTAGE
+        value: 0.5 
       depends_on: [ louvain_demo ]
 
     - step: OCReranker
       name: oc_reranker_test
       step_args:
-        query: $RERANKER_QUERY_WILDCARD
+        query: tell me about language models 
         model_name: BAAI/bge-reranker-base
-        top_k: $RERANKER_TOP_K_WILDCARD
+        top_k: 10 
       depends_on: [ demo_filter ]
 
