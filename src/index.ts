@@ -12,7 +12,53 @@ import {PollArgsType} from "./ocTypes/generalTypes.js";
 import {textWithColor, textWithIntSelectedColor} from "./rmUtils.js";
 import ora from "ora";
 
+export const createVectorIndex = async (vectorIndexCreateArgs: generalTypes.VectorIndexCreateType): Promise<any> => {
 
+    try {
+        await axios({
+            method: 'post',
+            url: vectorIndexCreateArgs.BASE_URL + 'index',
+            headers: {
+                Authorization: `Bearer ${vectorIndexCreateArgs.API_KEY}`,
+            },
+            data: {
+                name: vectorIndexCreateArgs.vectorIndexName,
+                model_name: vectorIndexCreateArgs.modelName
+            },
+        });
+        console.log("Created Vector Index: " + vectorIndexCreateArgs.vectorIndexName)
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
+        } else {
+            console.log(error)
+            console.error("Unknown error occurred")
+        }
+    }
+};
+export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.KnowledgeBaseCreateType): Promise<any> => {
+
+    try {
+        await axios({
+            method: 'post',
+            url: knowledgeBaseCreateArgs.BASE_URL + 'knowledgebase',
+            headers: {
+                Authorization: `Bearer ${knowledgeBaseCreateArgs.API_KEY}`,
+            },
+            data: {
+                name: knowledgeBaseCreateArgs.knowledgeBaseName,
+            },
+        });
+        console.log("Created Knowledge Base: " + knowledgeBaseCreateArgs.knowledgeBaseName)
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
+        } else {
+            console.log(error)
+            console.error("Unknown error occurred")
+        }
+    }
+};
 export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCreateType): Promise<any> => {
 
     try {
@@ -29,14 +75,14 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
                 },
                 data: {
                     name: pipelineCreateArgs.pipelineName,
-                    oc_yaml: pipelineCreateArgs.pipelineYaml,
+                    yaml_config: pipelineCreateArgs.pipelineYaml,
                 },
             });
             console.log("Created pipeline: " + pipelineCreateArgs.pipelineName)
         }
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors || error.message);
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
         } else {
             console.log(error)
             console.error("Unknown error occurred")
@@ -83,7 +129,7 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
         }
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
+            console.log(error.response?.data?.errors ?? error.response?.data?.detail ?? error.message);
         } else {
             console.error("Unknown error occurred")
             console.error(error)
@@ -92,7 +138,7 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
 };
 
 
-export const run = async (runArgs: generalTypes.RunArgsType,
+export const runPipeline = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any | undefined> => {
     try {
         const response = await axios({
@@ -102,7 +148,7 @@ export const run = async (runArgs: generalTypes.RunArgsType,
                 Authorization: `Bearer ${runArgs.API_KEY}`,
             },
             data: {
-                override_oc_yaml: runArgs.overrideOcYaml,
+                override_args: runArgs.overrideArgs,
                 pipeline_name: runArgs.pipelineName,
             },
         });
@@ -110,7 +156,7 @@ export const run = async (runArgs: generalTypes.RunArgsType,
 
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
         } else {
             console.error("Unknown error occurred")
             console.error(error)
@@ -118,7 +164,7 @@ export const run = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
-export const arun = async (runArgs: generalTypes.RunArgsType,
+export const aRunPipeline = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any | undefined> => {
     try {
         const response = await axios({
@@ -128,7 +174,7 @@ export const arun = async (runArgs: generalTypes.RunArgsType,
                 Authorization: `Bearer ${runArgs.API_KEY}`,
             },
             data: {
-                override_oc_yaml: runArgs.overrideOcYaml,
+                override_args: runArgs.overrideArgs,
                 pipeline_name: runArgs.pipelineName,
             },
         });
@@ -136,7 +182,7 @@ export const arun = async (runArgs: generalTypes.RunArgsType,
 
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
             console.log(error.response?.data ?? error.message);
         } else {
             console.error("Unknown error occurred")
@@ -154,7 +200,7 @@ export const runSummary = async (runArgs: generalTypes.RunArgsType,
                 Authorization: `Bearer ${runArgs.API_KEY}`,
             },
             data: {
-                override_oc_yaml: runArgs.overrideOcYaml,
+                override_args: runArgs.overrideArgs,
                 pipeline_name: runArgs.pipelineName,
             },
         });
@@ -251,8 +297,8 @@ export const poll = async (pollArgs: PollArgsType): Promise<any | undefined> => 
                         const { text, color } = textWithIntSelectedColor(runResults.steps[Object.keys(runResults.steps).at(-1) as string].step_name,Object.keys(runResults.steps).length, true)
                         spinner.color = color;
                         spinner.text = `Currently on step name: ${text}`
-                        } else {
-                        
+                    } else {
+
                     }
                 }
             } else {
@@ -292,7 +338,7 @@ export const getRunResults = async({BASE_URL, API_KEY, runID}:{ BASE_URL: string
 }
 export const uploadDirectory = async ({
                                           directory,
-                                          pipelineName,
+                                          knowledgeBaseName,
                                           metadataJson,
                                           BASE_URL,
                                           API_KEY,
@@ -314,7 +360,7 @@ export const uploadDirectory = async ({
         }
     });
 
-    formData.append('pipeline_name', pipelineName);
+    formData.append('knowledgebase_name', knowledgeBaseName);
 
     if (metadataJson) {
         formData.append('metadata_json', JSON.stringify(metadataJson));

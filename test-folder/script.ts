@@ -1,9 +1,10 @@
 import * as OneContext from 'onecontext'
+import { performance } from 'perf_hooks';
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
 import {awaitEmbeddings, getRunResults, PipelineSchema} from "onecontext";
-import {runMany} from "../src/rmUtils.js";
+import {runMany, textWithColor} from "../src/rmUtils.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
@@ -22,15 +23,22 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const fpath = __dirname+"/../example_yamls/wildcards.yaml"
-const otherPath = __dirname+"/../example_yamls/wildcards.yaml"
+const fpath = __dirname+"/../example_yamls/query.yaml"
+const otherPath = __dirname+"/../example_yamls/query.yaml"
 const file: string = fs.readFileSync(fpath, 'utf8')
 const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 
 // The first step is to create a pipeline
 // here we create one with the configuration in the "simple" yaml file
-// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm_test', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm_query', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.createPipeline(pipeCreate).then((res)=>{})
+
+// const vectorIndexCreate: OneContext.VectorIndexCreateType = {vectorIndexName: 'rm_test_vi', modelName: "BAAI/bge-base-en-v1.5", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.createVectorIndex(vectorIndexCreate).then((res)=>{})
+
+// const knowledgeBaseCreate: OneContext.KnowledgeBaseCreateType = {knowledgeBaseName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.createKnowledgeBase(knowledgeBaseCreate).then((res)=>{})
 
 // list your current pipelines to confirm that the above pipeline now exists
 // const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
@@ -41,14 +49,17 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
 //     directory: "/Users/rossmurphy/embedpdf/",
 //     metadataJson: {"description": "demo_example"},
-//     pipelineName: "rm_test",
+//     knowledgeBaseName: "rm_test",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 // }
 // const runId = OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
-//     console.log(res)
+//   if (res.data) {
+//     console.log(res.data)
+//   }
 // })
-// const out = getRunResults({BASE_URL: BASE_URL, API_KEY: API_KEY, runID: "10a69fc242d0434984b92aca0db0f718"}).then((res) => {console.log(res)})
+
+// const out = getRunResults({BASE_URL: BASE_URL, API_KEY: API_KEY, runID: "b4e35f2f7cab424da752dc54f6da1569"}).then((res) => {console.log(res)})
 
 // Of course, you can also choose to upload just one file, or an array of files, if you prefer
 
@@ -70,26 +81,30 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
-// const listFiles: OneContext.ListFilesType = {pipelineName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const listFiles: OneContext.ListFilesType = {pipelineName: 'rm_prod', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
 // QUERY DEMO
 // run the query pipeline. here we are passing the simple yaml we defined above
 // you don't actually need to pass the yaml if you just want to run the default one attached to the pipeline
 
-const wildcardPath = __dirname + "/../example_yamls/wildcards.yaml"
-const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
-const queryArgs: OneContext.RunArgsType = {
-    pipelineName: 'rm_test',
-    overrideOcYaml: wildcardFile,
+// const wildcardPath = __dirname + "/../example_yamls/simple.yaml"
+// const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
+const runPipeArgs: OneContext.RunArgsType = {
+    pipelineName: 'rm_query',
+    overrideArgs: {},
     BASE_URL: BASE_URL,
     API_KEY: API_KEY
 }
-// OneContext.run(queryArgs).then((res) => {
+// const t0 = performance.now()
+// OneContext.runPipeline(runPipeArgs).then((res) => {
+//     const t1 = performance.now()
+//     console.log(` the total time taken was ${textWithColor((t1 - t0).toFixed(3),"green")} milliseconds.`)
 //     console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}) )
 // })
+
 // @ts-ignore
-OneContext.poll({fnArgs: queryArgs, method: OneContext.arun})
+OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((res) => {console.log(res)})
 
 // OneContext.arun(queryArgs).then((res) => {console.log(res)})
 // OneContext.runSummary(queryArgs).then((res) => {console.log(res)})
@@ -99,12 +114,13 @@ OneContext.poll({fnArgs: queryArgs, method: OneContext.arun})
 // For reference, 100 concurrent calls should take around (800 miliseconds), or 8 miliseconds per call
 // const queryArgs: OneContext.RunArgsType = {
 //     pipelineName: 'rm_prod',
+//     overrideOcYaml: wildcardFile,
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY
 // }
 // const runManyArgs = {
 //     n: 100,
-//     callable: (args: any) => {OneContext.run(args).then((res)=>console.log(res))},
+//     callable: (args: any) => {OneContext.run(args)},
 //     callableArgs: queryArgs
 // }
 // //

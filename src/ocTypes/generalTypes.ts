@@ -44,7 +44,7 @@ export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
 })
 
 export const RunArgsSchema = BaseArgsSchema.extend({
-    overrideOcYaml: z.string().optional(),
+    overrideArgs: z.object({}).default({}).optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
 export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
@@ -119,6 +119,13 @@ export const PathFileSchema = z.object({
 });
 
 
+export const KnowledgeBaseCreateSchema = BaseArgsSchema.extend({
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+})
+export const VectorIndexCreateSchema = BaseArgsSchema.extend({
+    vectorIndexName: z.string().refine((val) => val.trim() !== '', {message: "Vector Index name cannot be empty"}),
+    modelName: z.string().refine((val) => val.trim() !== '', {message: "Model name cannot be empty"}),
+})
 
 export const PipelineCreateSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
@@ -169,7 +176,7 @@ export const ParseYamlSchema = z.object({
 
 export const UploadDirectoryOptionsSchema = BaseArgsSchema.extend({
     directory: z.string().refine((val) => val.endsWith("/"), {message: "Directory must end with /"}),
-    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     metadataJson: z.object({}).optional(),
 });
 
@@ -200,6 +207,8 @@ export const ContextCompletionArgsSchema = OpenAIBaseArgsSchema.extend({
 
 export type ContextCompletionArgsType = z.infer<typeof ContextCompletionArgsSchema>
 export type PipelineCreateType = z.infer<typeof PipelineCreateSchema>
+export type VectorIndexCreateType = z.infer<typeof VectorIndexCreateSchema>
+export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
 export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsArgs>
 export type PipelineDeleteType = z.infer<typeof PipelineDeleteSchema>
 export type CheckPipelineType = z.infer<typeof CheckPipelineSchema>
