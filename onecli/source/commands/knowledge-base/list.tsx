@@ -44,8 +44,8 @@ const KnowledgeBaseList = ({options}: Props) => {
 			{loading?<Text><Text color={"green"}><Spinner type="dots"/></Text>{` Loading`}</Text>:
 				<Box borderStyle="round" flexDirection="column">
 					{ knowledgeBases.length > 0 ?
-						knowledgeBases.map((kb, i) => <Text key={i}><Text color="yellow">ID:</Text><Text> {kb.id}. </Text><Text color="green">Name:
-							</Text><Text> {kb.name}.</Text></Text>) : <Text>No knowledge bases found</Text>
+						knowledgeBases.map((kb, i) => <Text key={i}><Text color="green">Knowledge Base Name:
+							</Text><Text color={"#f5f5f5"}> {kb.name}.</Text></Text>) : <Text>No knowledge bases found</Text>
 					}
 				</Box>
 			}

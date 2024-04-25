@@ -3,7 +3,7 @@ import {render, Box, Text, Spacer, Newline} from 'ink';
 import Spinner from 'ink-spinner';
 import * as OneContext from 'onecontext';
 import * as zod from 'zod';
-import {Credentials} from '../../setup.js';
+import {Credentials} from '../../../setup.js';
 import fs from "fs";
 
 const {API_KEY, BASE_URL} = Credentials;

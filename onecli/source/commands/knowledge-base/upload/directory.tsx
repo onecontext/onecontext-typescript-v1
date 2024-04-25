@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as OneContext from 'onecontext'
 
-import {Credentials} from '../../setup.js';
+import {Credentials} from '../../../setup.js';
 import * as zod from "zod";
 
 const {API_KEY, BASE_URL} = Credentials
@@ -14,19 +14,20 @@ export const options = zod.object({
 	BASE_URL: zod.string().default(BASE_URL),
 	API_KEY: zod.string().default(API_KEY),
 	knowledgeBaseName: zod.string().describe('Name of the knowledge base to upload the file to'),
-	metadataJson: zod.string().describe('Metadata to attach to the file').refine((metadata) => {
+	metadataJson: zod.string().default("{}")
+		.transform((metadata: string) => {
 		return JSON.parse(metadata)
-	})
+	}).describe('Metadata to attach to the file')
 })
 
-type Props = {options: zod.infer<typeof options>};
+type Props = { options: zod.infer<typeof options> };
 
 interface FileItem {
 	label: string;
 	value: string;
 }
 
-const Upload = ({options}: Props) => {
+const DirectoryUpload = ({options}: Props) => {
 
 	const [directory, setDirectory] = useState(process.cwd());
 	const [selected, setSelected] = useState(false);
@@ -42,26 +43,25 @@ const Upload = ({options}: Props) => {
 
 	const handleSelect = (item: FileItem) => {
 		if (fs.statSync(item.value).isDirectory()) {
-			setDirectory(item.value);
-		} else {
 			setSelected(true)
-			const uploadFileArgs: OneContext.UploadFileType = {
-				files: [{path: `${item?.value}`}],
+			const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
+				directory: item?.value+"/",
 				metadataJson: options.metadataJson,
 				knowledgeBaseName: options.knowledgeBaseName,
 				BASE_URL: options.BASE_URL,
 				API_KEY: options.API_KEY,
-				stream: false
 			}
-			OneContext.uploadFile(uploadFileArgs).then(() => {
-				process.exit(0)
+			OneContext.uploadDirectory(uploadDirectoryArgs).then(() => {
 			})
+		} else {
 		}
 	};
 
 	return <Box>
-		{selected?<Text>Sending file to the server!</Text> : <SelectInput items={items} onSelect={handleSelect}/>}
+		{selected ?
+			<Text>Uploading all files in directory to the server. Any pipelines connected to this knowledge base will be
+				automatically triggered.</Text> : <SelectInput items={items} onSelect={handleSelect}/>}
 	</Box>
 }
 
-export default Upload
+export default DirectoryUpload

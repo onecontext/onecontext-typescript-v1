@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { homedir } from 'os';
 
-const ConfigCommand = () => {
+const ApiKeyCommand = () => {
 	const [input, setInput] = useState('');
 	const [submitted, setSubmitted] = useState(false);
 
@@ -50,4 +50,4 @@ const ConfigCommand = () => {
 	);
 };
 
-export default ConfigCommand;
+export default ApiKeyCommand;
