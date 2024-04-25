@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as OneContext from 'onecontext'
 
-import {Credentials} from '../setup.js';
+import {Credentials} from '../../setup.js';
 import * as zod from "zod";
 
 const {API_KEY, BASE_URL} = Credentials
@@ -27,7 +27,6 @@ interface FileItem {
 }
 
 const Upload = ({options}: Props) => {
-	console.log(options.metadataJson)
 
 	const [directory, setDirectory] = useState(process.cwd());
 	const [selected, setSelected] = useState(false);

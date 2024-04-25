@@ -135,11 +135,21 @@ export const YouTubeUrlSchema = BaseArgsSchema.extend({
     urls: z.array(z.string()),
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
 })
+export const VectorIndexDeleteSchema = BaseArgsSchema.extend({
+    vectorIndexName: z.string().refine((val) => val.trim() !== '', {message: "Vector Index name cannot be empty"}),
+})
+export const KnowledgeBaseDeleteSchema = BaseArgsSchema.extend({
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+})
 export const PipelineDeleteSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 })
+export const ListKnowledgeBasesSchema = BaseArgsSchema.extend({
+})
 export const ListPipelinesSchema = BaseArgsSchema.extend({
     verbose: z.boolean().default(false).optional()
+})
+export const ListVectorIndicesSchema = BaseArgsSchema.extend({
 })
 export const CheckPipelineSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
@@ -216,11 +226,15 @@ export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
 export type YouTubeUrlType = z.infer<typeof YouTubeUrlSchema>
 export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsArgs>
 export type PipelineDeleteType = z.infer<typeof PipelineDeleteSchema>
+export type VectorIndexDeleteType = z.infer<typeof VectorIndexDeleteSchema>
+export type KnowledgeBaseDeleteType = z.infer<typeof KnowledgeBaseDeleteSchema>
 export type CheckPipelineType = z.infer<typeof CheckPipelineSchema>
 export type RunArgsType = z.infer<typeof RunArgsSchema>
 export type QuizPipeArgType = z.infer<typeof QuizPipeArgTypeSchema>
 export type CallPipelineType = z.infer<typeof CallPipelineSchema>
 export type ListPipelinesType = z.infer<typeof ListPipelinesSchema>
+export type ListKnowledgeBasesType = z.infer<typeof ListKnowledgeBasesSchema>
+export type ListVectorIndicesType = z.infer<typeof ListVectorIndicesSchema>
 export type ListFilesType = z.infer<typeof ListFilesArgs>
 export type CheckRunType = z.infer<typeof CheckRunArgs>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>

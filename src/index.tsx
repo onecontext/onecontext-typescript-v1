@@ -44,7 +44,7 @@ export const uploadYouTubeUrl = async (youtubeUrlArgs: generalTypes.YouTubeUrlTy
 export const createVectorIndex = async (vectorIndexCreateArgs: generalTypes.VectorIndexCreateType): Promise<any> => {
 
     try {
-        await axios({
+        return await axios({
             method: 'post',
             url: vectorIndexCreateArgs.BASE_URL + 'index',
             headers: {
@@ -55,7 +55,6 @@ export const createVectorIndex = async (vectorIndexCreateArgs: generalTypes.Vect
                 model_name: vectorIndexCreateArgs.modelName
             },
         });
-        console.log("Created Vector Index: " + vectorIndexCreateArgs.vectorIndexName)
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
@@ -96,7 +95,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
         if (parsedYaml == null) {
             console.log("Failed to create pipeline: " + pipelineCreateArgs.pipelineName)
         } else {
-            await axios({
+            return await axios({
                 method: 'post',
                 url: pipelineCreateArgs.BASE_URL + 'pipeline',
                 headers: {
@@ -107,7 +106,6 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
                     yaml_config: pipelineCreateArgs.pipelineYaml,
                 },
             });
-            console.log("Created pipeline: " + pipelineCreateArgs.pipelineName)
         }
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
@@ -119,17 +117,49 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
     }
 };
 
+export const deleteKnowledgeBase = async (knowledgeBaseDeleteArgs: generalTypes.KnowledgeBaseDeleteType): Promise<any | null> => {
+    try {
+        return await axios({
+            method: 'delete',
+            url: knowledgeBaseDeleteArgs.BASE_URL + `knowledgebase` + `/${knowledgeBaseDeleteArgs.knowledgeBaseName}`,
+            headers: {
+                Authorization: `Bearer ${knowledgeBaseDeleteArgs.API_KEY}`,
+            },
+        });
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+        }
+    }
+};
+export const deleteVectorIndex = async (vectorIndexDeleteArgs: generalTypes.VectorIndexDeleteType): Promise<any | null> => {
+    try {
+        return await axios({
+            method: 'delete',
+            url: vectorIndexDeleteArgs.BASE_URL + `index` + `/${vectorIndexDeleteArgs.vectorIndexName}`,
+            headers: {
+                Authorization: `Bearer ${vectorIndexDeleteArgs.API_KEY}`,
+            },
+        });
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+        }
+    }
+};
 export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDeleteType): Promise<any | null> => {
     try {
-        const response = await axios({
+        return await axios({
             method: 'delete',
             url: pipelineDeleteArgs.BASE_URL + `pipeline/${pipelineDeleteArgs.pipelineName}`,
             headers: {
                 Authorization: `Bearer ${pipelineDeleteArgs.API_KEY}`,
             },
         });
-        console.log("Deleted pipeline: " + pipelineDeleteArgs.pipelineName)
-        return response.data;
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
@@ -139,6 +169,27 @@ export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDe
     }
 };
 
+export const listKnowledgeBases = async (listKnowledgeBasesArgs: generalTypes.ListKnowledgeBasesType): Promise<{
+    id: string; name: string;
+}[] | undefined> => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: listKnowledgeBasesArgs.BASE_URL + `knowledgebase`,
+            headers: {
+                Authorization: `Bearer ${listKnowledgeBasesArgs.API_KEY}`,
+            },
+        });
+        return response.data
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.response?.data?.detail ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+        }
+    }
+};
 export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipelinesType): Promise<{
     name: string; yaml_config: string;
 }[] | undefined> => {
@@ -169,6 +220,27 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
     }
 };
 
+export const listVectorIndices = async (listVectorIndicesArgs: generalTypes.ListVectorIndicesType): Promise<{
+    name: string; model_name: string;
+}[] | undefined> => {
+    try {
+       const response = await axios({
+            method: 'get',
+            url: listVectorIndicesArgs.BASE_URL + `index`,
+            headers: {
+                Authorization: `Bearer ${listVectorIndicesArgs.API_KEY}`,
+            },
+        });
+       return response.data
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.errors ?? error.response?.data?.detail ?? error.message);
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+        }
+    }
+};
 
 export const runPipeline = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any | undefined> => {
