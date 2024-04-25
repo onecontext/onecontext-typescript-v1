@@ -67,7 +67,7 @@ export const createVectorIndex = async (vectorIndexCreateArgs: generalTypes.Vect
 export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.KnowledgeBaseCreateType): Promise<any> => {
 
     try {
-        await axios({
+        return await axios({
             method: 'post',
             url: knowledgeBaseCreateArgs.BASE_URL + 'knowledgebase',
             headers: {
@@ -77,7 +77,6 @@ export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.
                 name: knowledgeBaseCreateArgs.knowledgeBaseName,
             },
         });
-        console.log("Created Knowledge Base: " + knowledgeBaseCreateArgs.knowledgeBaseName)
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
