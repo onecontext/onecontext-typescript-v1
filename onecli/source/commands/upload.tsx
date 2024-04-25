@@ -14,6 +14,9 @@ export const options = zod.object({
 	BASE_URL: zod.string().default(BASE_URL),
 	API_KEY: zod.string().default(API_KEY),
 	knowledgeBaseName: zod.string().describe('Name of the knowledge base to upload the file to'),
+	metadataJson: zod.string().describe('Metadata to attach to the file').refine((metadata) => {
+		return JSON.parse(metadata)
+	})
 })
 
 type Props = {options: zod.infer<typeof options>};
@@ -39,10 +42,10 @@ const Upload = ({options}: Props) => {
 	});
 
 	const handleSelect = (item: FileItem) => {
-		setSelected(true)
 		if (fs.statSync(item.value).isDirectory()) {
 			setDirectory(item.value);
 		} else {
+			setSelected(true)
 			const uploadFileArgs: OneContext.UploadFileType = {
 				files: [{path: `${item?.value}`}],
 				metadataJson: options.metadataJson,
