@@ -29,7 +29,7 @@ export const uploadYouTubeUrl = async (youtubeUrlArgs: generalTypes.YouTubeUrlTy
                 knowledgebase_name: youtubeUrlArgs.knowledgeBaseName
             },
         });
-        console.log(`Uploaded all videos from ${youtubeUrlArgs.urls.map((x: string)=>{return x})} to: ${youtubeUrlArgs.knowledgeBaseName}`)
+        // console.log(`Uploaded all videos from ${youtubeUrlArgs.urls.map((x: string)=>{return x})} to: ${youtubeUrlArgs.knowledgeBaseName}`)
         return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
