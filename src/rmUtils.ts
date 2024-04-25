@@ -29,23 +29,19 @@ export function textWithIntSelectedColor(message: string, integerSelect: number,
     }
 }
 
-export const runMany = async ({n, callable, callableArgs}:{n: number, callable: (args: any) => any, callableArgs: any}) => {
+export const runMany = async ({n, callable, callableArgs}:{n: number, callable: (callableArgs: any) => any, callableArgs: any}) => {
+    const t0 = performance.now();
 
-    // create one task
-    const t0 = performance.now()
-    let task = callable(callableArgs)
+    // Create an array of Promises by invoking the callable function `n` times
+    const tasks = Array.from({length: n}, () => callable(callableArgs));
 
-    // make n copies of the above task
-    const tasks = Array.from({length:n}).map(x => task)
+    const results = await Promise.all(tasks);
 
-
-    return Promise.all(tasks).then((res) => {
-        const t1 = performance.now()
-
-        console.log(`This call executed ${textWithColor(String(n),"yellow")} times.\nThe total time taken was ${textWithColor((t1 - t0).toFixed(3),"green")} milliseconds.\nThe average time per execution was ${textWithColor(((t1 - t0)/n).toFixed(3),"magenta")} milliseconds.`)
-        return res
-    })
+    const t1 = performance.now();
+    console.log(`This call executed ${textWithColor(String(n), "yellow")} times.\nThe total time taken was ${textWithColor((t1 - t0).toFixed(3), "green")} milliseconds.\nThe average time per execution was ${textWithColor(((t1 - t0) / n).toFixed(3), "magenta")} milliseconds.`)
+    return results;
 }
+
 
 // const runit = async () => {
 //     const r = await OneContext.parseYaml({yaml: file, verboseErrorHandling: false})

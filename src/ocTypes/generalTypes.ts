@@ -72,7 +72,7 @@ export const CheckRunArgs = BaseArgsSchema.extend({
 });
 
 export const ListFilesArgs = BaseArgsSchema.extend({
-    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
 });
 
 export const ContentFileSchema = BaseArgsSchema.extend({
@@ -131,6 +131,10 @@ export const PipelineCreateSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     pipelineYaml: z.string(),
 })
+export const YouTubeUrlSchema = BaseArgsSchema.extend({
+    urls: z.array(z.string()),
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+})
 export const PipelineDeleteSchema = BaseArgsSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 })
@@ -159,7 +163,7 @@ export const UploadFileOptionsSchema = BaseArgsSchema.extend({
     files: z.array(FileSchema),
     stream: z.boolean(),
     directory: z.union([z.null(),z.string()]).default(null).optional(),
-    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     metadataJson: z.object({}).optional(),
 });
 
@@ -209,6 +213,7 @@ export type ContextCompletionArgsType = z.infer<typeof ContextCompletionArgsSche
 export type PipelineCreateType = z.infer<typeof PipelineCreateSchema>
 export type VectorIndexCreateType = z.infer<typeof VectorIndexCreateSchema>
 export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
+export type YouTubeUrlType = z.infer<typeof YouTubeUrlSchema>
 export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsArgs>
 export type PipelineDeleteType = z.infer<typeof PipelineDeleteSchema>
 export type CheckPipelineType = z.infer<typeof CheckPipelineSchema>

@@ -3,7 +3,7 @@ import { performance } from 'perf_hooks';
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
-import {awaitEmbeddings, getRunResults, PipelineSchema} from "onecontext";
+import {awaitEmbeddings, getRunResults, PipelineSchema, YouTubeUrlType} from "onecontext";
 import {runMany, textWithColor} from "../src/rmUtils.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename); // get the name of the directory
 import pl from 'nodejs-polars';
 // import {runMany} from "../rmUtils";
 import util from "util"
+import axios from "axios";
 
 // import the variables from the .env
 dotenv.config({path: __dirname + '/../.env'});
@@ -23,27 +24,37 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const fpath = __dirname+"/../example_yamls/query.yaml"
-const otherPath = __dirname+"/../example_yamls/query.yaml"
+const fpath = __dirname+"/../example_yamls/simple_retriever.yaml"
+const otherPath = __dirname+"/../example_yamls/simple_retriever.yaml"
 const file: string = fs.readFileSync(fpath, 'utf8')
 const otherFile: string = fs.readFileSync(otherPath, 'utf8')
+
+// const youtubeArgs: YouTubeUrlType = {
+//   BASE_URL: BASE_URL,
+//   API_KEY: API_KEY,
+//   urls: ["https://www.youtube.com/@ycombinator"],
+//   knowledgeBaseName: 'yc_kb'
+// } 
+
+// OneContext.uploadYouTubeUrl(youtubeArgs).then((res) => {console.log(res)})
 
 // The first step is to create a pipeline
 // here we create one with the configuration in the "simple" yaml file
 
-// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'rm_query', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
-// OneContext.createPipeline(pipeCreate).then((res)=>{})
+// const pipeCreate: OneContext.PipelineCreateType = {pipelineName: 'yc_retriever', pipelineYaml: file, BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.createPipeline(pipeCreate).then((res)=>{console.log(res)})
 
-// const vectorIndexCreate: OneContext.VectorIndexCreateType = {vectorIndexName: 'rm_test_vi', modelName: "BAAI/bge-base-en-v1.5", BASE_URL: BASE_URL, API_KEY: API_KEY}
-// OneContext.createVectorIndex(vectorIndexCreate).then((res)=>{})
 
-// const knowledgeBaseCreate: OneContext.KnowledgeBaseCreateType = {knowledgeBaseName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const vectorIndexCreate: OneContext.VectorIndexCreateType = {vectorIndexName: 'yc_vi', modelName: "BAAI/bge-base-en-v1.5", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// OneContext.createVectorIndex(vectorIndexCreate).then((res)=>{console.log(res)})
+
+// const knowledgeBaseCreate: OneContext.KnowledgeBaseCreateType = {knowledgeBaseName: 'yc_kb', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.createKnowledgeBase(knowledgeBaseCreate).then((res)=>{})
 
 // list your current pipelines to confirm that the above pipeline now exists
 // const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
-
+//
 
 // You can then upload a whole directory of files through the pipeline
 // const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
@@ -66,22 +77,20 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // const uploadFileArgs: OneContext.UploadFileType = {
 //     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}, {path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
 //     metadataJson: {"description": "hello"},
-//     pipelineName: "retainit_example",
+//     knowledgeBaseName: "rm_test",
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY,
 //     stream: false
 // }
-// OneContext.uploadFile(uploadFileArgs).then((res) => {
-//     console.log(res)
+// OneContext.uploadFile(uploadFileArgs).then(() => {
 // })
 
-
 // check on how that's going
-// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "rm_test", BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "yc_channel", BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
-// const listFiles: OneContext.ListFilesType = {pipelineName: 'rm_prod', BASE_URL: BASE_URL, API_KEY: API_KEY}
+// const listFiles: OneContext.ListFilesType = {pipelineName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
 
 // QUERY DEMO
@@ -91,20 +100,23 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 // const wildcardPath = __dirname + "/../example_yamls/simple.yaml"
 // const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
 const runPipeArgs: OneContext.RunArgsType = {
-    pipelineName: 'rm_query',
-    overrideArgs: {},
+    pipelineName: 'yc_retriever',
+    // overrideArgs: {"retriever": {"query": "who is michael seibel?", "top_k": 100}, "reranker" : {"query": "who is michael seibel?", "top_k": 25}},
+    overrideArgs: {"retriever": {"query": "who is michael seibel?", "top_k": 100}},
     BASE_URL: BASE_URL,
     API_KEY: API_KEY
 }
-// const t0 = performance.now()
-// OneContext.runPipeline(runPipeArgs).then((res) => {
-//     const t1 = performance.now()
-//     console.log(` the total time taken was ${textWithColor((t1 - t0).toFixed(3),"green")} milliseconds.`)
-//     console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}) )
-// })
+const t0 = performance.now()
+OneContext.runPipeline(runPipeArgs).then((res) => {
+    const t1 = performance.now()
+  if (res) {
+    console.log(` the total time taken was ${textWithColor((t1 - t0).toFixed(3),"green")} milliseconds.`)}
+  // console.log(res)
+    // console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}) )
+})
 
 // @ts-ignore
-OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((res) => {console.log(res)})
+// OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((res) => {console.log(res)})
 
 // OneContext.arun(queryArgs).then((res) => {console.log(res)})
 // OneContext.runSummary(queryArgs).then((res) => {console.log(res)})
@@ -113,18 +125,18 @@ OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((re
 // Run this call multiple times concurrently and see how long it takes
 // For reference, 100 concurrent calls should take around (800 miliseconds), or 8 miliseconds per call
 // const queryArgs: OneContext.RunArgsType = {
-//     pipelineName: 'rm_prod',
-//     overrideOcYaml: wildcardFile,
+//     pipelineName: 'yc_query',
 //     BASE_URL: BASE_URL,
 //     API_KEY: API_KEY
 // }
 // const runManyArgs = {
-//     n: 100,
-//     callable: (args: any) => {OneContext.run(args)},
+//     n: 5,
+//     callable: async (args: any) => {
+//         return await OneContext.runPipeline(args)
+//     },
 //     callableArgs: queryArgs
 // }
-// //
-// runMany(runManyArgs).then((res) => {console.log("Complete!")})
+// runMany(runManyArgs).then((res) => {console.log(res)})
 //
 
 
@@ -138,7 +150,7 @@ OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((re
 
 // list your current pipelines to confirm that the above pipeline now exists
 
-// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: true}
+// const listPipes: OneContext.ListPipelinesType = {BASE_URL: BASE_URL, API_KEY: API_KEY, verbose: false}
 // OneContext.listPipelines(listPipes).then((res)=>{console.log(res)})
 
 // let's upload some files again, but now to this new "wildcard" pipeline.
@@ -384,5 +396,19 @@ OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((re
 // note that doing this will also delete all the associated files, embeddings, and chunks
 // const pipeDelete: OneContext.PipelineDeleteType = {pipelineName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
 // OneContext.deletePipeline(pipeDelete).then((res)=>{console.log(res)})
+// make a post request using the fetch api
 
-
+//
+// const args = {
+//     n: 1_000,
+//     callable: (args: any) => axios(args),
+//     callableArgs: {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         // url: BASE_URL+"test_ping"
+//         url: "https://onecontext.ai/api/test_ping" 
+//     }
+// }
+// const a = await runMany(args)

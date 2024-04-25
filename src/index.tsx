@@ -11,6 +11,35 @@ import * as path from "path"
 import {PollArgsType} from "./ocTypes/generalTypes.js";
 import {textWithColor, textWithIntSelectedColor} from "./rmUtils.js";
 import ora from "ora";
+import React from 'react';
+import {render, Text} from 'ink';
+import Spinner from 'ink-spinner';
+
+export const uploadYouTubeUrl = async (youtubeUrlArgs: generalTypes.YouTubeUrlType): Promise<any> => {
+
+    try {
+        const response: any = await axios({
+            method: 'post',
+            url: youtubeUrlArgs.BASE_URL + 'yt_urls',
+            headers: {
+                Authorization: `Bearer ${youtubeUrlArgs.API_KEY}`,
+            },
+            data: {
+                urls: youtubeUrlArgs.urls,
+                knowledgebase_name: youtubeUrlArgs.knowledgeBaseName
+            },
+        });
+        console.log(`Uploaded all videos from ${youtubeUrlArgs.urls.map((x: string)=>{return x})} to: ${youtubeUrlArgs.knowledgeBaseName}`)
+        return response.data
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
+        } else {
+            console.log(error)
+            console.error("Unknown error occurred")
+        }
+    }
+};
 
 export const createVectorIndex = async (vectorIndexCreateArgs: generalTypes.VectorIndexCreateType): Promise<any> => {
 
@@ -63,7 +92,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
 
     try {
         // first make sure it's a valid pipeline
-        const parsedYaml = await parseYaml({ yaml: pipelineCreateArgs.pipelineYaml, verboseErrorHandling: true })
+        const parsedYaml = await parseYaml({yaml: pipelineCreateArgs.pipelineYaml, verboseErrorHandling: true})
         if (parsedYaml == null) {
             console.log("Failed to create pipeline: " + pipelineCreateArgs.pipelineName)
         } else {
@@ -111,7 +140,7 @@ export const deletePipeline = async (pipelineDeleteArgs: generalTypes.PipelineDe
 };
 
 export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipelinesType): Promise<{
-    id: string; name: string;
+    name: string; yaml_config: string;
 }[] | undefined> => {
     try {
         const response = await axios({
@@ -122,10 +151,13 @@ export const listPipelines = async (listPipelinesArgs: generalTypes.ListPipeline
             },
         });
         if (!listPipelinesArgs.verbose) {
-            return response.data.map((it: { name: string; spec: string;}): string  => { return it.name });
-        }
-        else {
-            return response.data
+            return response.data.map((it: { name: string; yaml_config: string; }): {name: string} => {
+                return {name: it.name}
+            });
+        } else {
+            return response.data.map((it: { name: string; yaml_config: string; }): {name: string, yaml_config: string} => {
+                return it 
+            });
         }
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
@@ -224,7 +256,7 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
     try {
         const response = await axios({
             method: 'get',
-            url: listFilesArgs.BASE_URL + `knowledgebase/${listFilesArgs.pipelineName}/files`,
+            url: listFilesArgs.BASE_URL + `knowledgebase/${listFilesArgs.knowledgeBaseName}/files`,
             headers: {
                 Authorization: `Bearer ${listFilesArgs.API_KEY}`,
             },
@@ -243,7 +275,7 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
 };
 
 export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Promise<
-  {id: string, steps: any, status: string}
+  { id: string, steps: any, status: string }
   | undefined> => {
     try {
         const response = await axios({
@@ -270,7 +302,7 @@ export const poll = async (pollArgs: PollArgsType): Promise<any | undefined> => 
     try {
         const spinner = ora({text: `Initialising Workflow.`, spinner: 'dots'}).start();
         const runID = await pollArgs.method(pollArgs.fnArgs)
-        spinner.text = `\u2710 Workflow Created. Got RunID: ${textWithColor(runID,"green")}\n`
+        spinner.text = `\u2710 Workflow Created. Got RunID: ${textWithColor(runID, "green")}\n`
         while (true) {
             if (runID) {
                 const runResults = await getRunResults({
@@ -294,7 +326,10 @@ export const poll = async (pollArgs: PollArgsType): Promise<any | undefined> => 
                         spinner.text = `Workflow is running. No steps have been completed yet.`
                     }
                     if (Object.keys(runResults.steps).length > 0) {
-                        const { text, color } = textWithIntSelectedColor(runResults.steps[Object.keys(runResults.steps).at(-1) as string].step_name,Object.keys(runResults.steps).length, true)
+                        const {
+                            text,
+                            color
+                        } = textWithIntSelectedColor(runResults.steps[Object.keys(runResults.steps).at(-1) as string].step_name, Object.keys(runResults.steps).length, true)
                         spinner.color = color;
                         spinner.text = `Currently on step name: ${text}`
                     } else {
@@ -315,7 +350,11 @@ export const poll = async (pollArgs: PollArgsType): Promise<any | undefined> => 
         }
     }
 }
-export const getRunResults = async({BASE_URL, API_KEY, runID}:{ BASE_URL: string, API_KEY: string, runID: string }): Promise<any | undefined> => {
+export const getRunResults = async ({BASE_URL, API_KEY, runID}: {
+    BASE_URL: string,
+    API_KEY: string,
+    runID: string
+}): Promise<any | undefined> => {
     try {
         const response = await axios({
             method: 'get',
@@ -391,12 +430,13 @@ export const uploadDirectory = async ({
 export const uploadFile = async ({
                                      files,
                                      stream,
-                                     pipelineName,
+                                     knowledgeBaseName,
                                      metadataJson,
                                      BASE_URL,
                                      API_KEY,
                                  }: generalTypes.UploadFileType): Promise<boolean | undefined> => {
     const formData = new FormData();
+    const spinner = ora({text: `Uploading ${files.map(f=>f.path)} to ${knowledgeBaseName}.`, spinner: 'dots'}).start();
     files.forEach(file => {
         if (stream) {
             try {
@@ -415,13 +455,14 @@ export const uploadFile = async ({
                 // try and parse it as a path type file, i.e. the user has given a local file path,
                 // and we are to use the fs library to read the file stream from that file
                 const f = generalTypes.PathFileSchema.parse(file, {errorMap: ocErrors.customErrorMap})
+                spinner.text += `\nAdding file: ${f.path}`
                 formData.append('files', f.readable);
             } catch (e) {
                 throw Error(`Error parsing file ${e}`)
             }
         }
     });
-    formData.append('pipeline_name', pipelineName);
+    formData.append('knowledgebase_name', knowledgeBaseName);
     if (metadataJson) {
         formData.append('metadata_json', JSON.stringify(metadataJson));
     }
@@ -435,8 +476,16 @@ export const uploadFile = async ({
             },
             data: formData,
         });
-        return response.status === 200;
+        spinner.stopAndPersist()
+        if (response.status === 200) {
+            console.log(`Uploaded files to ${knowledgeBaseName}`)
+            return
+        }
+        else {
+            throw Error("Failed to upload files")
+        }
     } catch (error: unknown) {
+        spinner.stopAndPersist()
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
         } else {
@@ -472,7 +521,7 @@ export const awaitEmbeddings = async (
 ): Promise<string | undefined> => {
     while (true) {
         const files = await listFiles({
-            pipelineName: awaitEmbeddings.pipelineName,
+            knowledgeBaseName: awaitEmbeddings.pipelineName,
             BASE_URL: awaitEmbeddings.BASE_URL,
             API_KEY: awaitEmbeddings.API_KEY
         });
@@ -513,7 +562,7 @@ export const contextCompletion = async (contextCompletionArgs: generalTypes.Cont
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
-            return(error.response?.data?.errors ?? error.message)
+            return (error.response?.data?.errors ?? error.message)
         } else {
             console.error("Unknown error occurred")
             console.error(error)
@@ -550,8 +599,7 @@ export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Prom
         if (!parseYamlArgs.overrides) {
             const pipe = yamlTypes.PipelineSchema.parse(YAML.parse(parseYamlArgs.yaml))
             return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
-        }
-        else {
+        } else {
 
             // if wildcard overrides are passed, just overwrite the values in the actual string
             const update = (stringYaml: string, updateObject: Record<string, string>) => {
@@ -570,9 +618,7 @@ export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Prom
                 let nestedOverriddenParsedYaml = {...objectYaml, ...parseYamlArgs.overrides.nestedOverrides}
                 const pipe = yamlTypes.PipelineSchema.parse(nestedOverriddenParsedYaml, {errorMap: ocErrors.pipelineErrorMap})
                 return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
-            }
-
-            else {
+            } else {
                 const pipe = yamlTypes.PipelineSchema.parse(objectYaml, {errorMap: ocErrors.pipelineErrorMap})
                 return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
             }

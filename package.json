@@ -7,14 +7,17 @@
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
     "form-data": "^4.0.0",
+    "ink": "^4.4.1",
+    "ink-spinner": "^5.0.0",
     "node-fetch": "^3.3.2",
     "nodejs-polars": "^0.8.4",
     "ora": "^8.0.1",
+    "pastel": "^2.0.2",
     "path": "^0.12.7",
-    "typescript": "^5.4.4",
+    "react": "^18.2.0",
     "url": "^0.11.3",
     "yaml": "^2.3.4",
-    "zod": "^3.22.4"
+    "zod": "^3.23.4"
   },
   "name": "onecontext",
   "version": "1.0.18",
@@ -41,8 +44,12 @@
   },
   "homepage": "https://github.com/onecontext/ts_sdk#readme",
   "devDependencies": {
+    "@sindresorhus/tsconfig": "^5.0.0",
     "@types/node": "^20.12.4",
+    "@types/react": "^18.2.79",
+    "i": "^0.3.7",
     "ts-node": "^10.9.2",
-    "tsx": "^4.7.2"
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
   }
 }
