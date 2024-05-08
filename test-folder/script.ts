@@ -57,33 +57,33 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 //
 
 // You can then upload a whole directory of files through the pipeline
-// const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
-//     directory: "/Users/rossmurphy/embedpdf/",
-//     metadataJson: {"description": "demo_example"},
-//     knowledgeBaseName: "rm_test",
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY,
-// }
-// const runId = OneContext.uploadDirectory(uploadDirectoryArgs).then((res) => {
-//   if (res.data) {
-//     console.log(res.data)
-//   }
-// })
+const uploadDirectoryArgs: OneContext.UploadDirectoryType = {
+    directory: "/Users/rossmurphy/embedding_example/embedpdf/",
+    metadataJson: {"description": "demo_example"},
+    knowledgeBaseName: "rm_kb",
+    BASE_URL: BASE_URL,
+    API_KEY: API_KEY,
+}
+const runId = OneContext.uploadDirectory(uploadDirectoryArgs).then((res: any) => {
+  if (res.data) {
+    console.log(res.data)
+  }
+})
 
 // const out = getRunResults({BASE_URL: BASE_URL, API_KEY: API_KEY, runID: "b4e35f2f7cab424da752dc54f6da1569"}).then((res) => {console.log(res)})
 
 // Of course, you can also choose to upload just one file, or an array of files, if you prefer
 
-// const uploadFileArgs: OneContext.UploadFileType = {
-//     files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}, {path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
-//     metadataJson: {"description": "hello"},
-//     knowledgeBaseName: "rm_test",
-//     BASE_URL: BASE_URL,
-//     API_KEY: API_KEY,
-//     stream: false
-// }
-// OneContext.uploadFile(uploadFileArgs).then(() => {
-// })
+const uploadFileArgs: OneContext.UploadFileType = {
+    files: [{path: "/Users/rossmurphy/embedpdf/faith_and_fate.pdf"}, {path: "/Users/rossmurphy/embedpdf/Implicit_representations.pdf"}],
+    metadataJson: {"description": "hello"},
+    knowledgeBaseName: "rm_test",
+    BASE_URL: BASE_URL,
+    API_KEY: API_KEY,
+    stream: false
+}
+OneContext.uploadFile(uploadFileArgs).then(() => {
+})
 
 // check on how that's going
 // const checkPipelineArgs: OneContext.CheckPipelineType = {pipelineName: "yc_channel", BASE_URL: BASE_URL, API_KEY: API_KEY}
@@ -99,21 +99,21 @@ const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 
 // const wildcardPath = __dirname + "/../example_yamls/simple.yaml"
 // const wildcardFile: string = fs.readFileSync(wildcardPath, 'utf8')
-const runPipeArgs: OneContext.RunArgsType = {
-    pipelineName: 'yc_retriever',
-    // overrideArgs: {"retriever": {"query": "who is michael seibel?", "top_k": 100}, "reranker" : {"query": "who is michael seibel?", "top_k": 25}},
-    overrideArgs: {"retriever": {"query": "who is michael seibel?", "top_k": 100}},
-    BASE_URL: BASE_URL,
-    API_KEY: API_KEY
-}
-const t0 = performance.now()
-OneContext.runPipeline(runPipeArgs).then((res) => {
-    const t1 = performance.now()
-  if (res) {
-    console.log(` the total time taken was ${textWithColor((t1 - t0).toFixed(3),"green")} milliseconds.`)}
-  // console.log(res)
-    // console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}) )
-})
+// const runPipeArgs: OneContext.RunArgsType = {
+//     pipelineName: 'yc_retriever',
+//     // overrideArgs: {"retriever": {"query": "who is michael seibel?", "top_k": 100}, "reranker" : {"query": "who is michael seibel?", "top_k": 25}},
+//     overrideArgs: {"retriever": {"query": "who is michael seibel?", "top_k": 100}},
+//     BASE_URL: BASE_URL,
+//     API_KEY: API_KEY
+// }
+// const t0 = performance.now()
+// OneContext.runPipeline(runPipeArgs).then((res) => {
+//     const t1 = performance.now()
+//   if (res) {
+//     console.log(` the total time taken was ${textWithColor((t1 - t0).toFixed(3),"green")} milliseconds.`)}
+//   // console.log(res)
+//     // console.log(util.inspect(res, {showHidden: false, depth: null, colors: true}) )
+// })
 
 // @ts-ignore
 // OneContext.poll({fnArgs: runPipeArgs, method: OneContext.aRunPipeline}).then((res) => {console.log(res)})

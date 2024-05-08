@@ -66,9 +66,14 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
 })
 
 
-export const CheckRunArgs = BaseArgsSchema.extend({
-    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    callId: z.string().refine((val) => val.trim() !== '', {message: "Call id cannot be empty"}),
+export const RunResultsArgs = BaseArgsSchema.extend({
+    skip: z.number().default(0),
+    limit: z.number().default(10),
+    sort: z.string().default("date_created"),
+    dateCreatedGte: z.date().default(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
+    dateCreatedLte: z.date().default(new Date()),
+    runid: z.string().refine((val) => val.trim() !== '', {message: "Run id cannot be empty"}),
+    status: z.string().optional()
 });
 
 export const ListFilesArgs = BaseArgsSchema.extend({
@@ -236,7 +241,7 @@ export type ListPipelinesType = z.infer<typeof ListPipelinesSchema>
 export type ListKnowledgeBasesType = z.infer<typeof ListKnowledgeBasesSchema>
 export type ListVectorIndicesType = z.infer<typeof ListVectorIndicesSchema>
 export type ListFilesType = z.infer<typeof ListFilesArgs>
-export type CheckRunType = z.infer<typeof CheckRunArgs>
+export type RunResultsType = z.infer<typeof RunResultsArgs>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectoryOptionsSchema>

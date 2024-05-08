@@ -8,7 +8,7 @@ import * as z from "zod";
 import * as YAML from 'yaml';
 import * as fs from 'fs';
 import * as path from "path"
-import {PollArgsType} from "./ocTypes/generalTypes.js";
+import {PollArgsType, RunResultsType} from "./ocTypes/generalTypes.js";
 import {textWithColor, textWithIntSelectedColor} from "./rmUtils.js";
 import ora from "ora";
 import React from 'react';
@@ -29,7 +29,6 @@ export const uploadYouTubeUrl = async (youtubeUrlArgs: generalTypes.YouTubeUrlTy
                 knowledgebase_name: youtubeUrlArgs.knowledgeBaseName
             },
         });
-        // console.log(`Uploaded all videos from ${youtubeUrlArgs.urls.map((x: string)=>{return x})} to: ${youtubeUrlArgs.knowledgeBaseName}`)
         return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
@@ -67,7 +66,7 @@ export const createVectorIndex = async (vectorIndexCreateArgs: generalTypes.Vect
 export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.KnowledgeBaseCreateType): Promise<any> => {
 
     try {
-        return await axios({
+        const response = await axios({
             method: 'post',
             url: knowledgeBaseCreateArgs.BASE_URL + 'knowledgebase',
             headers: {
@@ -77,6 +76,7 @@ export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.
                 name: knowledgeBaseCreateArgs.knowledgeBaseName,
             },
         });
+        return response
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
@@ -345,93 +345,33 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
     }
 };
 
-export const checkRunCall = async (checkRunArgs: generalTypes.CheckRunType): Promise<
-  { id: string, steps: any, status: string }
-  | undefined> => {
+export const getRunResults = async (runResults: RunResultsType): Promise<any | undefined> => {
+    const strippedObject = {...Object.fromEntries(Object.entries(runResults).filter(([key, _]) => key !== "BASE_URL" && key !== "API_KEY"))}
+    // rename some of the keys , i.e. runID to run_id
+    const renamedObject = Object.fromEntries(Object.entries(strippedObject).map(([key, value]) => {
+        switch (key) {
+            case "runID":
+                return ["run_id", value]
+            case "runid":
+                return ["run_id", value]
+            case "dateCreatedGte":
+                return ["date_created_gte", value]
+            case "dateCreatedLte":
+                return ["date_created_lte", value]
+            default:
+                return [key, value]
+        }
+    }))
     try {
         const response = await axios({
             method: 'get',
-            url: checkRunArgs.BASE_URL + `run_results/${checkRunArgs.callId}`,
-            headers: {
-                Authorization: `Bearer ${checkRunArgs.API_KEY}`,
+            url: runResults.BASE_URL + `run_results/`,
+            params: {
+            // the runResults object without the BASE_URL and API_KEY attributes, and with some keys renamed from camel case to snake case for the Python backend
+                ...renamedObject
             },
-        });
-        return response.data
-    } catch (error: unknown) {
-        if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
-        } else {
-            console.error("Unknown error occurred")
-            console.error(error)
-        }
-    }
-    return
-};
-
-
-export const poll = async (pollArgs: PollArgsType): Promise<any | undefined> => {
-    try {
-        const spinner = ora({text: `Initialising Workflow.`, spinner: 'dots'}).start();
-        const runID = await pollArgs.method(pollArgs.fnArgs)
-        spinner.text = `\u2710 Workflow Created. Got RunID: ${textWithColor(runID, "green")}\n`
-        while (true) {
-            if (runID) {
-                const runResults = await getRunResults({
-                    BASE_URL: pollArgs.fnArgs.BASE_URL,
-                    API_KEY: pollArgs.fnArgs.API_KEY,
-                    runID: runID
-                })
-                if (runResults.status === "FAILED") {
-                    spinner.text = `\u1F6A8 Workflow hit an error along the way!. Please check the logs for more information.\n`
-                    spinner.stopAndPersist()
-                    return runResults
-                }
-                if (runResults.status === "SUCCESSFUL") {
-                    spinner.text = `\u2705  Workflow Completed Successfully! Please check the logs for full details\n`
-                    spinner.stopAndPersist()
-                    return runResults
-                }
-                if (runResults.status === "RUNNING") {
-                    await sleep({ms: 1000});
-                    if (Object.keys(runResults.steps).length == 0) {
-                        spinner.text = `Workflow is running. No steps have been completed yet.`
-                    }
-                    if (Object.keys(runResults.steps).length > 0) {
-                        const {
-                            text,
-                            color
-                        } = textWithIntSelectedColor(runResults.steps[Object.keys(runResults.steps).at(-1) as string].step_name, Object.keys(runResults.steps).length, true)
-                        spinner.color = color;
-                        spinner.text = `Currently on step name: ${text}`
-                    } else {
-
-                    }
-                }
-            } else {
-                console.log("No run ID was ever generated")
-                break
-            }
-        }
-    } catch (error: unknown) {
-        if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.errors ?? error.message);
-        } else {
-            console.error("Unknown error occurred")
-            console.error(error)
-        }
-    }
-}
-export const getRunResults = async ({BASE_URL, API_KEY, runID}: {
-    BASE_URL: string,
-    API_KEY: string,
-    runID: string
-}): Promise<any | undefined> => {
-    try {
-        const response = await axios({
-            method: 'get',
-            url: BASE_URL + `run_results/${runID}`,
             headers: {
-                Authorization: `Bearer ${API_KEY}`,
+                Authorization: `Bearer ${runResults.API_KEY}`,
             },
         });
         return response.data;
@@ -477,7 +417,7 @@ export const uploadDirectory = async ({
     }
 
     try {
-        const response = await axios({
+        return await axios({
             method: 'post',
             url: BASE_URL + 'upload',
             headers: {
@@ -486,8 +426,6 @@ export const uploadDirectory = async ({
             },
             data: formData,
         });
-        // TODO: add run id and to return type
-        return response.data
     } catch (error: unknown) {
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
@@ -505,9 +443,8 @@ export const uploadFile = async ({
                                      metadataJson,
                                      BASE_URL,
                                      API_KEY,
-                                 }: generalTypes.UploadFileType): Promise<boolean | undefined> => {
+                                 }: generalTypes.UploadFileType): Promise<any | undefined> => {
     const formData = new FormData();
-    const spinner = ora({text: `Uploading ${files.map(f=>f.path)} to ${knowledgeBaseName}.`, spinner: 'dots'}).start();
     files.forEach(file => {
         if (stream) {
             try {
@@ -526,7 +463,6 @@ export const uploadFile = async ({
                 // try and parse it as a path type file, i.e. the user has given a local file path,
                 // and we are to use the fs library to read the file stream from that file
                 const f = generalTypes.PathFileSchema.parse(file, {errorMap: ocErrors.customErrorMap})
-                spinner.text += `\nAdding file: ${f.path}`
                 formData.append('files', f.readable);
             } catch (e) {
                 throw Error(`Error parsing file ${e}`)
@@ -538,7 +474,7 @@ export const uploadFile = async ({
         formData.append('metadata_json', JSON.stringify(metadataJson));
     }
     try {
-        const response = await axios({
+        return await axios({
             method: 'post',
             url: BASE_URL + 'upload',
             headers: {
@@ -547,16 +483,7 @@ export const uploadFile = async ({
             },
             data: formData,
         });
-        spinner.stopAndPersist()
-        if (response.status === 200) {
-            console.log(`Uploaded files to ${knowledgeBaseName}`)
-            return
-        }
-        else {
-            throw Error("Failed to upload files")
-        }
     } catch (error: unknown) {
-        spinner.stopAndPersist()
         if (error instanceof axios.AxiosError) {
             console.log(error.response?.data?.errors ?? error.message);
         } else {
