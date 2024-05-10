@@ -76,6 +76,10 @@ export const RunResultsArgs = BaseArgsSchema.extend({
     status: z.string().optional()
 });
 
+export const DeleteFilesArgs = BaseArgsSchema.extend({
+    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+    fileNames: z.array(z.string()).refine((val) => val.length > 0, {message: "File names cannot be empty"}),
+});
 export const ListFilesArgs = BaseArgsSchema.extend({
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     skip: z.number().default(0).optional(),
@@ -241,12 +245,12 @@ export type VectorIndexDeleteType = z.infer<typeof VectorIndexDeleteSchema>
 export type KnowledgeBaseDeleteType = z.infer<typeof KnowledgeBaseDeleteSchema>
 export type CheckPipelineType = z.infer<typeof CheckPipelineSchema>
 export type RunArgsType = z.infer<typeof RunArgsSchema>
-export type QuizPipeArgType = z.infer<typeof QuizPipeArgTypeSchema>
 export type CallPipelineType = z.infer<typeof CallPipelineSchema>
 export type ListPipelinesType = z.infer<typeof ListPipelinesSchema>
 export type ListKnowledgeBasesType = z.infer<typeof ListKnowledgeBasesSchema>
 export type ListVectorIndicesType = z.infer<typeof ListVectorIndicesSchema>
 export type ListFilesType = z.infer<typeof ListFilesArgs>
+export type DeleteFilesType = z.infer<typeof DeleteFilesArgs>
 export type RunResultsType = z.infer<typeof RunResultsArgs>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>

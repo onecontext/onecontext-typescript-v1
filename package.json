@@ -26,7 +26,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "reload": "nodemon --watch './src/**/*.ts' --ext 'ts,js' --exec 'tsc && npm link'",
+    "reload": "nodemon --watch './src/**/*.ts' --ext 'ts,js,tsx,jsx' --exec 'tsc && npm link'",
     "build": "tsc"
   },
   "repository": {

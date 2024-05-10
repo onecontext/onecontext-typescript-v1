@@ -319,6 +319,44 @@ export const runSummary = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
+export const deleteFiles = async (deleteFilesArgs: generalTypes.DeleteFilesType): Promise<any> => {
+    const strippedObject = {...Object.fromEntries(Object.entries(deleteFilesArgs).filter(([key, _]) => key !== "BASE_URL" && key !== "API_KEY"))}
+    // rename some of the keys , i.e. runID to run_id
+    const renamedObject = Object.fromEntries(Object.entries(strippedObject).map(([key, value]) => {
+        switch (key) {
+            // TODO - probably add metadata filtering or gte etc filtering to delete
+            case "fileNames":
+                return ["file_names", value]
+            case "knowledgeBaseName":
+                return ["knowledgebase_name", value]
+            default:
+                return [key, value]
+        }
+    }))
+    
+    try {
+        const response = await axios({
+            method: 'delete',
+            url: deleteFilesArgs.BASE_URL + `knowledgebase/files/`,
+            data: renamedObject,
+            headers: {
+                Authorization: `Bearer ${deleteFilesArgs.API_KEY}`,
+            },
+        });
+        return response.data;
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.detail)
+            console.log(error.response?.data?.errors ?? error.message);
+            return []
+        } else {
+            console.error("Unknown error occurred")
+            console.error(error)
+            return []
+        }
+    }
+};
+
 export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Promise<any> => {
     const strippedObject = {...Object.fromEntries(Object.entries(listFilesArgs).filter(([key, _]) => key !== "BASE_URL" && key !== "API_KEY"))}
     // rename some of the keys , i.e. runID to run_id
@@ -338,12 +376,9 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
     }))
     try {
         const response = await axios({
-            method: 'get',
+            method: 'post',
             url: listFilesArgs.BASE_URL + `knowledgebase/files/`,
-            params: {
-                // the runResults object without the BASE_URL and API_KEY attributes, and with some keys renamed from camel case to snake case for the Python backend
-                ...renamedObject
-            },
+            data: renamedObject,
             headers: {
                 Authorization: `Bearer ${listFilesArgs.API_KEY}`,
             },
