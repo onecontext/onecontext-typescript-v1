@@ -319,15 +319,31 @@ export const runSummary = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
-export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Promise<{
-    name: string;
-    status: string;
-    metadata_json: object;
-}[] | []> => {
+export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Promise<any> => {
+    const strippedObject = {...Object.fromEntries(Object.entries(listFilesArgs).filter(([key, _]) => key !== "BASE_URL" && key !== "API_KEY"))}
+    // rename some of the keys , i.e. runID to run_id
+    const renamedObject = Object.fromEntries(Object.entries(strippedObject).map(([key, value]) => {
+        switch (key) {
+            case "dateCreatedGte":
+                return ["date_created_gte", value]
+            case "knowledgeBaseName":
+                return ["knowledgebase_name", value]
+            case "dateCreatedLte":
+                return ["date_created_lte", value]
+            case "metadataJson":
+                return ["metadata_json", value]
+            default:
+                return [key, value]
+        }
+    }))
     try {
         const response = await axios({
             method: 'get',
-            url: listFilesArgs.BASE_URL + `knowledgebase/${listFilesArgs.knowledgeBaseName}/files`,
+            url: listFilesArgs.BASE_URL + `knowledgebase/files/`,
+            params: {
+                // the runResults object without the BASE_URL and API_KEY attributes, and with some keys renamed from camel case to snake case for the Python backend
+                ...renamedObject
+            },
             headers: {
                 Authorization: `Bearer ${listFilesArgs.API_KEY}`,
             },
@@ -514,25 +530,6 @@ export const checkPipelineStatus = async (
         }
     }
 };
-export const awaitEmbeddings = async (
-  awaitEmbeddings: generalTypes.AwaitEmbeddingsType
-): Promise<string | undefined> => {
-    while (true) {
-        const files = await listFiles({
-            knowledgeBaseName: awaitEmbeddings.pipelineName,
-            BASE_URL: awaitEmbeddings.BASE_URL,
-            API_KEY: awaitEmbeddings.API_KEY
-        });
-        if (!files) {
-            throw new Error('file not found');
-        }
-        if (files.some(it => it.name === awaitEmbeddings.fileName && it.status == "EMBEDDED")) {
-            return "File has been embedded";
-        }
-        await sleep({ms: 1000});
-    }
-};
-
 
 export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | string> => {
     try {

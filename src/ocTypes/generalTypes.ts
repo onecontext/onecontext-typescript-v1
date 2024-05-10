@@ -78,6 +78,12 @@ export const RunResultsArgs = BaseArgsSchema.extend({
 
 export const ListFilesArgs = BaseArgsSchema.extend({
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+    skip: z.number().default(0).optional(),
+    limit: z.number().default(10).optional(),
+    sort: z.string().default("date_created").optional(),
+    dateCreatedGte: z.date().default(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).optional(),
+    dateCreatedLte: z.date().default(new Date()).optional(),
+    metadataJson: z.object({}).default({}).optional(),
 });
 
 export const ContentFileSchema = BaseArgsSchema.extend({
