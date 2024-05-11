@@ -72,7 +72,7 @@ export const RunResultsArgs = BaseArgsSchema.extend({
     sort: z.string().default("date_created"),
     dateCreatedGte: z.date().default(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
     dateCreatedLte: z.date().default(new Date()),
-    runid: z.string().refine((val) => val.trim() !== '', {message: "Run id cannot be empty"}),
+    runid: z.string().optional(),
     status: z.string().optional()
 });
 
