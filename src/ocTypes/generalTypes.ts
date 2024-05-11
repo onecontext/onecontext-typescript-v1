@@ -65,7 +65,6 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
     }
 })
 
-
 export const RunResultsArgs = BaseArgsSchema.extend({
     skip: z.number().default(0),
     limit: z.number().default(10),
