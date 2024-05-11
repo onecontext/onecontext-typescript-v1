@@ -40,8 +40,8 @@ const deleteFiles: OneContext.DeleteFilesType = {
   knowledgeBaseName: "rm_kb",
   BASE_URL: BASE_URL,
   API_KEY: API_KEY,
-  fileNames: ["attention_is_all_you_need.pdf", "james_and_the_giant_penis.pdf", 
-    "what_to_do_in_case_of_mass_autonomous_dildo_invasion.pdf"]
+  fileNames: ["attention_is_all_you_need.pdf", "james_and_the_giant_peach.pdf", 
+    "what_to_do_in_case_of_mass_autonomous_agent_invasion.pdf"]
 }
 OneContext.deleteFiles(deleteFiles).then((res) => {
   console.log(res)
