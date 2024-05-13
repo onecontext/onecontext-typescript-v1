@@ -29,23 +29,23 @@ const otherPath = __dirname+"/../example_yamls/simple_retriever.yaml"
 const file: string = fs.readFileSync(fpath, 'utf8')
 const otherFile: string = fs.readFileSync(otherPath, 'utf8')
 
-// const listFilesArgs: OneContext.ListFilesType = {
-//   knowledgeBaseName: "rm_kb",
-//   BASE_URL: BASE_URL,
-//   API_KEY: API_KEY,
-// }
-// OneContext.listFiles(listFilesArgs).then((res) => {console.log(res)})
-
-const deleteFiles: OneContext.DeleteFilesType = {
+const listFilesArgs: OneContext.ListFilesType = {
   knowledgeBaseName: "rm_kb",
   BASE_URL: BASE_URL,
   API_KEY: API_KEY,
-  fileNames: ["attention_is_all_you_need.pdf", "james_and_the_giant_peach.pdf", 
-    "what_to_do_in_case_of_mass_autonomous_agent_invasion.pdf"]
 }
-OneContext.deleteFiles(deleteFiles).then((res) => {
-  console.log(res)
-})
+OneContext.listFiles(listFilesArgs).then((res: any) => {console.log(res)})
+
+// const deleteFiles: OneContext.DeleteFilesType = {
+//   knowledgeBaseName: "rm_kb",
+//   BASE_URL: BASE_URL,
+//   API_KEY: API_KEY,
+//   fileNames: ["attention_is_all_you_need.pdf", "james_and_the_giant_peach.pdf", 
+//     "what_to_do_in_case_of_mass_autonomous_agent_invasion.pdf"]
+// }
+// OneContext.deleteFiles(deleteFiles).then((res) => {
+//   console.log(res)
+// })
 
 // const youtubeArgs: YouTubeUrlType = {
 //   BASE_URL: BASE_URL,

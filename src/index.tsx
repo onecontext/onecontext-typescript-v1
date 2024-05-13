@@ -337,7 +337,7 @@ export const deleteFiles = async (deleteFilesArgs: generalTypes.DeleteFilesType)
     try {
         const response = await axios({
             method: 'delete',
-            url: deleteFilesArgs.BASE_URL + `knowledgebase/files/`,
+            url: deleteFilesArgs.BASE_URL + `files`,
             data: renamedObject,
             headers: {
                 Authorization: `Bearer ${deleteFilesArgs.API_KEY}`,
@@ -377,7 +377,7 @@ export const listFiles = async (listFilesArgs: generalTypes.ListFilesType): Prom
     try {
         const response = await axios({
             method: 'post',
-            url: listFilesArgs.BASE_URL + `knowledgebase/files/`,
+            url: listFilesArgs.BASE_URL + `files`,
             data: renamedObject,
             headers: {
                 Authorization: `Bearer ${listFilesArgs.API_KEY}`,

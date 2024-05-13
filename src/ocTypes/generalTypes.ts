@@ -76,11 +76,11 @@ export const RunResultsArgs = BaseArgsSchema.extend({
 });
 
 export const DeleteFilesArgs = BaseArgsSchema.extend({
-    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
-    fileNames: z.array(z.string()).refine((val) => val.length > 0, {message: "File names cannot be empty"}),
+    knowledgeBaseName: z.string().refine((val:any) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+    fileNames: z.array(z.string()).refine((val: any) => val.length > 0, {message: "File names cannot be empty"}),
 });
 export const ListFilesArgs = BaseArgsSchema.extend({
-    knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
+    knowledgeBaseName: z.string().refine((val: any) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     skip: z.number().default(0).optional(),
     limit: z.number().default(10).optional(),
     sort: z.string().default("date_created").optional(),
