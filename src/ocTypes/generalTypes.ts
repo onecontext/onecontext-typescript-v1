@@ -4,7 +4,7 @@ import {Readable} from "stream";
 import {z} from "zod";
 
 export const BaseArgsSchema = z.object({
-    BASE_URL: z.string().default("https://api.onecontext.ai/v1/"),
+    BASE_URL: z.string().default("https://api.onecontext.ai/v1/").optional(),
     API_KEY: z.string(),
 });
 export const OpenAIBaseArgsSchema = BaseArgsSchema.extend({
@@ -66,11 +66,11 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
 })
 
 export const RunResultsArgs = BaseArgsSchema.extend({
-    skip: z.number().default(0),
-    limit: z.number().default(10),
-    sort: z.string().default("date_created"),
-    dateCreatedGte: z.date().default(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
-    dateCreatedLte: z.date().default(new Date()),
+    skip: z.number().default(0).optional(),
+    limit: z.number().default(10).optional(),
+    sort: z.string().default("date_created").optional(),
+    dateCreatedGte: z.date().default(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).optional(),
+    dateCreatedLte: z.date().default(new Date()).optional(),
     runid: z.string().optional(),
     status: z.string().optional()
 });
