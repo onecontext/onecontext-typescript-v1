@@ -1,0 +1,14 @@
+name: demoRetrieverPipeline
+
+steps:
+  - step: Retriever
+    name: retriever
+    step_args:
+      query: When did the protagonist graduate from New Haven
+      model_name: BAAI/bge-base-en-v1.5
+      vector_index_name: demoVectorIndex
+      top_k: 5
+      metadata_filters: { }
+    depends_on: [ ]
+
+

@@ -1,9 +1,8 @@
-import * as OneContext from 'onecontext'
+import * as OneContext from '@onecontext/ts_sdk'
 import { performance } from 'perf_hooks';
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
-import {getRunResults, PipelineSchema, YouTubeUrlType} from "onecontext";
 import {runMany, textWithColor} from "../src/rmUtils.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
