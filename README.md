@@ -74,11 +74,9 @@ const simpleRetrieverPipelineName: string = "simpleDemoRetrieverPipeline"
 const involvedRetrieverPipelineName: string = "involvedDemoRetrieverPipeline"
 ```
 
-#### Create a Knowledge Base (think of this as a file store) 
+#### Create a Knowledge Base 
 
-Knowledge Bases are used to store your data. They get connected (via pipelines) to vector indices (which are basically
-just tables in a vector database). When you add data to a knowledge base, it automatically gets processed by the
-connected pipeline, and the resulting vectors get stored in the connected vector index.
+A `Knowledge Base` is used to store your data. You can think of a `Knowledge Base` as a file store. 
 
 ```ts
 const knowledgeBaseCreateArgs: OneContext.KnowledgeBaseCreateType = {
@@ -89,8 +87,8 @@ const knowledgeBaseCreateArgs: OneContext.KnowledgeBaseCreateType = {
 await OneContext.createKnowledgeBase(knowledgeBaseCreateArgs)
 ```
 
-#### Create a Vector Index (think of this as a vector database)
-You'll connect this (via a pipeline) to your Knowledge Base in a moment. 
+#### Create a Vector Index 
+You can think of a `Vector Index` as a table in a vector database. 
 ```ts
 const vectorIndexCreateArgs: OneContext.VectorIndexCreateType = {
 API_KEY: API_KEY,
@@ -101,3 +99,34 @@ modelName: "BAAI/bge-base-en-v1.5"
 await OneContext.createVectorIndex(vectorIndexCreateArgs)
 ```
 
+#### Create an Index Pipeline
+
+An `Index Pipeline` is a `Pipeline` that connects a `Knowledge Base` (above) to a `Vector Index` (above). When you add data to
+a `Knowledge Base`, it automatically gets processed by any `Pipelines` that are connected to the `Knowledge Base`, and the resulting vectors get saved to the connected `Vector Indices`.
+
+A `Pipeline` is an ordered collection of `Steps`, defined entirely in a YAML file. You can see examples of Pipeline YAML files in the `example_yamls` folder in this repo. A `Step` is an atomic unit of work in a `Pipeline`. Examples of `Steps` include "Chunker", "LexRank", "Retriever", etc.
+
+When data is "processed" by a `Pipeline`, it means that the data is passed through each `Step` in the `Pipeline` in order. Each `Step` takes the output of the previous `Step` as input, and produces some output. The final output of the `Pipeline` is the output of the last `Step`.
+
+For a full treatment of what exactly is a `Step`, `Pipeline`, `Knowledge Base`, `Vector Index`, etc, please see the [OneContext docs](https://docs.onecontext.ai/).
+
+```ts
+
+const indexPipelineCreateArgs: OneContext.PipelineCreateType = {
+API_KEY: API_KEY,
+pipelineName: indexPipelineName,
+pipelineYaml: "example_yamls/index.yaml",
+}
+
+await OneContext.createPipeline(indexPipelineCreateArgs)
+```
+
+#### Create a (simple) Retriever Pipeline
+We now create a `Retriever Pipeline`. A `Retriever Pipeline` is a `Pipeline` that is used to retrieve data from a `Vector Index` and output it to your application. 
+
+(so, whereas an `Index Pipeline` processes data and saves it to a `Vector Index`, a `Retriever Pipeline` retrieves data from a `Vector Index` and outputs it to your application)
+
+Here we first create a "simple" `Retriever Pipeline`. This pipeline is simple because it only has one `Step` in it, which is a `Retriever` `Step`. This retriever step just does a cosine similarity in the Vector Index and retrieves the most similar vectors to the input query. 
+You can check out the specification of this `Retriever Pipeline` in the `example_yamls` folder in this repo, in the file "retrieve.yaml".
+
+```ts
