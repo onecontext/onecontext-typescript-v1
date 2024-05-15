@@ -130,3 +130,68 @@ Here we first create a "simple" `Retriever Pipeline`. This pipeline is simple be
 You can check out the specification of this `Retriever Pipeline` in the `example_yamls` folder in this repo, in the file "retrieve.yaml".
 
 ```ts
+// Create a "simple" retriever pipeline
+
+const simpleRetrieverPipeline: OneContext.PipelineCreateType = {
+  API_KEY: API_KEY,
+  pipelineName: indexPipelineName,
+  pipelineYaml: "example_yamls/retrieve.yaml",
+}
+
+await OneContext.createPipeline(simpleRetrieverPipeline)
+```
+
+#### Create a more involved Retriever Pipeline
+Let's also create a more complicated retriever pipeline. We can easily compare and contrast the results later on.
+
+The specification for this pipeline is in the file "retrieve_filter_and_rerank.yaml" in the `example_yamls` folder in this repo.
+
+This pipeline has three steps in it: a `Retriever` step, a `FilterInMemory` step, and a `Reranker` step. The `Retriever` step
+retrieves the most similar vectors to the input query, the `FilterInMemory` step only passes through vectors which score more than 0.5 on the `LexRank Percentile Score` (this was added to the vectors by the `LexRank` step in the `Indexing Pipeline`). Finally, 
+the `Reranker` step passes the resultant vectors through a `ReRanker` model, which is a special machine learning model which re-ranks vectors for relevancy to a query. 
+
+For more on `ReRanker` models, see the [OneContext docs](https://docs.onecontext.ai/).
+
+```ts
+// Create an "involved" retriever pipeline
+
+const involvedRetrieverPipelineCreateArgs: OneContext.PipelineCreateType = {
+API_KEY: API_KEY,
+pipelineName: indexPipelineName,
+pipelineYaml: "example_yamls/retrieve_filter_and_rerank.yaml",
+}
+
+await OneContext.createPipeline(involvedRetrieverPipelineCreateArgs)
+```
+
+#### Upload a directory of files related to Charlie Munger to the `Knowledge Base`
+
+We'll include a metadataJson field to tag them with the tag "charlie_munger". This can be useful later as we can filter on metadata when we want to retrieve these files.
+
+```ts
+
+const uploadDirectoryArgsMunger: OneContext.UploadDirectoryType = {
+API_KEY: API_KEY,
+knowledgeBaseName: knowledgeBaseName,
+directory: "demo_data/long_form",
+metadataJson: {"tag": "charlie_munger"}
+}
+
+await OneContext.uploadDirectory(uploadDirectoryArgsMunger)
+
+```
+
+#### Upload another directory of files related to Machine Learning to the same `Knowledge Base`
+
+We could also of course have created a different `Knowledge Base` for this data if we wanted to. For ease, let's just upload to the same `Knowledge Base` and we'll tag these files with a different tag.
+
+```ts
+const uploadDirectoryArgsML: OneContext.UploadDirectoryType = {
+API_KEY: API_KEY,
+knowledgeBaseName: knowledgeBaseName,
+directory: "demo_data/machine_learning",
+metadataJson: {"tag": "machine_learning"}
+}
+
+await OneContext.uploadDirectory(uploadDirectoryArgsML)
+```
