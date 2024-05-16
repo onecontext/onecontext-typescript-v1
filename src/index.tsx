@@ -243,6 +243,18 @@ export const listVectorIndices = async (listVectorIndicesArgs: generalTypes.List
 
 export const runPipeline = async (runArgs: generalTypes.RunArgsType,
 ): Promise<any | undefined> => {
+    const strippedObject = {...Object.fromEntries(Object.entries(runArgs).filter(([key, _]) => key !== "BASE_URL" && key !== "API_KEY"))}
+    // rename some of the keys , i.e. runID to run_id
+    const renamedObject = Object.fromEntries(Object.entries(strippedObject).map(([key, value]) => {
+        switch (key) {
+            case "overrideArgs":
+                return ["override_args", value]
+            case "pipelineName":
+                return ["pipeline_name", value]
+            default:
+                return [key, value]
+        }
+    }))
     try {
         const response = await axios({
             method: 'post',
@@ -250,10 +262,7 @@ export const runPipeline = async (runArgs: generalTypes.RunArgsType,
             headers: {
                 Authorization: `Bearer ${runArgs.API_KEY}`,
             },
-            data: {
-                override_args: runArgs.overrideArgs,
-                pipeline_name: runArgs.pipelineName,
-            },
+            data: renamedObject,
         });
         return response.data;
 
