@@ -78,8 +78,10 @@ export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.
         });
         return response
     } catch (error: unknown) {
+        console.log("wjhat errorthe fuck", error)
         if (error instanceof axios.AxiosError) {
-            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
+            console.log('in axios')
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message || error);
         } else {
             console.log(error)
             console.error("Unknown error occurred")

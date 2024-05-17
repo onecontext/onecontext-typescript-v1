@@ -47,6 +47,8 @@ export const RunArgsSchema = BaseArgsSchema.extend({
     overrideArgs: z.object({}).default({}).optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
+
+
 export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
     overrideOcYaml: z.string().optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),

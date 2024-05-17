@@ -1,4 +1,4 @@
-import * as OneContext from '@onecontext/ts_sdk'
+import * as OneContext from '.'
 import { performance } from 'perf_hooks';
 import fs from "fs";
 import YAML from 'yaml';
@@ -23,17 +23,17 @@ const BASE_URL: string = process.env.BASE_URL!;
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 
 // define a default yaml, and an override yaml
-const fpath = __dirname+"/../example_yamls/simple_retriever.yaml"
-const otherPath = __dirname+"/../example_yamls/simple_retriever.yaml"
-const file: string = fs.readFileSync(fpath, 'utf8')
-const otherFile: string = fs.readFileSync(otherPath, 'utf8')
-
-const listFilesArgs: OneContext.ListFilesType = {
-  knowledgeBaseName: "rm_kb",
-  BASE_URL: BASE_URL,
-  API_KEY: API_KEY,
-}
-OneContext.listFiles(listFilesArgs).then((res: any) => {console.log(res)})
+// const fpath = __dirname+"/../example_yamls/simple_retriever.yaml"
+// const otherPath = __dirname+"/../example_yamls/simple_retriever.yaml"
+// const file: string = fs.readFileSync(fpath, 'utf8')
+// const otherFile: string = fs.readFileSync(otherPath, 'utf8')
+//
+// const listFilesArgs: OneContext.ListFilesType = {
+//   knowledgeBaseName: "rm_kb",
+//   BASE_URL: BASE_URL,
+//   API_KEY: API_KEY,
+// }
+// OneContext.listFiles(listFilesArgs).then((res: any) => {console.log(res)})
 
 // const deleteFiles: OneContext.DeleteFilesType = {
 //   knowledgeBaseName: "rm_kb",
@@ -429,3 +429,20 @@ OneContext.listFiles(listFilesArgs).then((res: any) => {console.log(res)})
 //     }
 // }
 // const a = await runMany(args)
+
+const pipelineDeleteList: Array<OneContext.PipelineDeleteType> = [
+  {API_KEY: API_KEY, pipelineName: "demoIndexPipeline"},
+  {API_KEY: API_KEY, pipelineName: "demoSimpleRetrieverPipeline"},
+  {API_KEY: API_KEY, pipelineName: "demoInvolvedRetrieverPipeline"},
+]
+
+pipelineDeleteList.forEach((pipe) => {
+  OneContext.deletePipeline(pipe).then((res) => {
+    console.log(res, `Deleted pipeline ${pipe.pipelineName} successfully`)
+  })
+})
+
+
+
+
+

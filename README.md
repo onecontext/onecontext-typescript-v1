@@ -1,43 +1,60 @@
 # Official OneContext TypeScript SDK
-This is the official TypeScript SDK for the OneContext platform. Use this SDK to connect your Node backend applications, Node CLI tools, and front-end WebApps to OneContext's platform. 
+This is the official TypeScript SDK for the OneContext platform. Use this SDK to connect your Node backend applications, Node CLI tools, and front-end WebApps to OneContext's platform.
 
 ## What is OneContext?
 OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on SOTA infrastructure. You define the pipeline in YAML, and OneContext takes care of the rest of the infra (SSL certs, DNS, Kubernetes cluster, GPUs, autoscaling, load balancing, etc).
 
 ## Where can I learn more about how it works?
-Check out our docs page [here](https://docs.onecontext.ai/). The below examples will also help you get started, but they are intended as a quickstart, rather than a fundamental overview of the platform.
+Check out our docs page [here](https://docs.onecontext.ai/). The below quickstart example will also help you get started, but is intended as a quickstart, rather than a fundamental overview of the platform.
 
 ## Sounds great. How do I get started?
-If you've already read the docs, or are just keen to learn by doing, you can follow the below steps to get started with the SDK in minutes.
 
-## Setup
+### General Set Up 
 
-### Install the SDK
-
-#### Get it from npm (recommended)
-
+#### Get the SDK from npm
 ```zsh
 npm install @onecontext/sdk
 ```
+#### API Key
 
-### Get an API key
-You can get an API key [here](https://onecontext.ai/settings)
+Access to the OneContext platform is via an API key. If you already have one, great, pop it in an .env file in the root
+of your project, or export it from the command line as an environment variable.
 
-### Clone the [quickstart repo](https://github.com/onecontext/ts_sdk_quickstart) 
-Clone the repo with the quickstart code. It's the fastest and easiest way to get started. Not only does it have a bunch of examples, but it also has an example tsconfig.json that works well straight out of the box.
+If you've misplaced your API key, you can rotate your existing one [here](https://onecontext.ai/settings). 
+
+If you've never had an API key before, we'd recommend you check out the quickstart section below: 
+
+### Quickstart 
+
+If this is your first time using OneContext, check out the below quickstart to get familiarised with the library. We'll
+take you through how to set up an API key and the main things you can do with OneContext. We'd also recommend you check
+out the official [docs](https://docs.onecontext.ai/) for a more in-depth treatment of the platform. You can also check
+out our [Python SDK](https://github.com/onecontext/onecontext-python), our [CLI tool](https://github.com/onecontext/onecontext-cli), and
+our [WebApp Template](https://github.com/onecontext/onecontext-nextjs-webapp).
+.
+If you don't know what you're doing (yet), and want to play around with the library first, before you sign up, then follow the quick-start guide below.
+
+#### Clone this repo 
+
+Clone this repo. Change directory into the "quickstart" directory. In there, you'll find a file called `quickstart.ts`.
+It's full of examples of things you can do with OneContext. It also has an example tsconfig.json that works well
+straight out of the box (top-level await, etc.).
 ```zsh
-git clone https://github.com/onecontext/ts_sdk_quickstart
+git clone https://github.com/onecontext/onecontext-typescript
 ```
-Change directory into the quickstart repo.
+Change directory into the quickstart directory of the repo.
 ```zsh
-cd ts_sdk_quickstart
+cd onecontext-typescript/quickstart
 ```
-Install the dependencies.
+Install the dependencies. This will automatically install the SDK for you.
 ```zsh
 npm install
 ```
 
-### Pop your API key in an .env file in the root of the quickstart project
+#### Get an API Key 
+As in the general set up, you can get an API key [here](https://onecontext.ai/settings). It comes with 2,500 free credits to get you started.
+
+#### Pop your API key in an .env file in the root of the repo (i.e. in the same directory as the package.json)
 ```ts
 touch .env
 ```
@@ -46,10 +63,12 @@ Add your API key to this .env file like so:
 API_KEY=your_api_key_here
 ```
 
-## Play around 
+## Play around
 
-### `quickstart.ts` has a lot of examples to get you started 
-Let's go through what's going on in the `quickstart.ts` file below.
+If you change directory into the `quickstart` folder, you'll find a file called `quickstart.ts`. This file is full of examples of things you can do with the OneContext SDK.
+
+### `quickstart/quickstart.ts` has a lot of examples to get you started
+Let's go through what's going on in this file below.
 
 #### First load your API key as an env variable
 ```ts
@@ -70,8 +89,8 @@ const API_KEY: string = process.env.API_KEY!;
 const knowledgeBaseName: string = "demoKnowledgeBase" 
 const vectorIndexName: string = "demoVectorIndex"
 const indexPipelineName: string = "demoIndexPipeline"
-const simpleRetrieverPipelineName: string = "simpleDemoRetrieverPipeline"
-const involvedRetrieverPipelineName: string = "involvedDemoRetrieverPipeline"
+const simpleRetrieverPipelineName: string = "demoSimpleRetrieverPipeline"
+const involvedRetrieverPipelineName: string = "demoInvolvedRetrieverPipeline"
 ```
 
 #### Create a `Knowledge Base`
@@ -279,6 +298,22 @@ vectorIndexName: vectorIndexName
 }
 
 await OneContext.deleteVectorIndex(vectorIndexDeleteArgs)
+```
+
+#### Finally, we can delete the `Pipelines` we created. Again, no real need to, but for the sake of ending the example, we'll delete them. 
+
+```ts 
+const pipelineDeleteList: Array<OneContext.PipelineDeleteType> = [
+  {API_KEY: API_KEY, pipelineName: "demoIndexPipeline"},
+  {API_KEY: API_KEY, pipelineName: "demoSimpleRetrieverPipeline"},
+  {API_KEY: API_KEY, pipelineName: "demoInvolvedRetrieverPipeline"},
+]
+
+pipelineDeleteList.forEach((pipe) => {
+  OneContext.deletePipeline(pipe).then((res) => {
+    console.log(res, `Deleted pipeline ${pipe.pipelineName} successfully`)
+  })
+})
 ```
   
 
