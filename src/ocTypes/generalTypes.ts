@@ -3,18 +3,18 @@ import * as fs from "fs";
 import {Readable} from "stream";
 import {z} from "zod";
 
-export const BaseArgsSchema = z.object({
-    BASE_URL: z.string().default("https://api.onecontext.ai/v1/").optional(),
+export const BaseSchema = z.object({
+    BASE_URL: z.string().default("https://api.onecontext.ai/v1/"),
     API_KEY: z.string(),
 });
-export const OpenAIBaseArgsSchema = BaseArgsSchema.extend({
+export const OpenAIBaseSchema = BaseSchema.extend({
     OPENAI_API_KEY: z.string(),
     model: z.string().default("gpt-3.5-turbo").optional(),
 });
 
-type PollMethodArgsType = z.infer<typeof BaseArgsSchema> & Record<string, unknown> 
+type PollMethodType = z.infer<typeof BaseSchema> & Record<string, unknown> 
 
-export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
+export const GenerateQuestOptionsSchema = OpenAIBaseSchema.extend({
     vision: z.string().optional(),
     mission: z.string().optional(),
     quest: z.string().optional(),
@@ -43,13 +43,13 @@ export const GenerateQuestOptionsSchema = OpenAIBaseArgsSchema.extend({
     }
 })
 
-export const RunArgsSchema = BaseArgsSchema.extend({
+export const RunSchema = BaseSchema.extend({
     overrideArgs: z.object({}).default({}).optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
 
 
-export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
+export const QuizPipeArgTypeSchema = OpenAIBaseSchema.extend({
     overrideOcYaml: z.string().optional(),
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     totalNumQuestions: z.number(),
@@ -67,7 +67,7 @@ export const QuizPipeArgTypeSchema = OpenAIBaseArgsSchema.extend({
     }
 })
 
-export const RunResultsArgs = BaseArgsSchema.extend({
+export const RunResultsSchema = BaseSchema.extend({
     skip: z.number().default(0).optional(),
     limit: z.number().default(10).optional(),
     sort: z.string().default("date_created").optional(),
@@ -77,11 +77,11 @@ export const RunResultsArgs = BaseArgsSchema.extend({
     status: z.string().optional()
 });
 
-export const DeleteFilesArgs = BaseArgsSchema.extend({
+export const DeleteFilesSchema = BaseSchema.extend({
     knowledgeBaseName: z.string().refine((val:any) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     fileNames: z.array(z.string()).refine((val: any) => val.length > 0, {message: "File names cannot be empty"}),
 });
-export const ListFilesArgs = BaseArgsSchema.extend({
+export const ListFilesSchema = BaseSchema.extend({
     knowledgeBaseName: z.string().refine((val: any) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     skip: z.number().default(0).optional(),
     limit: z.number().default(10).optional(),
@@ -91,7 +91,7 @@ export const ListFilesArgs = BaseArgsSchema.extend({
     metadataJson: z.object({}).default({}).optional(),
 });
 
-export const ContentFileSchema = BaseArgsSchema.extend({
+export const ContentFileSchema = BaseSchema.extend({
     name: z.string().optional().transform((val, ctx) => {
         if (val && !val.endsWith(".txt")) {
             ctx.addIssue({code: z.ZodIssueCode.custom, message: "'name' must end with .txt"});
@@ -112,7 +112,7 @@ export const ContentFileSchema = BaseArgsSchema.extend({
         return data;
     });
 
-export const CallPipelineSchema = BaseArgsSchema.extend({
+export const CallPipelineSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     overrideOcYaml: z.string().optional(),
 });
@@ -134,58 +134,58 @@ export const PathFileSchema = z.object({
     return data;
 });
 
-
-export const KnowledgeBaseCreateSchema = BaseArgsSchema.extend({
+export const KnowledgeBaseCreateSchema = BaseSchema.extend({
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
 })
-export const VectorIndexCreateSchema = BaseArgsSchema.extend({
+
+export const VectorIndexCreateSchema = BaseSchema.extend({
     vectorIndexName: z.string().refine((val) => val.trim() !== '', {message: "Vector Index name cannot be empty"}),
     modelName: z.string().refine((val) => val.trim() !== '', {message: "Model name cannot be empty"}),
 })
 
-export const PipelineCreateSchema = BaseArgsSchema.extend({
+export const PipelineCreateSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     pipelineYaml: z.string(),
 })
-export const YouTubeUrlSchema = BaseArgsSchema.extend({
+export const YouTubeUrlSchema = BaseSchema.extend({
     urls: z.array(z.string()),
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
 })
-export const VectorIndexDeleteSchema = BaseArgsSchema.extend({
+export const VectorIndexDeleteSchema = BaseSchema.extend({
     vectorIndexName: z.string().refine((val) => val.trim() !== '', {message: "Vector Index name cannot be empty"}),
 })
-export const KnowledgeBaseDeleteSchema = BaseArgsSchema.extend({
+export const KnowledgeBaseDeleteSchema = BaseSchema.extend({
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
 })
-export const PipelineDeleteSchema = BaseArgsSchema.extend({
+export const PipelineDeleteSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 })
-export const ListKnowledgeBasesSchema = BaseArgsSchema.extend({
+export const ListKnowledgeBasesSchema = BaseSchema.extend({
 })
-export const ListPipelinesSchema = BaseArgsSchema.extend({
+export const ListPipelinesSchema = BaseSchema.extend({
     verbose: z.boolean().default(false).optional()
 })
-export const ListVectorIndicesSchema = BaseArgsSchema.extend({
+export const ListVectorIndicesSchema = BaseSchema.extend({
 })
-export const CheckPipelineSchema = BaseArgsSchema.extend({
+export const CheckPipelineSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 })
-export const GetChunkArgsSchema = BaseArgsSchema.extend({
+export const GetChunksSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     metaDataJson: z.object({}).default({}).optional(),
     top_k: z.union([z.number().refine((val) => val > 0, {message: "Top k must be greater than 0"}),z.null()])
 })
-export const GetPipeSchema = BaseArgsSchema.extend({
+export const GetPipeSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 })
 
-export const AwaitEmbeddingsArgs = BaseArgsSchema.extend({
+export const AwaitEmbeddingsSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
     fileName: z.string().refine((val) => val.trim() !== '', {message: "Filename id cannot be empty"}),
 })
 export const FileSchema: z.ZodType = z.union([ContentFileSchema, PathFileSchema]);
 
-export const UploadFileOptionsSchema = BaseArgsSchema.extend({
+export const UploadFileOptionsSchema = BaseSchema.extend({
     files: z.array(FileSchema),
     stream: z.boolean(),
     directory: z.union([z.null(),z.string()]).default(null).optional(),
@@ -204,13 +204,13 @@ export const ParseYamlSchema = z.object({
 })
 
 
-export const UploadDirectoryOptionsSchema = BaseArgsSchema.extend({
+export const UploadDirectorySchema = BaseSchema.extend({
     directory: z.string().refine((val) => val.endsWith("/"), {message: "Directory must end with /"}),
     knowledgeBaseName: z.string().refine((val) => val.trim() !== '', {message: "Knowledge Base name cannot be empty"}),
     metadataJson: z.object({}).optional(),
 });
 
-export const ContextCompletionArgsSchema = OpenAIBaseArgsSchema.extend({
+export const ContextCompletionSchema = OpenAIBaseSchema.extend({
     prompt: z.string().superRefine((val, ctx) => {
         if (!val.includes("{chunks}")) {
             ctx.addIssue({code: z.ZodIssueCode.custom, message: "Prompt must include the variable '{chunks}', which will serve as the entry-point into which the relevant context will be injected by OneContext."});
@@ -235,32 +235,32 @@ export const ContextCompletionArgsSchema = OpenAIBaseArgsSchema.extend({
     scorePercentileKey: z.string().default("lexrank.percentile_score").optional(),
 });
 
-export type ContextCompletionArgsType = z.infer<typeof ContextCompletionArgsSchema>
+export type ContextCompletionType = z.infer<typeof ContextCompletionSchema>
 export type PipelineCreateType = z.infer<typeof PipelineCreateSchema>
 export type VectorIndexCreateType = z.infer<typeof VectorIndexCreateSchema>
 export type KnowledgeBaseCreateType = z.infer<typeof KnowledgeBaseCreateSchema>
 export type YouTubeUrlType = z.infer<typeof YouTubeUrlSchema>
-export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsArgs>
+export type AwaitEmbeddingsType = z.infer<typeof AwaitEmbeddingsSchema>
 export type PipelineDeleteType = z.infer<typeof PipelineDeleteSchema>
 export type VectorIndexDeleteType = z.infer<typeof VectorIndexDeleteSchema>
 export type KnowledgeBaseDeleteType = z.infer<typeof KnowledgeBaseDeleteSchema>
 export type CheckPipelineType = z.infer<typeof CheckPipelineSchema>
-export type RunArgsType = z.infer<typeof RunArgsSchema>
+export type RunType = z.infer<typeof RunSchema>
 export type CallPipelineType = z.infer<typeof CallPipelineSchema>
 export type ListPipelinesType = z.infer<typeof ListPipelinesSchema>
 export type ListKnowledgeBasesType = z.infer<typeof ListKnowledgeBasesSchema>
 export type ListVectorIndicesType = z.infer<typeof ListVectorIndicesSchema>
-export type ListFilesType = z.infer<typeof ListFilesArgs>
-export type DeleteFilesType = z.infer<typeof DeleteFilesArgs>
-export type RunResultsType = z.infer<typeof RunResultsArgs>
+export type ListFilesType = z.infer<typeof ListFilesSchema>
+export type DeleteFilesType = z.infer<typeof DeleteFilesSchema>
+export type RunResultsType = z.infer<typeof RunResultsSchema>
 export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
-export type UploadDirectoryType = z.infer<typeof UploadDirectoryOptionsSchema>
-export type GetChunksType = z.infer<typeof GetChunkArgsSchema>
+export type UploadDirectoryType = z.infer<typeof UploadDirectorySchema>
+export type GetChunksType = z.infer<typeof GetChunksSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>
 export type ParseYamlType = z.infer<typeof ParseYamlSchema>
 
 export interface PollArgsType {
-    method: (pollMethodArgs:PollMethodArgsType) => Promise<string>
-    fnArgs: PollMethodArgsType
+    method: (pollMethodArgs:PollMethodType) => Promise<string>
+    fnArgs: PollMethodType
 }

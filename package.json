@@ -20,7 +20,7 @@
     "zod": "^3.23.4"
   },
   "name": "@onecontext/ts-sdk",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on cloud infrastructure",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

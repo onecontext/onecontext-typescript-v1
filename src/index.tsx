@@ -78,9 +78,7 @@ export const createKnowledgeBase = async (knowledgeBaseCreateArgs: generalTypes.
         });
         return response
     } catch (error: unknown) {
-        console.log("wjhat errorthe fuck", error)
         if (error instanceof axios.AxiosError) {
-            console.log('in axios')
             console.log(error.response?.data?.detail || error.response?.data?.errors || error.message || error);
         } else {
             console.log(error)
@@ -243,7 +241,7 @@ export const listVectorIndices = async (listVectorIndicesArgs: generalTypes.List
     }
 };
 
-export const runPipeline = async (runArgs: generalTypes.RunArgsType,
+export const runPipeline = async (runArgs: generalTypes.RunType,
 ): Promise<any | undefined> => {
     const strippedObject = {...Object.fromEntries(Object.entries(runArgs).filter(([key, _]) => key !== "BASE_URL" && key !== "API_KEY"))}
     // rename some of the keys , i.e. runID to run_id
@@ -278,7 +276,7 @@ export const runPipeline = async (runArgs: generalTypes.RunArgsType,
     }
 };
 
-export const aRunPipeline = async (runArgs: generalTypes.RunArgsType,
+export const aRunPipeline = async (runArgs: generalTypes.RunType,
 ): Promise<any | undefined> => {
     try {
         const response = await axios({
@@ -304,7 +302,7 @@ export const aRunPipeline = async (runArgs: generalTypes.RunArgsType,
         }
     }
 };
-export const runSummary = async (runArgs: generalTypes.RunArgsType,
+export const runSummary = async (runArgs: generalTypes.RunType,
 ): Promise<any | undefined> => {
     try {
         const response = await axios({
@@ -577,7 +575,7 @@ export const checkPipelineStatus = async (
     }
 };
 
-export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionArgsType): Promise<any[] | string> => {
+export const contextCompletion = async (contextCompletionArgs: generalTypes.ContextCompletionType): Promise<any[] | string> => {
     try {
         const result = await axios({
             method: 'post',
