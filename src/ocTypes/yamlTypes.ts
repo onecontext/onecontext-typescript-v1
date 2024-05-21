@@ -16,7 +16,7 @@ export const PipelineSchema = z.object({
             name: z.string(),
             step_args: z.union([z.object({
             }).passthrough().optional(),z.null()]),
-            depends_on: z.array(z.string().optional())
+            inputs: z.array(z.string().optional())
         })),
     });
 
