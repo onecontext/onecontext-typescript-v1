@@ -1,4 +1,3 @@
-// the union of a readable stream type and a file path
 import * as fs from "fs";
 import {Readable} from "stream";
 import {z} from "zod";
@@ -48,24 +47,6 @@ export const RunSchema = BaseSchema.extend({
     pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
 });
 
-
-export const QuizPipeArgTypeSchema = OpenAIBaseSchema.extend({
-    overrideOcYaml: z.string().optional(),
-    pipelineName: z.string().refine((val) => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    totalNumQuestions: z.number(),
-    promptPerTopic: z.string(),
-    clusterLabel: z.string()
-}).superRefine((val, ctx) => {
-    if (val.promptPerTopic !== undefined) {
-        const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
-        const missingVariables: string[] = requiredVariables.filter(variable => !val.promptPerTopic?.includes(variable));
-        if (missingVariables.length > 0) {
-            ctx.addIssue({code: z.ZodIssueCode.custom, message: `You are missing a required variable in the override string you passed to promptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`, path: ['promptPerTopic']})
-            return false
-        }
-        return true
-    }
-})
 
 export const RunResultsSchema = BaseSchema.extend({
     skip: z.number().default(0).optional(),
@@ -253,7 +234,6 @@ export type ListVectorIndicesType = z.infer<typeof ListVectorIndicesSchema>
 export type ListFilesType = z.infer<typeof ListFilesSchema>
 export type DeleteFilesType = z.infer<typeof DeleteFilesSchema>
 export type RunResultsType = z.infer<typeof RunResultsSchema>
-export type GenerateQuestOptionsType = z.infer<typeof GenerateQuestOptionsSchema>
 export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectorySchema>
 export type GetChunksType = z.infer<typeof GetChunksSchema>

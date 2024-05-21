@@ -1,0 +1,29 @@
+{
+  "name": "quickstart",
+  "type": "module",
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
+  "version": "0.0.1",
+  "description": "A project with basic examples of how to use OneContext",
+  "main": "quickstart.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "RAG"
+  ],
+  "author": "Ross Murphy",
+  "license": "MIT",
+  "dependencies": {
+    "@onecontext/ts-sdk": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.4",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}

@@ -186,8 +186,8 @@ We'll include a metadataJson field to tag them with the tag "charlie_munger". Th
 const uploadDirectoryArgsMunger: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
   API_KEY: API_KEY,
   knowledgeBaseName: knowledgeBaseName,
-  directory: "demo_data/long_form/",
-  metadataJson: {"tag": "charlie_munger"}
+  directory: "demo_data/investing/",
+  metadataJson: {"tag": "snowball"}
 })
 
 await OneContext.uploadDirectory(uploadDirectoryArgsMunger)

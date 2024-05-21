@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "target": "es2020",
+    "moduleResolution": "NodeNext",
+    "sourceMap": true,
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "lib": [
+      "es2015"
+    ]
+  },
+  "include": [
+    "./quickstart/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
