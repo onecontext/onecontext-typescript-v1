@@ -3,19 +3,22 @@ steps:
   - step: KnowledgeBaseFiles
     name: input
     step_args:
-      knowledgebase_names: ["demoKnowledgeBase"]
-    inputs: []
+      # specify the source knowledgebases to watch
+      knowledgebase_names: ["rm_kb"]
+    depends_on: []
+
+  - step: Preprocessor
+    name: preprocessor
+    step_args: {}
+    inputs: [input]
 
   - step: Chunker
     name: simple_chunker
     step_args:
       chunk_size_words: 320
       chunk_overlap: 30
-      split_by: word
-      split_respect_sentence_boundary: true
-      hard_split_max_chars: 2400
-    inputs: [input]
-
+    inputs: [preprocessor]
+    
   - step: SentenceTransformerEmbedder
     name: sentence-transformers
     step_args:
