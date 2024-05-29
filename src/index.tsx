@@ -6,14 +6,9 @@ import * as ocErrors from "./ocTypes/errors.js";
 import FormData from 'form-data';
 import * as z from "zod";
 import * as YAML from 'yaml';
-import * as fs from 'fs';
+import { promises as fs } from 'fs';
 import * as path from "path"
 import {PollArgsType, RunResultsType} from "./ocTypes/generalTypes.js";
-import {textWithColor, textWithIntSelectedColor} from "./rmUtils.js";
-import ora from "ora";
-import React from 'react';
-import {render, Text} from 'ink';
-import Spinner from 'ink-spinner';
 
 export const uploadYouTubeUrl = async (youtubeUrlArgs: generalTypes.YouTubeUrlType): Promise<any> => {
 
@@ -456,7 +451,7 @@ export const uploadDirectory = async ({
 
     const formData = new FormData();
 
-    const files = await fs.promises.readdir(directory)
+    const files = await fs.readdir(directory)
 
     files.forEach(file => {
         try {
@@ -635,34 +630,9 @@ export const getPipe = async (getPipe: generalTypes.GetPipeType): Promise<any | 
 export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Promise<yamlTypes.PipelineSchema | string | null> => {
 
     try {
-        if (!parseYamlArgs.overrides) {
-            const pipe = yamlTypes.PipelineSchema.parse(YAML.parse(parseYamlArgs.yaml))
-            return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
-        } else {
-
-            // if wildcard overrides are passed, just overwrite the values in the actual string
-            const update = (stringYaml: string, updateObject: Record<string, string>) => {
-                for (const [key, value] of Object.entries(updateObject)) {
-                    stringYaml = stringYaml.replace(key, value)
-                }
-                return stringYaml
-            }
-
-            const stringYaml = parseYamlArgs.overrides.wildcardOverrides ? update(parseYamlArgs.yaml, parseYamlArgs.overrides.wildcardOverrides) : parseYamlArgs.yaml
-
-            // now parse that string into an object
-            let objectYaml = YAML.parse(stringYaml)
-
-            if (parseYamlArgs.overrides.nestedOverrides) {
-                let nestedOverriddenParsedYaml = {...objectYaml, ...parseYamlArgs.overrides.nestedOverrides}
-                const pipe = yamlTypes.PipelineSchema.parse(nestedOverriddenParsedYaml, {errorMap: ocErrors.pipelineErrorMap})
-                return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
-            } else {
-                const pipe = yamlTypes.PipelineSchema.parse(objectYaml, {errorMap: ocErrors.pipelineErrorMap})
-                return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
-            }
-
-        }
+        const fileContent = await fs.readFile(parseYamlArgs.yaml, 'utf8');
+        const pipe = yamlTypes.PipelineSchema.parse(fileContent);
+        return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
     } catch (error) {
         if (error instanceof z.ZodError) {
             if (parseYamlArgs.verboseErrorHandling) {
