@@ -50,6 +50,10 @@ Install the dependencies. This will automatically install the SDK for you.
 ```zsh
 npm install
 ```
+Jump back out of there. From now on, we'll run commands from the root of the repo.
+```zsh
+cd .. 
+```
 
 #### Get an API Key 
 As in the general set up, you can get an API key [here](https://onecontext.ai/settings). It comes with 2,500 free credits to get you started.
@@ -65,7 +69,7 @@ API_KEY=your_api_key_here
 
 ## Play around
 
-If you change directory into the `quickstart` folder, you'll find a file called `quickstart.ts`. This file is full of examples of things you can do with the OneContext SDK.
+In the `quickstart` folder, you'll find a file called `quickstart.ts`. This file is full of examples of things you can do with the OneContext SDK.
 
 ### `quickstart/quickstart.ts` has a lot of examples to get you started
 Let's go through what's going on in this file below.
