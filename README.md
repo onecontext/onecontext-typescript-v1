@@ -24,10 +24,8 @@ If you've never had an API key before, we'd recommend you check out the quicksta
 ### Quickstart 
 
 If this is your first time using OneContext, check out the below quickstart to get familiarised with the library. We'll
-take you through how to set up an API key and the main things you can do with OneContext. We'd also recommend you check
-out the official [docs](https://docs.onecontext.ai/) for a more in-depth treatment of the platform. You can also check
-out our [Python SDK](https://github.com/onecontext/onecontext-python), our [CLI tool](https://github.com/onecontext/onecontext-cli), and
-our [WebApp Template](https://github.com/onecontext/onecontext-nextjs-webapp).
+take you through how to set up an API key and the main things you can do with OneContext. You can also check
+out our [Python SDK](https://github.com/onecontext/onecontext-python), and our [CLI tool](https://github.com/onecontext/onecontext-cli).
 .
 If you don't know what you're doing (yet), and want to play around with the library first, before you sign up, then follow the quick-start guide below.
 
