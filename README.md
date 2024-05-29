@@ -4,9 +4,6 @@ This is the official TypeScript SDK for the OneContext platform. Use this SDK to
 ## What is OneContext?
 OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on SOTA infrastructure. You define the pipeline in YAML, and OneContext takes care of the rest of the infra (SSL certs, DNS, Kubernetes cluster, GPUs, autoscaling, load balancing, etc).
 
-## Where can I learn more about how it works?
-Check out our docs page [here](https://docs.onecontext.ai/). The below quickstart example will also help you get started, but is intended as a quickstart, rather than a fundamental overview of the platform.
-
 ## Sounds great. How do I get started?
 
 ### General Set Up 
@@ -27,10 +24,8 @@ If you've never had an API key before, we'd recommend you check out the quicksta
 ### Quickstart 
 
 If this is your first time using OneContext, check out the below quickstart to get familiarised with the library. We'll
-take you through how to set up an API key and the main things you can do with OneContext. We'd also recommend you check
-out the official [docs](https://docs.onecontext.ai/) for a more in-depth treatment of the platform. You can also check
-out our [Python SDK](https://github.com/onecontext/onecontext-python), our [CLI tool](https://github.com/onecontext/onecontext-cli), and
-our [WebApp Template](https://github.com/onecontext/onecontext-nextjs-webapp).
+take you through how to set up an API key and the main things you can do with OneContext. You can also check
+out our [Python SDK](https://github.com/onecontext/onecontext-python), and our [CLI tool](https://github.com/onecontext/onecontext-cli).
 .
 If you don't know what you're doing (yet), and want to play around with the library first, before you sign up, then follow the quick-start guide below.
 
