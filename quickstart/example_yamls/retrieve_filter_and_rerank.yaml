@@ -1,5 +1,3 @@
-name: demoRetrieverAndRerankerPipeline
-
 steps:
   - step: Retriever
     name: retriever

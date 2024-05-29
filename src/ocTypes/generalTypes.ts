@@ -174,16 +174,6 @@ export const UploadFileOptionsSchema = BaseSchema.extend({
     metadataJson: z.object({}).optional(),
 });
 
-export const ParseYamlSchema = z.object({
-    yaml: z.string(),
-    verboseErrorHandling: z.boolean().default(false).optional(),
-    overrides: z.object({
-        nestedOverrides: z.object({}).passthrough().optional(),
-        wildcardOverrides: z.record(z.string()).optional(),
-    }).default({}).optional(),
-    asString: z.boolean().default(false).optional(),
-})
-
 
 export const UploadDirectorySchema = BaseSchema.extend({
     directory: z.string().refine((val) => val.endsWith("/"), {message: "Directory must end with /"}),
@@ -238,7 +228,6 @@ export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectorySchema>
 export type GetChunksType = z.infer<typeof GetChunksSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>
-export type ParseYamlType = z.infer<typeof ParseYamlSchema>
 
 export interface PollArgsType {
     method: (pollMethodArgs:PollMethodType) => Promise<string>

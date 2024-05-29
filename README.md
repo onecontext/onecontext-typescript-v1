@@ -133,10 +133,12 @@ For a full treatment of what exactly is a `Step`, `Pipeline`, `Knowledge Base`, 
 const indexPipelineCreateArgs: OneContext.PipelineCreateType = OneContext.PipelineCreateSchema.parse({
   API_KEY: API_KEY,
   pipelineName: indexPipelineName,
-  pipelineYaml: "./example_yamls/index.yaml",
+  pipelineYaml: "./quickstart/example_yamls/index.yaml",
 })
 
-await OneContext.createPipeline(indexPipelineCreateArgs)
+OneContext.createPipeline(indexPipelineCreateArgs).then((res) => {console.log(res)})
+
+
 ```
 
 #### Create a (simple) `Retriever Pipeline`
@@ -150,11 +152,12 @@ You can check out the specification of this `Retriever Pipeline` in the `example
 ```ts
 const simpleRetrieverPipeline: OneContext.PipelineCreateType = OneContext.PipelineCreateSchema.parse({
   API_KEY: API_KEY,
-  pipelineName: indexPipelineName,
-  pipelineYaml: "./example_yamls/retrieve.yaml",
+  pipelineName: simpleRetrieverPipelineName,
+  pipelineYaml: "./quickstart/example_yamls/retrieve.yaml",
 })
 
-await OneContext.createPipeline(simpleRetrieverPipeline))
+OneContext.createPipeline(simpleRetrieverPipeline).then((res) => {console.log(res)})
+
 ```
 
 #### Create a more involved `Retriever Pipeline`
@@ -171,11 +174,12 @@ For more on `ReRanker` models, see the [OneContext docs](https://docs.onecontext
 ```ts
 const involvedRetrieverPipelineCreateArgs: OneContext.PipelineCreateType = OneContext.PipelineCreateSchema.parse({
   API_KEY: API_KEY,
-  pipelineName: indexPipelineName,
-  pipelineYaml: "./example_yamls/retrieve_filter_and_rerank.yaml",
+  pipelineName: involvedRetrieverPipelineName,
+  pipelineYaml: "./quickstart/example_yamls/retrieve_filter_and_rerank.yaml",
 })
 
-await OneContext.createPipeline(involvedRetrieverPipelineCreateArgs)
+OneContext.createPipeline(involvedRetrieverPipelineCreateArgs).then((res) => {console.log(res)})
+
 ```
 
 #### Upload a directory of files related to Charlie Munger to the `Knowledge Base`
@@ -183,14 +187,14 @@ await OneContext.createPipeline(involvedRetrieverPipelineCreateArgs)
 We'll include a metadataJson field to tag them with the tag "charlie_munger". This can be useful later as we can filter on metadata when we want to retrieve these files.
 
 ```ts
-const uploadDirectoryArgsMunger: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
+const uploadDirectoryArgsLongForm: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
   API_KEY: API_KEY,
   knowledgeBaseName: knowledgeBaseName,
-  directory: "demo_data/investing/",
-  metadataJson: {"tag": "snowball"}
+  directory: "./quickstart/demo_data/long_form/",
+  metadataJson: {"tag": "longForm"}
 })
 
-await OneContext.uploadDirectory(uploadDirectoryArgsMunger)
+OneContext.uploadDirectory(uploadDirectoryArgsLongForm).then((res) => {console.log(res)})
 
 ```
 
@@ -202,11 +206,12 @@ We could also of course have created a different `Knowledge Base` for this data 
 const uploadDirectoryArgsML: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
   API_KEY: API_KEY,
   knowledgeBaseName: knowledgeBaseName,
-  directory: "demo_data/machine_learning/",
+  directory: "./quickstart/demo_data/machine_learning/",
   metadataJson: {"tag": "machine_learning"}
 })
 
-await OneContext.uploadDirectory(uploadDirectoryArgsML)
+OneContext.uploadDirectory(uploadDirectoryArgsML).then((res) => {console.log(res)})
+
 ```
 
 #### List all the currently running `Pipelines`
@@ -221,7 +226,9 @@ const runResultsArgs: OneContext.RunResultsType = OneContext.RunResultsSchema.pa
   dateCreatedGte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
 })
 
-await OneContext.getRunResults(runResultsArgs)
+OneContext.getRunResults(runResultsArgs).then((res) => {console.log(util.inspect(res,{showHidden: false, colors: true}))})
+
+
 ```
 
 #### We can also view the files which are in a particular `Knowledge Base`
@@ -232,7 +239,7 @@ const listFilesArgs: OneContext.ListFilesType = OneContext.ListFilesSchema.parse
   knowledgeBaseName: knowledgeBaseName,
 })
 
-await OneContext.listFiles(listFilesArgs)
+OneContext.listFiles(listFilesArgs).then((res) => {console.log(res)})
 ```
 
 #### See any files you don't want in the `Knowledge Base`? Delete them. You can pass a list of strings as file names.
@@ -244,7 +251,7 @@ const deleteFileArgs: OneContext.DeleteFilesType = OneContext.DeleteFilesSchema.
   fileNames: ["instruct_gpt.pdf"]
 })
 
-await OneContext.deleteFiles(deleteFileArgs)
+OneContext.deleteFiles(deleteFileArgs).then((res) => {console.log(res)})
 ```
 
 #### Run the "simple" retriever pipeline to query the vector index (full of embeddings of the above files) for the most relevant chunks to a given query.
@@ -256,7 +263,7 @@ const simpleRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchema.
   overrideArgs: {"retriever" : {"query" : "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}}
 })
 
-await OneContext.runPipeline(simpleRetrieverPipelineRunArgs)
+OneContext.runPipeline(simpleRetrieverPipelineRunArgs).then((res) => {console.log(util.inspect(res, {showHidden: true, colors: true}))})
 ```
 
 #### Run the more "involved" retriever pipeline to first query the vector index, then filter for embeddings with a relevancy score of > 0.5, and finally rerank the results using a reranker model.
@@ -272,7 +279,7 @@ const involvedRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchem
   overrideArgs: {"retriever" : {"query" : "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}}
 })
 
-await OneContext.runPipeline(involvedRetrieverPipelineRunArgs)
+OneContext.runPipeline(involvedRetrieverPipelineRunArgs).then((res) => {console.log(util.inspect(res, {showHidden: true, colors: true}))})
 ```
 
 #### When you're finished with the `Knowledge Base`, you can delete it. This will delete all the data in the `Knowledge Base`, along with any chunks, and embeddings connected to it.
@@ -283,7 +290,7 @@ const knowledgeBaseDeleteArgs: OneContext.KnowledgeBaseDeleteType = OneContext.K
   knowledgeBaseName: knowledgeBaseName
 })
 
-await OneContext.deleteKnowledgeBase(knowledgeBaseDeleteArgs))
+OneContext.deleteKnowledgeBase(knowledgeBaseDeleteArgs).then((res) => {console.log(res)})
 ```
 
 #### You can also delete the `Vector Index`. It will already have no data in it (as the chunks and embeddings were cascade deleted after you deleted the `Knowledge Base` above), but it's good practice to delete it anyway.
@@ -294,7 +301,7 @@ const vectorIndexDeleteArgs: OneContext.VectorIndexDeleteType = OneContext.Vecto
   vectorIndexName: vectorIndexName
 })
 
-await OneContext.deleteVectorIndex(vectorIndexDeleteArgs)
+OneContext.deleteVectorIndex(vectorIndexDeleteArgs).then((res)=>{console.log(res)})
 ```
 
 #### Finally, we can delete the `Pipelines` we created. Again, no real need to, but for the sake of ending the example, we'll delete them. 

@@ -85,7 +85,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
 
     try {
         // first make sure it's a valid pipeline
-        const parsedYaml = await parseYaml({yaml: pipelineCreateArgs.pipelineYaml, verboseErrorHandling: true})
+        const parsedYaml = await parseYaml(pipelineCreateArgs.pipelineYaml)
         if (parsedYaml == null) {
             console.log("Failed to create pipeline: " + pipelineCreateArgs.pipelineName)
         } else {
@@ -97,7 +97,7 @@ export const createPipeline = async (pipelineCreateArgs: generalTypes.PipelineCr
                 },
                 data: {
                     name: pipelineCreateArgs.pipelineName,
-                    yaml_config: pipelineCreateArgs.pipelineYaml,
+                    yaml_config: parsedYaml,
                 },
             });
         }
@@ -627,19 +627,18 @@ export const getPipe = async (getPipe: generalTypes.GetPipeType): Promise<any | 
 };
 
 
-export const parseYaml = async (parseYamlArgs: generalTypes.ParseYamlType): Promise<yamlTypes.PipelineSchema | string | null> => {
+export const parseYaml = async (yamlPath: string): Promise<yamlTypes.PipelineSchema | string | null> => {
 
     try {
-        const fileContent = await fs.readFile(parseYamlArgs.yaml, 'utf8');
-        const pipe = yamlTypes.PipelineSchema.parse(fileContent);
-        return parseYamlArgs.asString ? YAML.stringify(pipe) : pipe
+        // asynchronously read the file as a string
+        const fileContent = await fs.readFile(yamlPath, 'utf8');
+        // Zod error check the yaml string parsed as a JS object
+        const pipe = yamlTypes.PipelineSchema.parse(YAML.parse(fileContent));
+        // once you the yaml is all good, just return it as a string
+        return YAML.stringify(pipe)
     } catch (error) {
         if (error instanceof z.ZodError) {
-            if (parseYamlArgs.verboseErrorHandling) {
-                console.log(error.message)
-            } else {
                 console.log(error.issues.map((issue) => issue.message).join("\n"));
-            }
         }
         throw error
     }

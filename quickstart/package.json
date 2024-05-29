@@ -16,7 +16,7 @@
   "author": "Ross Murphy",
   "license": "MIT",
   "dependencies": {
-    "@onecontext/ts-sdk": "1.0.8",
+    "@onecontext/ts-sdk": "1.0.9",
     "dotenv": "^16.4.5",
     "path": "^0.12.7"
   },

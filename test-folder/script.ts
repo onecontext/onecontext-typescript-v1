@@ -1,4 +1,4 @@
-import * as OneContext from '.'
+import * as OneContext from '@onecontext/ts-sdk'
 import { performance } from 'perf_hooks';
 import fs from "fs";
 import YAML from 'yaml';
@@ -429,18 +429,6 @@ const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 //     }
 // }
 // const a = await runMany(args)
-
-const pipelineDeleteList: Array<OneContext.PipelineDeleteType> = [
-  {API_KEY: API_KEY, pipelineName: "demoIndexPipeline"},
-  {API_KEY: API_KEY, pipelineName: "demoSimpleRetrieverPipeline"},
-  {API_KEY: API_KEY, pipelineName: "demoInvolvedRetrieverPipeline"},
-]
-
-pipelineDeleteList.forEach((pipe) => {
-  OneContext.deletePipeline(pipe).then((res) => {
-    console.log(res, `Deleted pipeline ${pipe.pipelineName} successfully`)
-  })
-})
 
 
 

@@ -10,7 +10,6 @@ const stepEnum = z.enum(
 );
 
 export const PipelineSchema = z.object({
-        name: z.string(),
         steps: z.array(z.object({
             step: stepEnum,
             name: z.string(),

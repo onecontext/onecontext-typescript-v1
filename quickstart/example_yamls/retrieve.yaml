@@ -1,5 +1,3 @@
-name: demoRetrieverPipeline
-
 steps:
   - step: Retriever
     name: retriever

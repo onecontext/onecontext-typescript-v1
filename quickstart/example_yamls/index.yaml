@@ -1,10 +1,9 @@
-name: demoIndexPipeline
 steps:
   - step: KnowledgeBaseFiles
     name: input
     step_args:
       # specify the source knowledgebases to watch
-      knowledgebase_names: ["rm_kb"]
+      knowledgebase_names: ["demoKnowledgeBase"]
     inputs: []
 
   - step: Preprocessor

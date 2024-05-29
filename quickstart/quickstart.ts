@@ -2,6 +2,7 @@ import * as OneContext from "@onecontext/ts-sdk"
 import * as dotenv from "dotenv";
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as util from "util";
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename); 
 
@@ -10,6 +11,7 @@ dotenv.config({path: __dirname + '/../.env'});
 
 // make sure the env variables are being read correctly and instantiated as global variables
 const API_KEY: string = process.env.API_KEY!;
+const BASE_URL: string = process.env.BASE_URL!;
 
 const knowledgeBaseName: string = "demoKnowledgeBase" 
 const vectorIndexName: string = "demoVectorIndex"
@@ -38,55 +40,55 @@ OneContext.createVectorIndex(vectorIndexCreateArgs).then((res) => {console.log(r
 const indexPipelineCreateArgs: OneContext.PipelineCreateType = OneContext.PipelineCreateSchema.parse({
   API_KEY: API_KEY,
   pipelineName: indexPipelineName,
-  pipelineYaml: "./example_yamls/index.yaml",
+  pipelineYaml: "./quickstart/example_yamls/index.yaml",
 })
 
-await OneContext.createPipeline(indexPipelineCreateArgs)
+OneContext.createPipeline(indexPipelineCreateArgs).then((res) => {console.log(res)})
 
 // Create a "simple" retriever pipeline
 
 const simpleRetrieverPipeline: OneContext.PipelineCreateType = OneContext.PipelineCreateSchema.parse({
   API_KEY: API_KEY,
-  pipelineName: indexPipelineName,
-  pipelineYaml: "./example_yamls/retrieve.yaml",
+  pipelineName: simpleRetrieverPipelineName,
+  pipelineYaml: "./quickstart/example_yamls/retrieve.yaml",
 })
 
-await OneContext.createPipeline(simpleRetrieverPipeline)
+OneContext.createPipeline(simpleRetrieverPipeline).then((res) => {console.log(res)})
+
 
 // Create an "involved" retriever pipeline
 
 const involvedRetrieverPipelineCreateArgs: OneContext.PipelineCreateType = OneContext.PipelineCreateSchema.parse({
   API_KEY: API_KEY,
-  pipelineName: indexPipelineName,
-  pipelineYaml: "./example_yamls/retrieve_filter_and_rerank.yaml",
+  pipelineName: involvedRetrieverPipelineName,
+  pipelineYaml: "./quickstart/example_yamls/retrieve_filter_and_rerank.yaml",
 })
 
-await OneContext.createPipeline(involvedRetrieverPipelineCreateArgs)
+OneContext.createPipeline(involvedRetrieverPipelineCreateArgs).then((res) => {console.log(res)})
 
 
-// Upload a directory of files related to Charlie Munger to the knowledge base, and tag them with "charlie_munger"
+// Upload a directory of books to the knowledge base, and tag them with "long_form"
 
-const uploadDirectoryArgsMunger: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
+const uploadDirectoryArgsLongForm: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
   API_KEY: API_KEY,
   knowledgeBaseName: knowledgeBaseName,
-  directory: "demo_data/long_form/",
-  metadataJson: {"tag": "charlie_munger"} 
+  directory: "./quickstart/demo_data/long_form/",
+  metadataJson: {"tag": "longForm"} 
 })
 
-await OneContext.uploadDirectory(uploadDirectoryArgsMunger)
+OneContext.uploadDirectory(uploadDirectoryArgsLongForm).then((res) => {console.log(res)})
 
-// Upload a directory of files related to Charlie Munger to the knowledge base, and tag them with "charlie_munger"
 
 const uploadDirectoryArgsML: OneContext.UploadDirectoryType = OneContext.UploadDirectorySchema.parse({
   API_KEY: API_KEY,
   knowledgeBaseName: knowledgeBaseName,
-  directory: "demo_data/machine_learning/",
+  directory: "./quickstart/demo_data/machine_learning/",
   metadataJson: {"tag": "machine_learning"}
 })
 
-await OneContext.uploadDirectory(uploadDirectoryArgsML)
+OneContext.uploadDirectory(uploadDirectoryArgsML).then((res) => {console.log(res)})
 
-// Have a look at the current running pipelines
+// // Have a look at the current running pipelines
 
 const runResultsArgs: OneContext.RunResultsType = OneContext.RunResultsSchema.parse({
   API_KEY: API_KEY,
@@ -95,17 +97,17 @@ const runResultsArgs: OneContext.RunResultsType = OneContext.RunResultsSchema.pa
   dateCreatedGte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
 })
 
-await OneContext.getRunResults(runResultsArgs)
+OneContext.getRunResults(runResultsArgs).then((res) => {console.log(util.inspect(res,{showHidden: false, colors: true}))})
 
-// Once the index pipeline has finished running, the embeddings are now ready to be queried in the vector index. 
-// Another way of checking if the pipeline has finished running is to list the files available in the Knowledge Base 
+// // Once the index pipeline has finished running, the embeddings are now ready to be queried in the vector index. 
+// // Another way of checking if the pipeline has finished running is to list the files available in the Knowledge Base 
 
 const listFilesArgs: OneContext.ListFilesType = OneContext.ListFilesSchema.parse({
   API_KEY: API_KEY,
   knowledgeBaseName: knowledgeBaseName,
 })
 
-await OneContext.listFiles(listFilesArgs)
+OneContext.listFiles(listFilesArgs).then((res) => {console.log(res)})
 
 // You can easily delete any files you no longer want in the Knowledge Base
 
@@ -115,9 +117,9 @@ const deleteFileArgs: OneContext.DeleteFilesType = OneContext.DeleteFilesSchema.
   fileNames: ["instruct_gpt.pdf"]
 })
 
-await OneContext.deleteFiles(deleteFileArgs)
+OneContext.deleteFiles(deleteFileArgs).then((res) => {console.log(res)})
 
-// Run a retriever pipeline to query the vector index (full of embeddings of the above files) for the most relevant chunks to a given query.
+// // Run a retriever pipeline to query the vector index (full of embeddings of the above files) for the most relevant chunks to a given query.
 
 const simpleRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchema.parse({
   API_KEY: API_KEY,
@@ -125,7 +127,7 @@ const simpleRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchema.
   overrideArgs: {"retriever" : {"query" : "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}}
 })
 
-await OneContext.runPipeline(simpleRetrieverPipelineRunArgs)
+OneContext.runPipeline(simpleRetrieverPipelineRunArgs).then((res) => {console.log(util.inspect(res, {showHidden: true, colors: true}))})
 
 // Try the more involved pipeline (more steps, higher latency, but more accurate results) and compare and contrast the results for yourself
 // This pipeline filters the results to only include chunks tagged with a lexrank percentile score of > 0.5, and then passes the output of that filter through a reranker model.
@@ -137,8 +139,7 @@ const involvedRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchem
   overrideArgs: {"retriever" : {"query" : "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}}
 })
 
-await OneContext.runPipeline(involvedRetrieverPipelineRunArgs)
-
+OneContext.runPipeline(involvedRetrieverPipelineRunArgs).then((res) => {console.log(util.inspect(res, {showHidden: true, colors: true}))})
 
 // Delete the knowledge base you created earlier
 
@@ -147,19 +148,17 @@ const knowledgeBaseDeleteArgs: OneContext.KnowledgeBaseDeleteType = OneContext.K
   knowledgeBaseName: knowledgeBaseName
 })
 
-await OneContext.deleteKnowledgeBase(knowledgeBaseDeleteArgs)
+OneContext.deleteKnowledgeBase(knowledgeBaseDeleteArgs).then((res) => {console.log(res)})
 
-// Delete the vector index you created earlier
-
+// // Delete the vector index you created earlier
 const vectorIndexDeleteArgs: OneContext.VectorIndexDeleteType = OneContext.VectorIndexDeleteSchema.parse({
   API_KEY: API_KEY,
   vectorIndexName: vectorIndexName
 })
 
-await OneContext.deleteVectorIndex(vectorIndexDeleteArgs)
+OneContext.deleteVectorIndex(vectorIndexDeleteArgs).then((res) => {console.log(res)})
 
-
-// Delete the pipelines you created earlier
+// // Delete the pipelines you created earlier
 const pipelineDeleteList: Array<OneContext.PipelineDeleteType> = [
   OneContext.PipelineDeleteSchema.parse({API_KEY: API_KEY, pipelineName: "demoIndexPipeline"}),
   OneContext.PipelineDeleteSchema.parse({API_KEY: API_KEY, pipelineName: "demoSimpleRetrieverPipeline"}),
