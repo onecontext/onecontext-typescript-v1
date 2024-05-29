@@ -5,7 +5,7 @@ steps:
     step_args:
       # specify the source knowledgebases to watch
       knowledgebase_names: ["rm_kb"]
-    depends_on: []
+    inputs: []
 
   - step: Preprocessor
     name: preprocessor
@@ -18,7 +18,7 @@ steps:
       chunk_size_words: 320
       chunk_overlap: 30
     inputs: [preprocessor]
-    
+
   - step: SentenceTransformerEmbedder
     name: sentence-transformers
     step_args:
@@ -41,6 +41,6 @@ steps:
   - step: ChunkWriter
     name: save
     step_args:
-#      duplicates: overwrite on file_name
+      #      duplicates: overwrite on file_name
       vector_index_name: demoVectorIndex
     inputs: [louvain]
