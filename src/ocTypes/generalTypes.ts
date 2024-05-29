@@ -166,7 +166,7 @@ export const AwaitEmbeddingsSchema = BaseSchema.extend({
 })
 export const FileSchema: z.ZodType = z.union([ContentFileSchema, PathFileSchema]);
 
-export const UploadFileOptionsSchema = BaseSchema.extend({
+export const UploadFilesSchema = BaseSchema.extend({
     files: z.array(FileSchema),
     stream: z.boolean(),
     directory: z.union([z.null(),z.string()]).default(null).optional(),
@@ -224,7 +224,7 @@ export type ListVectorIndicesType = z.infer<typeof ListVectorIndicesSchema>
 export type ListFilesType = z.infer<typeof ListFilesSchema>
 export type DeleteFilesType = z.infer<typeof DeleteFilesSchema>
 export type RunResultsType = z.infer<typeof RunResultsSchema>
-export type UploadFileType = z.infer<typeof UploadFileOptionsSchema>
+export type UploadFilesType = z.infer<typeof UploadFilesSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectorySchema>
 export type GetChunksType = z.infer<typeof GetChunksSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>

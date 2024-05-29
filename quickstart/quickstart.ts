@@ -88,6 +88,16 @@ const uploadDirectoryArgsML: OneContext.UploadDirectoryType = OneContext.UploadD
 
 OneContext.uploadDirectory(uploadDirectoryArgsML).then((res) => {console.log(res)})
 
+// You can also upload just one file to the knowledge base and tag it with "longForm"
+const uploadFileArgs: OneContext.UploadFilesType = OneContext.UploadFilesSchema.parse({
+  API_KEY: API_KEY,
+  knowledgeBaseName: knowledgeBaseName,
+  file: "./quickstart/demo_data/instruct_gpt.pdf",
+  metadataJson: {"tag": "longForm"}
+})
+
+OneContext.uploadFiles(uploadFileArgs).then((res) => {console.log(res)})
+
 // // Have a look at the current running pipelines
 
 const runResultsArgs: OneContext.RunResultsType = OneContext.RunResultsSchema.parse({

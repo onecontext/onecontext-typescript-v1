@@ -211,7 +211,21 @@ const uploadDirectoryArgsML: OneContext.UploadDirectoryType = OneContext.UploadD
 
 OneContext.uploadDirectory(uploadDirectoryArgsML).then((res) => {console.log(res)})
 
+
 ```
+#### You can also just upload one file at a time 
+
+```ts
+const uploadFileArgs: OneContext.UploadFilesType = OneContext.UploadFilesSchema.parse({
+API_KEY: API_KEY,
+knowledgeBaseName: knowledgeBaseName,
+file: "./quickstart/demo_data/instruct_gpt.pdf",
+metadataJson: {"tag": "longForm"}
+})
+
+OneContext.uploadFiles(uploadFileArgs).then((res) => {console.log(res)})
+```
+
 
 #### List all the currently running `Pipelines`
 

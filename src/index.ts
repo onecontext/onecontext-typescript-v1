@@ -491,14 +491,14 @@ export const uploadDirectory = async ({
     }
 };
 
-export const uploadFile = async ({
+export const uploadFiles = async ({
                                      files,
                                      stream,
                                      knowledgeBaseName,
                                      metadataJson,
                                      BASE_URL,
                                      API_KEY,
-                                 }: generalTypes.UploadFileType): Promise<any | undefined> => {
+                                 }: generalTypes.UploadFilesType): Promise<any | undefined> => {
     const formData = new FormData();
     files.forEach(file => {
         if (stream) {
