@@ -4,6 +4,9 @@ This is the official TypeScript SDK for the OneContext platform. Use this SDK to
 ## What is OneContext?
 OneContext is a platform that enables software engineers to compose and deploy custom RAG pipelines on SOTA infrastructure. You define the pipeline in YAML, and OneContext takes care of the rest of the infra (SSL certs, DNS, Kubernetes cluster, GPUs, autoscaling, load balancing, etc).
 
+## Where can I learn more?
+Check out our [docs](https://docs.onecontext.ai) for a in-depth treatment of how our platform works!
+
 ## Sounds great. How do I get started?
 
 ### General Set Up 
