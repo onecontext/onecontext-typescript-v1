@@ -9,14 +9,6 @@ steps:
       metadata_filters: { }
     inputs: [ ]
 
-  - step: FilterInMemory
-    name: filter
-    step_args:
-      key: lexranker_file.percentile_score
-      value: 0.5
-      comparator: $gt
-    inputs: [ retriever ]
-
   - step: Reranker
     name: reranker
     step_args:
@@ -24,4 +16,4 @@ steps:
       model_name: BAAI/bge-reranker-base
       top_k: 5
       metadata_filters: { }
-    inputs: [ filter ]
+    inputs: [ retriever ]

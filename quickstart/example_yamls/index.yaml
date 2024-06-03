@@ -3,7 +3,7 @@ steps:
     name: input
     step_args:
       # specify the source knowledgebases to watch
-      knowledgebase_names: ["demoKnowledgeBase"]
+      knowledgebase_names: ["yc_kb"]
     inputs: []
 
   - step: Preprocessor
@@ -25,21 +25,9 @@ steps:
       include_metadata: [ title, file_name ]
     inputs: [ simple_chunker ]
 
-  - step: LexRank
-    name: lexranker_file
-    step_args:
-      scope: file
-    inputs: [ sentence-transformers ]
-
-  - step: LouvainCommunityDetection
-    name: louvain
-    step_args:
-      assign_labels: gpt-3.5-turbo # RateLimit later
-    inputs: [ lexranker_file ]
-
   - step: ChunkWriter
     name: save
     step_args:
       #      duplicates: overwrite on file_name
-      vector_index_name: demoVectorIndex
-    inputs: [louvain]
+      vector_index_name: yc_vi
+    inputs: [sentence-transformers]
