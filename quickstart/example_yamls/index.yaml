@@ -3,7 +3,7 @@ steps:
     name: input
     step_args:
       # specify the source knowledgebases to watch
-      knowledgebase_names: ["yc_kb"]
+      knowledgebase_names: ["demo_kb"]
     inputs: []
 
   - step: Preprocessor
@@ -29,5 +29,5 @@ steps:
     name: save
     step_args:
       #      duplicates: overwrite on file_name
-      vector_index_name: yc_vi
+      vector_index_name: demo_vi
     inputs: [sentence-transformers]
