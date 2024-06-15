@@ -15,11 +15,12 @@ export const createQuickStart = async (quickStartCreateArgs: generalTypes.QuickS
     try {
         return await axios({
             method: 'post',
-            url: quickStartCreateArgs.BASE_URL + 'quickstart/' + quickStartCreateArgs.name,
+            url: quickStartCreateArgs.BASE_URL + 'quickstart',
             headers: {
                 Authorization: `Bearer ${quickStartCreateArgs.API_KEY}`,
             },
             data: {
+              name: quickStartCreateArgs.name,
             },
         });
     } catch (error: unknown) {
