@@ -6,7 +6,7 @@ import * as z from "zod";
 
 // steps
 const stepEnum = z.enum(
-  ["KnowledgeBaseFiles", "Preprocessor", "Chunker", "ChunkWriter", "UpdateOnDb", "FilterInMemory", "GetChunks", "SentenceTransformerEmbedder", "LexRank", "LouvainCommunityDetection", "KmeansClassifier", "HdbScan", "Reranker", "Retriever", "UpdateMetadata"]
+  ["KnowledgeBaseFiles", "Preprocessor", "Chunker", "ChunkWriter", "UpdateOnDb", "FilterInMemory", "GetChunks", "SentenceTransformerEmbedder", "OpenAIEmbedder", "LexRank", "LouvainCommunityDetection", "KmeansClassifier", "HdbScan", "Reranker", "Retriever", "UpdateMetadata"]
 );
 
 export const PipelineSchema = z.object({
