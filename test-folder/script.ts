@@ -431,6 +431,7 @@ const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 // const a = await runMany(args)
 
 
-
+const a = await OneContext.createQuickStart({ BASE_URL: BASE_URL, API_KEY: API_KEY, name: "quickstart" })
+console.log(a.data)
 
 
