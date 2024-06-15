@@ -12,7 +12,7 @@ Check out our [docs](https://docs.onecontext.ai) for a in-depth treatment of how
 ### General Set Up 
 
 #### Get the SDK from npm
-```zsh
+```bash
 npm install @onecontext/sdk
 ```
 #### API Key
