@@ -13,34 +13,10 @@ export const OpenAIBaseSchema = BaseSchema.extend({
 
 type PollMethodType = z.infer<typeof BaseSchema> & Record<string, unknown> 
 
-export const GenerateQuestOptionsSchema = OpenAIBaseSchema.extend({
-    vision: z.string().optional(),
-    mission: z.string().optional(),
-    quest: z.string().optional(),
-    introPrompt: z.string().optional(),
-    introContextBudget: z.number().refine((val: number): boolean => val > 0, {message: "Intro context budget must be greater than 0"}),
-    quizTotalContextBudget: z.number().refine((val: number): boolean => val > 0, {message: "Quiz total context budget must be greater than 0"}),
-    promptPerTopic: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Prompt per topic cannot be empty"}),
-    metadataJson: z.object({}).default({}),
-    pipelineName: z.string().refine((val: string): boolean => val.trim() !== '', {message: "Pipeline name cannot be empty"}),
-    totalNumberOfQuestions: z.number().refine((val: number): boolean => val > 0, {message: "Total number of questions must be greater than 0"}),
-    chunksLimit: z.union([z.number().refine((val: number): boolean => val > 0, {message: "Chunks limit must be greater than 0"}), z.null()]).default(30),
-    scorePercentileKey: z.string().optional(),
-    clusterLabelKey: z.string().optional(),
-}).superRefine((val, ctx) => {
-    // make sure they have passed the required variables in the promptPerTopic IF they have overridden
-    if (val.promptPerTopic !== undefined) {
-        const requiredVariables: string[] = ['{topic}', '{chunks}', '{num_questions_topic}'];
-        const missingVariables: string[] = requiredVariables.filter(variable => !val.promptPerTopic.includes(variable));
-        if (missingVariables.length > 0) {
-            ctx.addIssue({code: z.ZodIssueCode.custom, message: `You are missing a required variable in the override string you passed to promptPerTopic. You are missing (and must include) the following variables: ${missingVariables.join(', ')}`, path: ['promptPerTopic']})
-            return false
-        }
-        return true
-    } else {
-        return true
-    }
-})
+export const QuickStartCreateSchema = BaseSchema.extend({
+  name: z.string().refine((val) => val.trim() !== '', {message: "Name cannot be empty"}),
+});
+
 
 export const RunSchema = BaseSchema.extend({
     overrideArgs: z.object({}).default({}).optional(),
@@ -227,6 +203,7 @@ export type RunResultsType = z.infer<typeof RunResultsSchema>
 export type UploadFilesType = z.infer<typeof UploadFilesSchema>
 export type UploadDirectoryType = z.infer<typeof UploadDirectorySchema>
 export type GetChunksType = z.infer<typeof GetChunksSchema>
+export type QuickStartCreateType = z.infer<typeof QuickStartCreateSchema>
 export type GetPipeType = z.infer<typeof GetPipeSchema>
 
 export interface PollArgsType {

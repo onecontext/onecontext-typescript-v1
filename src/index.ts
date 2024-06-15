@@ -10,6 +10,28 @@ import { promises as fs } from 'fs';
 import * as path from "path"
 import {PollArgsType, RunResultsType} from "./ocTypes/generalTypes.js";
 
+export const createQuickStart = async (quickStartCreateArgs: generalTypes.QuickStartCreateType): Promise<any> => {
+
+    try {
+        return await axios({
+            method: 'post',
+            url: quickStartCreateArgs.BASE_URL + 'quickstart/' + quickStartCreateArgs.name,
+            headers: {
+                Authorization: `Bearer ${vectorIndexCreateArgs.API_KEY}`,
+            },
+            data: {
+            },
+        });
+    } catch (error: unknown) {
+        if (error instanceof axios.AxiosError) {
+            console.log(error.response?.data?.detail || error.response?.data?.errors || error.message);
+        } else {
+            console.log(error)
+            console.error("Unknown error occurred")
+        }
+    }
+};
+
 export const uploadYouTubeUrl = async (youtubeUrlArgs: generalTypes.YouTubeUrlType): Promise<any> => {
 
     try {
