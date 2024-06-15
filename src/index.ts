@@ -17,7 +17,7 @@ export const createQuickStart = async (quickStartCreateArgs: generalTypes.QuickS
             method: 'post',
             url: quickStartCreateArgs.BASE_URL + 'quickstart/' + quickStartCreateArgs.name,
             headers: {
-                Authorization: `Bearer ${vectorIndexCreateArgs.API_KEY}`,
+                Authorization: `Bearer ${quickStartCreateArgs.API_KEY}`,
             },
             data: {
             },
