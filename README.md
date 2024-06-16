@@ -276,7 +276,7 @@ OneContext.deleteFiles(deleteFileArgs).then((res) => {console.log(res)})
 const simpleRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchema.parse({
   API_KEY: API_KEY,
   pipelineName: simpleRetrieverPipelineName,
-  overrideArgs: {"retriever" : {"query" : "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}}
+  overrideArgs: {"query_embedder": {"query": "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}, "retriever" : {"top_k" : 10}}
 })
 
 OneContext.runPipeline(simpleRetrieverPipelineRunArgs).then((res) => {console.log(util.inspect(res, {showHidden: true, colors: true}))})
@@ -292,7 +292,7 @@ For more on LexRank and how it works, read our [docs!](https://docs.onecontext.a
 const involvedRetrieverPipelineRunArgs: OneContext.RunType = OneContext.RunSchema.parse({
   API_KEY: API_KEY,
   pipelineName: involvedRetrieverPipelineName,
-  overrideArgs: {"retriever" : {"query" : "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}}
+  overrideArgs: {"query_embedder": {"query": "what did Charlie Munger have to say about having an opinion on something he was not an expert in?"}, "retriever" : {"top_k" : 10}}
 })
 
 OneContext.runPipeline(involvedRetrieverPipelineRunArgs).then((res) => {console.log(util.inspect(res, {showHidden: true, colors: true}))})
