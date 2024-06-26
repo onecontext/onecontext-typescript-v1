@@ -3,7 +3,7 @@ import { performance } from 'perf_hooks';
 import fs from "fs";
 import YAML from 'yaml';
 import * as dotenv from "dotenv";
-import {runMany, textWithColor} from "../src/rmUtils.js";
+import { runMany, textWithColor } from "../src/rmUtils.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
@@ -15,7 +15,7 @@ import util from "util"
 import axios from "axios";
 
 // import the variables from the .env
-dotenv.config({path: __dirname + '/../.env'});
+dotenv.config({ path: __dirname + '/../.env' });
 
 // make sure they are being read correctly and instantiate as global variables
 const API_KEY: string = process.env.API_KEY!;
@@ -107,8 +107,8 @@ const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 // OneContext.checkPipelineStatus(checkPipelineArgs).then((res)=>{console.log(res)})
 
 // look at the statuses of files you have uploaded through the pipeline
-// const listFiles: OneContext.ListFilesType = {pipelineName: 'rm_test', BASE_URL: BASE_URL, API_KEY: API_KEY}
-// OneContext.listFiles(listFiles).then((res)=>{console.log(res)})
+const listFiles: OneContext.ListFilesType = { knowledgeBaseNames: ['wexler-blood-facts'], BASE_URL: BASE_URL, API_KEY: API_KEY }
+OneContext.listFiles(listFiles).then((res) => { console.log(res) })
 
 // QUERY DEMO
 // run the query pipeline. here we are passing the simple yaml we defined above
@@ -431,7 +431,7 @@ const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 // const a = await runMany(args)
 
 
-const a = await OneContext.createQuickStart({ BASE_URL: BASE_URL, API_KEY: API_KEY, name: "quickstart" })
-console.log(a.data)
+// const a = await OneContext.createQuickStart({ BASE_URL: BASE_URL, API_KEY: API_KEY, name: "quickstart" })
+// console.log(a.data)
 
 
