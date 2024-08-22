@@ -150,7 +150,6 @@ export const UploadFilesSchema = BaseSchema.extend({
   metadataJson: z.object({}).optional(),
 });
 
-
 export const UploadDirectorySchema = BaseSchema.extend({
   directory: z.string().refine((val) => val.endsWith("/"), { message: "Directory must end with /" }),
   knowledgeBaseName: z.string().refine((val) => val.trim() !== '', { message: "Knowledge Base name cannot be empty" }),
